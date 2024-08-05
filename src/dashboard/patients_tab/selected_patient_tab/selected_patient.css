@@ -1,0 +1,17 @@
+.dashboard-profile-container {
+  display: block;
+  width: inherit;
+  height: inherit;
+}
+
+.medicine-notes-container {
+  border-radius: 24px;
+  background-color: #fff;
+  display: inline-flex;
+  flex-direction: column;
+  max-width: 380px;
+  height: 49%;
+  gap: 0;
+  padding: 31px 12px 16px;
+  margin: 0 10px;
+}

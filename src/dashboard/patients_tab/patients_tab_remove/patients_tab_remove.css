@@ -1,0 +1,83 @@
+.remove-patients-container {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 24px;
+  background-color: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  padding: 3%;
+}
+
+
+.remove-patients-container .divider {
+  line-height: normal;
+  background-color: #c1c1c1;
+  color: #FFFFFF;
+  border-radius: 1px;
+  height: 1px;
+  width: 100%;
+  margin-top: 2%;
+}
+
+.blackout-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.blackout {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background: #000000;
+  opacity: 0.2;
+}
+
+.patient-remove-container {
+  position: absolute;
+  border-radius: 30px;
+  height: 20%;
+  width: fit-content;
+  background: #FFFFFF;
+}
+
+.patient-remove-button-container{
+  position: absolute;
+  height: fit-content;
+  width: 100%;
+  bottom: 0;
+}
+
+.patient-remove-button-container button {
+  display: block;
+  width: 40%;
+  height: 3vw;
+  border-radius: 25px;
+  border: none;
+  color: #FFFFFF;
+  font-size: 1em;
+  opacity: 0.5;
+  margin: 5%;
+}
+
+.patient-remove-button-container button:hover {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.patient-remove-container text {
+  position: relative;
+  display: block;
+  text-align: center;
+  font-size: 1.3vw;
+  top: 10%;
+  margin-right: 2%;
+  margin-left: 2%;
+}

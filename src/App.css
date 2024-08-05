@@ -1,0 +1,187 @@
+@font-face {
+  font-family: 'RedHatDisplay';
+  src: url('assets/fonts/RedHatDisplay-VariableFont_wght.ttf') format('truetype');
+  /* Add additional font formats if necessary */
+  /* Specify the correct path to the font files */
+}
+
+body {
+  font-family: 'RedHatDisplay', sans-serif !important;
+}
+
+.mainContainer {
+    display: flex;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background-color: #28252F;
+}
+
+
+.titleContainer {
+  display: flex;
+  flex-direction: column;
+  font-size: 55px;
+  font-weight: bold;
+  color: #FBFBFB;
+}
+
+.subTitleContainer {
+  display: flex;
+  flex-direction: column;
+  font-size: 45px;
+  font-style: italic;
+  color: #98979B;
+  justify-content: left;
+}
+
+.resultContainer, .historyItem {
+  flex-direction: row;
+  display: flex;
+  width: 400px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.historyContainer {
+  flex-direction: column;
+  display: flex;
+  height: 200px;
+  align-items: center;
+  flex-grow: 5;
+  justify-content: flex-start;
+}
+
+.buttonContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 260px;
+}
+
+.body, html {
+    overflow: hidden; /* Optional: prevent scroll */
+}
+
+.imageContainer {
+    min-height: 100%;
+    height: 100%;
+    width: auto;
+    left: 0;
+    top: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    overflow: hidden; /* Ensures no part of the image spills out */
+}
+
+.homeContainer{
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
+.loginContainer{
+    top: 175px;
+    left: 934px;
+    position: absolute;
+    width: auto;
+    height: auto;
+}
+
+.registerContainer{
+    width: 660px;
+    left: 934px;
+    position: absolute;
+}
+
+
+.dashboard-content-container {
+    display: grid;
+    position: absolute !important;
+    height: 82vh;
+    width: 86vw;
+    top: 9vh;
+    left: 11vw;
+    background-color: transparent;
+}
+
+
+.formContainer {
+    height: 6vh;
+    width: 660px;
+    display: flex;
+    position: relative;
+    margin-bottom: 3vh;
+    border-radius: 45px;
+    border: 1px solid grey;
+
+}
+
+.formBox{
+    height: 100%;
+    width: 100%;
+    background-color: transparent;
+    position: relative;
+    color: #98979B;
+    border-radius: 45px;
+    border: none;
+    font-size: 1.3vw;
+    padding: .7vw;
+}
+
+.formContainer .errorLabel {
+  color: red;
+  font-size: 1.3vw;
+}
+
+.formContainer label {
+    left:1.2vw;
+    padding: 1px;
+    position:absolute;
+    align-self: center;
+    font-size: 1.3vw;
+    background: #28252F;
+    color: #98979B;
+    pointer-events: none;
+    transition: 0.2s;
+    transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.inputButton{
+    height: 5vh;
+    width: 640px;
+    background-color: #FBFBFB !important;
+    color: #000000 !important;
+    border: none !important;
+    border-radius: 45px !important;
+}
+
+
+input:focus + label, input:not(:placeholder-shown) + label {
+    opacity: 1;
+    transform: scale(0.75) translateY(-145%) translateX(-1vw);
+    padding: 0 .3vw;
+}
+
+/*.logout-button {*/
+/*  top: -0.5vw;*/
+/*  left: 0.2vw;*/
+/*  display: flex;*/
+/*  position: relative;*/
+/*  align-items: center;*/
+/*  justify-content: center;*/
+/*  text-align: center;*/
+/*  font-weight: bolder;*/
+/*  font-size: 1.5vw !important;*/
+/*  stroke: black;*/
+/*  text-shadow: 0 4px 3px rgba(0, 0, 0, 25%);*/
+/*  background-color: transparent !important;*/
+/*  color: #000000 !important;*/
+/*  border: none !important;*/
+/*}*/

@@ -1,0 +1,227 @@
+.profile-container-general {
+  float: left;
+  max-width: 380px;
+  height: 100%;
+  width: 50em;
+  margin: 0;
+  background-color: #FFFFFF;
+  border-radius: 24px;
+}
+
+.profile-container-top {
+  display: inline-grid;
+  height: 50%;
+  width: 100%;
+}
+
+.profile-container-bottom {
+  display: inline-grid;
+  height: 50%;
+  width: 100%;
+}
+
+.person-info {
+  display: inline-flex;
+  background-color: #DFDBE7;
+  border-radius: 24px 24px 0 0;
+  padding: 10px 0;
+}
+.person-photo {
+  display: flex;
+  width: 50%;
+  height: 100%;
+  float: left;
+  align-items: center;
+  justify-content: center;
+}
+.photo {
+  border-radius: 50%;
+  background-color: #28252f;
+  width: 70%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.info {
+  display: block;
+  align-self: center;
+  width: 50%;
+  float: right;
+  text-align: left;
+  color: #343738;
+}
+.name {
+  margin: 0;
+  font: 24px 'Red Hat Display', -apple-system, Roboto, Helvetica, sans-serif;
+}
+.surname {
+  margin: 0;
+  font: 700 24px 'Red Hat Display', -apple-system, Roboto, Helvetica, sans-serif;
+}
+.gender-age {
+  margin: 10px 0;
+  font: 16px 'Red Hat Display', -apple-system, Roboto, Helvetica, sans-serif;
+  color: #5f6767;
+}
+.blood-and-physical {
+  display: flex;
+  gap: 6px;
+  color: #fff;
+}
+.blood-type {
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2em;
+  height: 2em;
+  border-radius: 50%;
+  background-color: #ef7171;
+  text-align: center;
+  filter: drop-shadow(0px 0px 5px rgba(20, 20, 20, 0.12));
+}
+
+.physical-stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  height: 2em;
+  border-radius: 24px;
+  background-color: #74a1aa;
+  gap: 0.2em;
+  padding: 0 12px;
+  filter: drop-shadow(0px 0px 5px rgba(20, 20, 20, 0.12));
+}
+.blood-type .unit,
+.physical-stats .unit {
+  font-size: 12px;
+}
+.separator {
+  width: 100%;
+  height: 1px;
+  background-color: #c1c1c1;
+  margin: 0;
+  padding: 0;
+}
+.room-info,
+.care-category{
+  margin: 0;
+  padding: 0 24px;
+  height: fit-content;
+}
+
+.vital-scores {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.title {
+  margin: 0;
+  font: bold 16px 'Red Hat Display', -apple-system, Roboto, Helvetica, sans-serif;
+  color: #343738;
+}
+
+.vitals-title .title {
+}
+
+.vital-score .title {
+  margin: 0;
+  font: normal 16px 'Red Hat Display', -apple-system, Roboto, Helvetica, sans-serif;
+}
+
+.details,
+.category,
+.vital{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.vitals-title {
+  text-align: center;
+  padding: 0 24px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  vertical-align: center;
+}
+
+.details p,
+.category p {
+  color: rgba(40, 37, 47, 0.75);
+  font: 14px 'Red Hat Display', -apple-system, Roboto, Helvetica, sans-serif;
+}
+.change-room,
+.change-category,
+.see-details {
+  border: 1px solid rgba(166, 149, 204, 0.5);
+  border-radius: 24px;
+  padding: 3px 23px;
+  color: rgba(52, 55, 56, 0.75);
+  font: 12px/160% 'Red Hat Display', -apple-system, Roboto, Helvetica, sans-serif;
+  background-color: transparent;
+}
+
+.vital-score {
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  padding: 0 24px;
+  height: 15%;
+  background-color: #DFDBE7;
+}
+.vital-score:nth-child(odd) {
+  background-color: #FFFFFF;
+}
+
+
+.status-good {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font: 500 12px 'Red Hat Display', -apple-system, Roboto, Helvetica, sans-serif;
+  color: #40dba3;
+}
+.status-good-icon {
+  width: 12px;
+  height: 12px;
+  background-color: #40dba3;
+  padding: 6px;
+  border-radius: 24px;
+}
+.status-okay {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font: 500 12px 'Red Hat Display', -apple-system, Roboto, Helvetica, sans-serif;
+  color: #5F6767;
+}
+.status-okay-icon {
+  width: 12px;
+  height: 12px;
+  background-color: #5F6767;
+  padding: 6px;
+  border-radius: 24px;
+}
+.status-warning {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font: 500 12px 'Red Hat Display', -apple-system, Roboto, Helvetica, sans-serif;
+  color: #E4756D;
+}
+.status-warning-icon {
+  width: 12px;
+  height: 12px;
+  background-color: #E4756D;
+  padding: 6px;
+  border-radius: 24px;
+}
+
+.score {
+  margin: 0;
+  font: italic 18px 'Red Hat Display', -apple-system, Roboto, Helvetica, sans-serif;
+}

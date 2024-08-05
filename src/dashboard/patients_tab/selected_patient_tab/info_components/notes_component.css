@@ -1,0 +1,65 @@
+.note-container {
+  border-radius: 24px;
+  background-color: #fff;
+  display: inline-flex;
+  flex-direction: column;
+  max-width: 380px;
+  height: 49%;
+  gap: 0;
+  padding: 30px 0 12px 0;
+  margin: 0 10px;
+}
+.note-header {
+  color: #343738;
+  letter-spacing: 0.48px;
+  align-self: start;
+  margin-left: 24px;
+  font: 700 24px "Red Hat Display", -apple-system, Roboto, Helvetica, sans-serif;
+}
+.note-divider {
+  border-radius: 1px;
+  background-color: #c1c1c1;
+  margin-top: 19px;
+  height: 1px;
+  border: none;
+}
+.note {
+  display: grid;
+  width: 22vw;
+  margin: 0;
+  padding: 10px 0;
+  align-items: start;
+  font-weight: 400;
+  background-color: #DFDBE7;
+}
+.note:nth-child(odd) {
+  background-color: #FFFFFF;
+}
+.note-date {
+  color: #717070;
+  margin: 2px 1vw;
+  font: 12px "Red Hat Display", -apple-system, Roboto, Helvetica, sans-serif;
+}
+.note-title {
+  color: rgba(52, 55, 56, 1);
+  margin: 2px 1vw;
+  font: 600 16px "Red Hat Display", -apple-system, Roboto, Helvetica, sans-serif;
+}
+.note-data {
+  color: rgba(52, 55, 56, 1);
+  margin: 2px 1vw;
+  font: 400 16px "Red Hat Display", -apple-system, Roboto, Helvetica, sans-serif;
+}
+.notes-button {
+  border: None;
+  border-radius: 24px;
+  background-color: #A695CCFF;
+  margin: 15px 5px 0;
+  color: #fff;
+  padding: 3px 22px;
+  font: 500 16px/160% "Red Hat Display", -apple-system, Roboto, Helvetica, sans-serif;
+}
+.notes-button:hover {
+  background-color: #A695CC7F;
+  cursor: pointer;
+}
