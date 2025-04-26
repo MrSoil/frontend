@@ -1,20 +1,20 @@
 .note-container {
+  display: grid;
   border-radius: 24px;
   background-color: #fff;
-  display: inline-flex;
   flex-direction: column;
-  max-width: 380px;
+  width: 600px;
   height: 49%;
   gap: 0;
   padding: 30px 0 12px 0;
-  margin: 0 10px;
+  margin: 0 0 3% 3%;
 }
 .note-header {
   color: #343738;
   letter-spacing: 0.48px;
   align-self: start;
   margin-left: 24px;
-  font: 700 24px "Red Hat Display", -apple-system, Roboto, Helvetica, sans-serif;
+  font: 700 24px "RedHatDisplay";
 }
 .note-divider {
   border-radius: 1px;
@@ -25,12 +25,11 @@
 }
 .note {
   display: grid;
-  width: 22vw;
   margin: 0;
   padding: 10px 0;
   align-items: start;
   font-weight: 400;
-  background-color: #DFDBE7;
+  background-color: #F6F0F6;
 }
 .note:nth-child(odd) {
   background-color: #FFFFFF;
@@ -38,26 +37,27 @@
 .note-date {
   color: #717070;
   margin: 2px 1vw;
-  font: 12px "Red Hat Display", -apple-system, Roboto, Helvetica, sans-serif;
+  font: 12px "RedHatDisplay";
 }
 .note-title {
   color: rgba(52, 55, 56, 1);
   margin: 2px 1vw;
-  font: 600 16px "Red Hat Display", -apple-system, Roboto, Helvetica, sans-serif;
+  font: 600 16px "RedHatDisplay";
 }
 .note-data {
   color: rgba(52, 55, 56, 1);
   margin: 2px 1vw;
-  font: 400 16px "Red Hat Display", -apple-system, Roboto, Helvetica, sans-serif;
+  font: 400 16px "RedHatDisplay";
 }
 .notes-button {
+  height: 35px;
   border: None;
   border-radius: 24px;
   background-color: #A695CCFF;
   margin: 15px 5px 0;
   color: #fff;
   padding: 3px 22px;
-  font: 500 16px/160% "Red Hat Display", -apple-system, Roboto, Helvetica, sans-serif;
+  font: 500 16px/160% "RedHatDisplay";
 }
 .notes-button:hover {
   background-color: #A695CC7F;

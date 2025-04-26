@@ -22,9 +22,9 @@ const Dashboard = () => {
 
         { sidebarHovers[1] ? <PatientsTab/> : null}
 
-        { sidebarHovers[2] ? <div className="dashboard-content-container">profile?</div> : null}
+        { sidebarHovers[2] ? <div className="dashboard-content-background">profile?</div> : null}
 
-        { sidebarHovers[3] ? <div className="dashboard-content-container">sec</div> : null}
+        { sidebarHovers[3] ? <div className="dashboard-content-background">sec</div> : null}
 
     </div>
 );

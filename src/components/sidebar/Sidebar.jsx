@@ -24,13 +24,12 @@ function Sidebar({ setHover, sidebarHovers }) {
   return (
     <div className="sidebar">
       <button
-        className="sidebar-content home-button"
+        className="home-button"
         onClick={onHomeButtonClick}>
         SUGR.
       </button>
 
-      <div className={"sidebar-content"}
-           style={{ "top": "10vw" }}>
+      <div className={"sidebar-content"}>
 
           <div className={"sidebar-main-contents"}>
             <img src={sugrIconImage} alt="SugrIcon"/>
@@ -73,9 +72,8 @@ function Sidebar({ setHover, sidebarHovers }) {
           </button>
       </div>
 
-<br/>
       <button
-        className="sidebar-content logout-button"
+        className="logout-button"
         onClick={logout}>
         <img src={logoutImage} alt="Logout"/>
       </button>

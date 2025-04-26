@@ -1,0 +1,103 @@
+.hc-container {
+  display: grid;
+  background-color: #fff;
+  width: 600px;
+  height: 49%;
+  border-radius: 24px;
+  padding: 30px 0 12px 0;
+  margin: 0 0 0 3%;
+}
+.hc-header {
+  color: #343738;
+  align-self: start;
+  margin-left: 24px;
+  font: 700 24px "RedHatDisplay";
+}
+.hc-divider {
+  border-radius: 1px;
+  background-color: #c1c1c1;
+  margin-top: 19px;
+  height: 1px;
+  border: none;
+}
+.hc-status {
+  display: grid;
+  margin: 0;
+  padding: 10px 0;
+  align-items: start;
+  font-weight: 400;
+  background-color: #F6F0F6;
+}
+.hc-status:nth-child(odd) {
+  background-color: #FFFFFF;
+}
+.hc-date {
+  color: #717070;
+  margin: 2px 1vw;
+  font: 12px "RedHatDisplay";
+}
+.hc-name {
+  color: rgba(52, 55, 56, 1);
+  margin: 2px 1vw;
+  font: 600 16px "RedHatDisplay";
+}
+.dosage-detail {
+  font-size: 12px;
+  color: rgba(52, 55, 56, 0.5);
+  margin-left: 5px;
+}
+.hc-timing {
+  color: #5f6767;
+  margin: 2px 1vw;
+  font: 14px "RedHatDisplay";
+}
+.hc-info {
+  align-self: end;
+  margin: 0;
+  font-size: 12px;
+  text-align: right;
+}
+.satisfaction-status {
+  display: flex;
+  float: right;
+  gap: 8px;
+  color: #c1c1c1;
+  white-space: nowrap;
+  padding: 0 1px;
+}
+.status-label {
+  font-family: "RedHatDisplay";
+}
+.status-indicator {
+  border-radius: 2px;
+  border: 1px solid rgba(193, 193, 193, 1);
+  background-color: #f9f8fa;
+  width: 16px;
+  height: 16px;
+}
+.last-mod {
+  color: rgba(52, 55, 56, 0.75);
+  font-family: "RedHatDisplay";
+  margin-top: 20px;
+}
+.label-text {
+  font-weight: 500;
+  color: rgba(52, 55, 56, 1);
+}
+.time-text {
+  color: rgba(52, 55, 56, 1);
+}
+.hcs-button {
+  height: 35px;
+  border: None;
+  border-radius: 24px;
+  background-color: #A695CCFF;
+  margin: 15px 5px 0;
+  color: #fff;
+  padding: 3px 22px;
+  font: 500 16px/160% "RedHatDisplay";
+}
+.hcs-button:hover {
+  background-color: #A695CC7F;
+  cursor: pointer;
+}

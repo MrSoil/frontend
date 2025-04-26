@@ -30,6 +30,7 @@
   left: 0;
   align-items: center;
   justify-content: center;
+  z-index: 1;
 }
 
 .blackout {
@@ -58,7 +59,7 @@
 .patient-remove-button-container button {
   display: block;
   width: 40%;
-  height: 3vw;
+  height: 50px;
   border-radius: 25px;
   border: none;
   color: #FFFFFF;

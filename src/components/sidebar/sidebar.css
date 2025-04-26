@@ -1,7 +1,9 @@
 .sidebar {
+  display: grid;
+  justify-content: center;
   position: relative;
   height: 100%; /* Full-height: stretch from top to bottom */
-  width: 8vw; /* Set the width */
+  width: 8rem; /* Set the width */
   z-index: 1; /* Stay on top */
   top: 0; /* Stay at the top */
   background-color: #FFFFFF; /* Black */
@@ -36,46 +38,46 @@
 
 
 .sidebar-content {
-  position: absolute;
-  justify-content: center;
-  left: 0;
-  right: 0;
-  width: 100%;
-  height: auto;
-  text-align: center;
-  margin-top: 1vw;
+  height: fit-content;
+  align-self: center;
 }
 
 .sidebar-main-contents {
-  height: auto;
-  justify-content: center;
   width: 100%;
-  margin-bottom: 2vw;
+  text-align: center;
+  margin-block: 10px 10px;
 }
 
 
 .home-button {
-  font-size: 1.5vw;
-  top: 0.8vw;
+  height: fit-content;
+  width: 100%;
+  top: 1.5rem;
+  position: absolute;
+  font-size: 1.5rem;
   font-weight: bold;
-  text-shadow: 0 4px 3px rgba(0, 0, 0, 25%);
   background-color: transparent !important;
   color: #000000 !important;
   border: none !important;
   cursor: pointer;
 }
 
-.stat-button {
+.home-button:hover{
+  text-shadow: 0 4px 3px rgba(0, 0, 0, 25%);
+}
+
+.logout-button {
+  height: fit-content;
+  width: 100%;
+  bottom: 1.5rem;
+  position: absolute;
+  text-shadow: 0 4px 3px rgba(0, 0, 0, 25%);
   background-color: transparent !important;
   border: none !important;
   cursor: pointer;
 }
 
-.logout-button {
-  scale: 1.5;
-  bottom: 1.5vw;
-  float: bottom;
-  text-shadow: 0 4px 3px rgba(0, 0, 0, 25%);
+.stat-button {
   background-color: transparent !important;
   border: none !important;
   cursor: pointer;

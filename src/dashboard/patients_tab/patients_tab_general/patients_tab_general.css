@@ -62,7 +62,7 @@
 .dashboard-remove-patient-container button,
 .dashboard-add-patient-container button {
     width: 15em;
-    height: 3.5em;
+    height: 50px;
     border-radius: 25px;
     border: none;
     color: #FFFFFF;
@@ -83,7 +83,6 @@
   border-radius: 24px;
   background-color: #FFFFFF;
   display: flex;
-  margin-top: 2em;
   flex-direction: column;
   padding: 3%;
 }
@@ -111,7 +110,7 @@
   color: #003238;
   flex-grow: 1;
   flex-basis: auto;
-  font: 700 32px RedHatDisplay, -apple-system, Roboto, Helvetica, sans-serif;
+  font: 700 32px "RedHatDisplay";
 }
 
 .search-container {
@@ -133,7 +132,7 @@
 }
 
 .search-container input {
-  font-family: Red Hat Display, -apple-system, Roboto, Helvetica, sans-serif;
+  font-family: "RedHatDisplay";
   background: transparent;
   margin-left: 2%;
   width: 100%;
@@ -152,7 +151,7 @@
 }
 
 .sort-label {
-  font-family: Red Hat Display, -apple-system, Roboto, Helvetica, sans-serif;
+  font-family: "RedHatDisplay";
 }
 
 .sort-icon {
@@ -229,11 +228,11 @@
 
 .patient-name {
   color: #28252f;
-  font: 700 16px Red Hat Display, -apple-system, Roboto, Helvetica, sans-serif;
+  font: 700 16px "RedHatDisplay";
 }
 
 .patient-location {
   color: rgba(40, 37, 47, 0.7);
   letter-spacing: 0.24px;
-  font: 400 12px/160% Red Hat Display, -apple-system, Roboto, Helvetica, sans-serif;
+  font: 400 12px/160% "RedHatDisplay";
 }

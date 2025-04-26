@@ -1,9 +1,25 @@
-.container {
-  overflow: scroll;
+.main-container-add-patient {
+  display: grid;
+  width: 100%;
+  height: inherit;
+}
+
+.header-add-patient {
+  background-color: #fff;
+  border-radius: 24px;
+  padding: 20px 150px;
+  display: flex;
+  margin-bottom: 15px;
+  height: fit-content;
+  justify-content: space-evenly;
+}
+
+.container-add-patient {
+  overflow-y: scroll;
   overflow-x: hidden;
   background-color: #fff;
   border-radius: 24px;
-  padding: 32px 42px 76px;
+  padding: 18px 42px 18px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -11,31 +27,40 @@
 
 .page-title {
   color: #003238;
-  font: 700 28px -apple-system, Roboto, Helvetica, sans-serif;
+  font: 700 24px "RedHatDisplay";
   align-self: stretch;
 }
 
-.container .divider {
+.page-description {
+  width: 40%;
+  color: rgba(0, 50, 56, 0.6);
+  align-self: stretch;
+  font: 500 14px "RedHatDisplay";
+}
+
+.container-add-patient .divider {
   line-height: normal;
   background-color: #c1c1c1;
   color: #FFFFFF;
   border-radius: 1px;
   height: 1px;
-  width: 100%;
+  width: 950px;
   margin: 1%;
 }
 
-.patient-personal-information, .patient-contact-information {
-  display: grid;
-  width: 80%;
+.information-block {
+  width: 950px;
   justify-items: center;
   text-align: center;
 }
 
 .section-title {
   color: #003238;
-  opacity: 0.7;
-  font: 700 16px -apple-system, Roboto, Helvetica, sans-serif;
+  justify-self: center;
+  text-align: left;
+  width: 100%;
+  font: 700 20px "RedHatDisplay";
+
 }
 
 .photograph-container {
@@ -45,7 +70,6 @@
   margin-top: 2%;
   margin-bottom: 2%;
   width: 145px;
-  font-size: 1vw;
   color: rgba(40, 37, 47, 0.7);
   text-align: center;
 }
@@ -75,36 +99,65 @@
 }
 
 .photograph-label {
-  font-family: Red Hat Display, -apple-system, Roboto, Helvetica, sans-serif;
+  font-family: "RedHatDisplay";
   margin-top: 11px;
 }
 
 .input-group {
   width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+
 }
 
-.formContainer{
-  height: 3vw !important;
+.input-group-2 {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+
 }
 
-.formBox{
-  height: 3vw !important;
-  border: none !important;
+.patienceFormContainer {
+  display: grid;
+  text-align: left;
+  gap: 8px;
+  font: 550 18px "RedHatDisplay";
+  color: #003238;
 }
 
-.input-group .formContainer label {
-  font-size: 1vw;
+.patienceFormBox, .ReactTags__tagInputField {
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: 1px solid #D2D2D2;
+  width: 100%;
+}
+
+.patienceFormBox, textarea {
+  border-radius: 6px;
+  border: 1px solid #D2D2D2;
+  width: 100%;
+  max-height: 200px;
+  resize: vertical;
+}
+
+.information-block .patienceFormBox, .information-block .ReactTags__tagInputField {
+  height: 35px;
+}
+
+
+.input-group .patienceFormBox label, .input-group .ReactTags__tagInputField label {
   background-color: #FFFFFF;
-  color: #28252F;
   opacity: 0.7;
 }
 
 
-.input-group .formContainer .errorLabel {
+.input-group .patienceFormBox .errorLabel, .input-group .ReactTags__tagInputField .errorLabel {
   color: red !important;
 }
 
-.input-group .formContainer label {
+.input-group .patienceFormBox label, .input-group .ReactTags__tagInputField label {
   background-color: #FFFFFF !important;
   opacity: 1 !important;
 }
@@ -115,19 +168,53 @@
   margin: 1%;
 }
 
+.header-add-patient button {
+  width: 200px;
+  height: 40px;
+  border-radius: 6px;
+  background-color: transparent;
+  color: #00323880;
+  border: 1px solid #00323880;
+  cursor: pointer;
+}
+
+.header-add-patient button:hover {
+    background-color: #00323880;
+}
+
+.header-add-patient .clicked {
+  background-color: #00323880;
+  color: #fff;
+}
+
 .patient-add-button-container button {
   width: 15em;
-  height: 3vw;
+  height: 50px;
   border-radius: 25px;
   border: none;
   color: #FFFFFF;
-  font-size: 1em;
   opacity: 0.5;
 }
 
 .patient-add-button-container button:hover {
     opacity: 1;
     cursor: pointer;
+}
+
+.patienceFormContainer button.ReactTags__remove{
+  background-color: rgba(255, 204, 0, 1);
+  opacity: 0.7;
+  margin: 0 7px 10px 3px;
+  border-radius: 45px;
+  border: 1px solid rgba(255, 120, 0, 1);
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  align-content: center;
+}
+
+.patienceFormContainer button.ReactTags__remove:hover{
+  opacity: 1;
 }
 
 

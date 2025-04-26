@@ -7,14 +7,14 @@
 
 body {
   font-family: 'RedHatDisplay', sans-serif !important;
+    background-color: #28252F;
 }
 
 .mainContainer {
     display: flex;
     align-items: center;
     height: 100vh;
-    width: 100vw;
-    background-color: #28252F;
+    width: 100vh;
 }
 
 
@@ -100,14 +100,17 @@ body {
     position: absolute;
 }
 
+.dashboard-content-background {
+    position: absolute !important;
+    top: 50px;
+    left: 155px;
+}
 
 .dashboard-content-container {
+    margin: 10px 0 0 0;
     display: grid;
-    position: absolute !important;
-    height: 82vh;
+    height: 750px;
     width: 86vw;
-    top: 9vh;
-    left: 11vw;
     background-color: transparent;
 }
 
@@ -120,7 +123,49 @@ body {
     margin-bottom: 3vh;
     border-radius: 45px;
     border: 1px solid grey;
+}
 
+
+.Select {
+    height: 50px;
+    border-radius: 45px !important;
+    margin-bottom: 30px;
+    z-index: 999;
+}
+
+.select__control {
+    background-color: #f0f0f0;
+    height: 650px;
+    width: 320px;
+    display: flex;
+    position: relative;
+    border-radius: 45px !important;
+    border: 1px solid grey;
+    max-height: 50px;
+    overflow-y: auto;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+    z-index: 999;
+}
+
+.select__control::-webkit-scrollbar {
+  display: none;
+}
+
+.select__menu {
+    border-radius: 5px;
+    max-height: 150px;
+    overflow-y: scroll;
+    z-index: 999;
+    box-sizing: border-box !important; /* Ensure consistent sizing */
+    cursor: pointer !important;
+    margin: 0;
+    padding: 0;
+}
+
+.select__option {
+    cursor: pointer;
+    z-index: 999;
 }
 
 .formBox{
@@ -141,16 +186,17 @@ body {
 }
 
 .formContainer label {
-    left:1.2vw;
+    margin: 12px 0 0 15px;
     padding: 1px;
-    position:absolute;
-    align-self: center;
+    position: absolute;
+    align-self: start;
     font-size: 1.3vw;
     background: #28252F;
     color: #98979B;
     pointer-events: none;
     transition: 0.2s;
     transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+    left: 5px;
 }
 
 .inputButton{
@@ -162,12 +208,58 @@ body {
     border-radius: 45px !important;
 }
 
-
-input:focus + label, input:not(:placeholder-shown) + label {
+input:focus + label,
+input:not(:placeholder-shown) + label,
+textarea:focus + label,
+textarea:not(:placeholder-shown) + label{
     opacity: 1;
-    transform: scale(0.75) translateY(-145%) translateX(-1vw);
-    padding: 0 .3vw;
+    transform: scale(0.70) translateY(-150%) translateX(-25%);
+    padding: 3px;
+    left: 5px;
 }
+
+.formContainer select {
+  appearance: none;
+}
+
+.formContainer select:hover {
+  cursor: pointer;
+}
+
+.miniAdd {
+    height: 50px;
+    width: 90px;
+    background-color: #A695CC;
+    font: 24px "RedHatDisplay";
+    border: none !important;
+    border-radius: 45px !important;
+}
+
+.miniRemove {
+    height: 50px;
+    width: 90px;
+    background-color: #E77169;
+    font: 24px "RedHatDisplay";
+    border: none !important;
+    border-radius: 45px !important;
+}
+
+.miniDisabled {
+    height: 50px;
+    width: 90px;
+    background-color: rgba(231, 113, 105, 0.2);
+    font: 24px "RedHatDisplay";
+    border: none !important;
+    border-radius: 45px !important;
+}
+
+.miniAdd:hover, .miniRemove:hover{
+    cursor: pointer;
+}
+
+
+
+
 
 /*.logout-button {*/
 /*  top: -0.5vw;*/

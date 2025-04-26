@@ -18,26 +18,37 @@ const getGenderAge = ( age, gender ) => {
 };
 
 const getStatus = ( title, score ) => {
-    let thresholds = {
-        "heart_beat": { "low_risk": 50, "high_risk": 150 },
-        "oxygen": { "low_risk": 50, "high_risk": 150 },
-        "sleep": { "low_risk": 50, "high_risk": 150 },
-        "stress": { "low_risk": 50, "high_risk": 150 },
-        "vitality": { "low_risk": 50, "high_risk": 150 }
-    }
-    if (score.length === 0) {
-        return "Okay"
-    }
-    else {
-        score = score[-1]
+    let okay_thresholds = {
+        "heart_beat": { "low_risk": 51, "high_risk": 149 },
+        "oxygen": { "low_risk": 51, "high_risk": 149 },
+        "sleep": { "low_risk": 51, "high_risk": 149 },
+        "stress": { "low_risk": 51, "high_risk": 149 },
+        "vitality": { "low_risk": 51, "high_risk": 149 }
     }
 
-    if (!score) {
-        return "Okay"
+    let good_thresholds = {
+        "heart_beat": { "low_risk": 71, "high_risk": 89 },
+        "oxygen": { "low_risk": 71, "high_risk": 89 },
+        "sleep": { "low_risk": 71, "high_risk": 89 },
+        "stress": { "low_risk": 71, "high_risk": 89 },
+        "vitality": { "low_risk": 71, "high_risk": 89 }
     }
-    if ( score < thresholds[title]["low_risk"] || score > thresholds[title]["high_risk"] ) {
+
+    if (score.length === 0) {
+        return "None"
+    }
+    else {
+        score = score[score.length - 1]
+    }
+
+    if ( score < okay_thresholds[title]["low_risk"] || score > okay_thresholds[title]["high_risk"] ) {
         return "Warning"
     }
+
+    if ( score < good_thresholds[title]["low_risk"] || score > good_thresholds[title]["high_risk"] ) {
+        return "Okay"
+    }
+
     return "Good"
 };
 
@@ -95,77 +106,54 @@ const PersonInfo = ({ patientPhoto, name, surname, gender, age, bloodType, heigh
   </div>
 );
 
-const RoomInfo = ({ block, floor, roomNumber }) => (
-  <div className="room-info">
-    <h3 className="title">Room</h3>
-    <div className="details">
-      <p>{block} | {floor} | {roomNumber} Room</p>
-      <button className="change-room">Change Room</button>
-    </div>
-  </div>
-);
-
-const CareCategory = ({ category }) => (
-  <div className="care-category">
-    <h3 className="title">Care Category</h3>
-    <div className="category">
-        <p>{category}</p>
-        <button className="change-category">Change Category</button>
-    </div>
-  </div>
-);
-
-const VitalScores = ({ scores }) => (
-  <section className="vital-scores">
-    <div className="vitals-title">
-      <h3 className="title">Vital Scores</h3>
-      <button className="see-details">See Details</button>
-    </div>
-    <hr className="separator"></hr>
-    {Object.keys(scores).map(key => (
-      <VitalScore title={key} score={scores[key].pop()} status={getStatus(key, scores[key])} />
-    ))}
-
-  </section>
-);
-
 
 const VitalScore = ({ title, score, status }) => (
   <section className="vital-score">
     <div className="vital">
       <h4 className="title">{getTitle(title)}</h4>
-
       {
-      status.search("Good") !== -1 ?
+      status.search("Good") === 0 ?
         <div className="status-good">
-          {score ? <p className="score">{score} {getUnitType(title)}</p> : null}
+          {score.length > 0 ? <p className="score">{score[score.length - 1]} {getUnitType(title)}</p> : null}
           <div loading="lazy" className="status-good-icon"></div>
           {status}
         </div>
           :
-      status.search("Okay") !== -1 ?
+      status.search("Okay") === 0 ?
         <div className="status-okay">
-            {score ? <p className="score">{score} {getUnitType(title)}</p> : null}
+            {score.length > 0 ? <p className="score">{score[score.length - 1]} {getUnitType(title)}</p> : null}
           <div loading="lazy" className="status-okay-icon"></div>
           {status}
         </div>
           :
-      status.search("Warning") !== -1 ?
+      status.search("Warning") === 0 ?
         <div className="status-warning">
-            {score ? <p className="score">{score} {getUnitType(title)}</p> : null}
+            {score.length > 0 ? <p className="score">{score[score.length - 1]} {getUnitType(title)}</p> : null}
           <div loading="lazy" className="status-warning-icon"></div>
           {status}
         </div>
           :
-          null}
-
+          // NONE CASE HAS "OKAY"
+          <div className="status-okay">
+          <div loading="lazy" className="status-okay-icon"></div>
+          {status}
+        </div>
+      }
     </div>
   </section>
 );
 
-function PatientProfileComponent({ selectedPatient }) {
+function PatientProfileComponent({ selectedPatient, setNewRoomContainer, setNewCareCategoryContainer }) {
 
-  return (
+    const handleNewRoom = () => {
+        setNewRoomContainer(true)
+    }
+
+    const handleNewCareCategory = () => {
+        setNewCareCategoryContainer(true)
+    }
+
+    return (
      <article className="profile-container-general">
          <div className="profile-container-top">
             <PersonInfo
@@ -179,19 +167,35 @@ function PatientProfileComponent({ selectedPatient }) {
               weight={selectedPatient.weight}
             />
             <hr className="separator" />
-            <RoomInfo
-              floor={selectedPatient.floor_no}
-            />
+            <div className="room-info">
+                <h3 className="title">Room</h3>
+                <div className="details">
+                  <p>{selectedPatient.floor_no}</p>
+                  <button className="change-room" onClick={handleNewRoom}>Change Room</button>
+                </div>
+            </div>
             <hr className="separator" />
-            <CareCategory
-              category={selectedPatient.care_category}
-            />
+            <div className="care-category">
+            <h3 className="title">Care Category</h3>
+            <div className="category">
+                <p>{selectedPatient.care_category}</p>
+                <button className="change-category" onClick={handleNewCareCategory}>Change Category</button>
+            </div>
+          </div>
             <hr className="separator" />
          </div>
          <div className="profile-container-bottom">
-             <VitalScores
-              scores={selectedPatient.patient_vitals}
-            />
+            <section className="vital-scores">
+            <div className="vitals-title">
+              <h3 className="title">Vital Scores</h3>
+              <button className="see-details">See Details</button>
+            </div>
+            <hr className="separator"></hr>
+            {selectedPatient.patient_vitals.length !== 0 ? Object.keys(selectedPatient.patient_vitals).map(key => (
+              <VitalScore key={key} title={key} score={selectedPatient.patient_vitals[key]}
+                          status={getStatus(key, selectedPatient.patient_vitals[key])} />
+            )) : null}
+         </section>
          </div>
      </article>
   );

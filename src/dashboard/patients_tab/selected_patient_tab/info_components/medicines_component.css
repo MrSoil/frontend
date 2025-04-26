@@ -1,19 +1,17 @@
 .medicine-container {
-  border-radius: 24px;
+  display: grid;
   background-color: #fff;
-  display: inline-flex;
-  flex-direction: column;
-  max-width: 380px;
+  width: 600px;
   height: 49%;
-  gap: 0;
+  border-radius: 24px;
   padding: 30px 0 12px 0;
-  margin: 0 10px;
+  margin: 0 0 3% 3%;
 }
 .medicine-header {
   color: #343738;
   align-self: start;
   margin-left: 24px;
-  font: 700 24px "Red Hat Display", -apple-system, Roboto, Helvetica, sans-serif;
+  font: 700 24px "RedHatDisplay";
 }
 .medicine-divider {
   border-radius: 1px;
@@ -24,12 +22,11 @@
 }
 .medicine-status {
   display: grid;
-  width: 380px;
   margin: 0;
   padding: 10px 0;
   align-items: start;
   font-weight: 400;
-  background-color: #DFDBE7;
+  background-color: #F6F0F6;
 }
 .medicine-status:nth-child(odd) {
   background-color: #FFFFFF;
@@ -37,12 +34,12 @@
 .medicine-date {
   color: #717070;
   margin: 2px 1vw;
-  font: 12px "Red Hat Display", -apple-system, Roboto, Helvetica, sans-serif;
+  font: 12px "RedHatDisplay";
 }
 .medicine-name {
   color: rgba(52, 55, 56, 1);
   margin: 2px 1vw;
-  font: 600 16px "Red Hat Display", -apple-system, Roboto, Helvetica, sans-serif;
+  font: 600 16px "RedHatDisplay";
 }
 .dosage-detail {
   font-size: 12px;
@@ -52,7 +49,7 @@
 .medicine-timing {
   color: #5f6767;
   margin: 2px 1vw;
-  font: 14px "Red Hat Display", -apple-system, Roboto, Helvetica, sans-serif;
+  font: 14px "RedHatDisplay";
 }
 .medicine-info {
   align-self: end;
@@ -69,7 +66,7 @@
   padding: 0 1px;
 }
 .status-label {
-  font-family: "Red Hat Display", -apple-system, Roboto, Helvetica, sans-serif;
+  font-family: "RedHatDisplay";
 }
 .status-indicator {
   border-radius: 2px;
@@ -80,7 +77,7 @@
 }
 .last-mod {
   color: rgba(52, 55, 56, 0.75);
-  font-family: "Red Hat Display", -apple-system, Roboto, Helvetica, sans-serif;
+  font-family: "RedHatDisplay";
   margin-top: 20px;
 }
 .label-text {
@@ -91,13 +88,14 @@
   color: rgba(52, 55, 56, 1);
 }
 .medicines-button {
+  height: 35px;
   border: None;
   border-radius: 24px;
   background-color: #A695CCFF;
   margin: 15px 5px 0;
   color: #fff;
   padding: 3px 22px;
-  font: 500 16px/160% "Red Hat Display", -apple-system, Roboto, Helvetica, sans-serif;
+  font: 500 16px/160% "RedHatDisplay";
 }
 .medicines-button:hover {
   background-color: #A695CC7F;

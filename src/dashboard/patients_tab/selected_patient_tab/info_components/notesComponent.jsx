@@ -17,7 +17,7 @@ function PatientNotes({ note }) {
   );
 }
 
-function NotesList({ selectedPatient }) {
+function NotesList({ selectedPatient, setNewNoteContainer }) {
   const notes = [
     {
       note_date: "15.09.23",
@@ -41,6 +41,10 @@ function NotesList({ selectedPatient }) {
     }
   ];
 
+  const handleNewNote = () => {
+      setNewNoteContainer(true)
+  }
+
   return (
     <article className="note-container">
         <header className="note-header">Notes</header>
@@ -51,8 +55,8 @@ function NotesList({ selectedPatient }) {
           ))}
         </div>
         <div className="note-divider" />
-        <div style={{alignSelf: "center"}}>
-            <button className="notes-button">Add Notes</button>
+        <div style={{alignSelf: "center", marginLeft: "3%"}}>
+            <button className="notes-button"onClick={handleNewNote}>Add Notes</button>
         </div>
     </article>
   );

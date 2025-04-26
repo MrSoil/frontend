@@ -22,7 +22,7 @@ function MedicineStatus({ date, medicine, dosage, timing, satisfaction, lastMod 
   );
 }
 
-function MedicineList({ selectedPatient }) {
+function MedicineList({ selectedPatient, setNewMedicineContainer }) {
   const medicines = [
     {
       date: "15.09.23 | Permanently",
@@ -50,18 +50,22 @@ function MedicineList({ selectedPatient }) {
     },
   ];
 
+  const handleNewMedicine = () => {
+      setNewMedicineContainer(true)
+  }
+
   return (
     <article className="medicine-container">
         <header className="medicine-header">Medicines</header>
         <div className="medicine-divider" />
-        <div style={{"overflow": "scroll", "overflowX": "hidden"}}>
+        <div style={{"overflow": "scroll", "overflow-x": "hidden"}}>
           {medicines.map((medicine, index) => (
             <MedicineStatus key={index} {...medicine} />
           ))}
         </div>
         <div className="medicine-divider" />
-        <div style={{alignSelf: "center"}}>
-            <button className="medicines-button">Manage Medicines</button>
+        <div style={{alignSelf: "center", marginLeft: "3%"}}>
+            <button className="medicines-button" onClick={handleNewMedicine}>Add Medicines</button>
             <button className="medicines-button">Submit</button>
         </div>
     </article>
