@@ -3,6 +3,7 @@ import Sidebar from '../components/sidebar/Sidebar';
 import DrugsTab from './drugs_tab/DrugsTab';
 import './drugs_tab/drugs_tab.css';
 import PatientsTab from "./patients_tab/PatientsTab";
+import {BrowserRouter, Route, Routes} from "react-router-dom";
 
 const Dashboard = () => {
     const [sidebarHovers, setSidebarHovers] = useState([ false, true, false, false ]);
@@ -16,11 +17,19 @@ const Dashboard = () => {
 
     return (
     <div className="main-container">
-        <Sidebar setHover={handleHoverChange} sidebarHovers={sidebarHovers}></Sidebar>
+        {/*<BrowserRouter>*/}
+        {/*    <Routes>*/}
+        {/*        <Route path="/dashboard" element={ <Sidebar setHover={handleHoverChange} sidebarHovers={sidebarHovers}></Sidebar>}>*/}
+        {/*            <Route path="/dashboard/patients" element={<DrugsTab/>}/>*/}
+        {/*            <Route path="/dashboard/drugs" element={<PatientsTab/>}/>*/}
+        {/*        </Route>*/}
+        {/*    </Routes>*/}
+        {/*</BrowserRouter>*/}
 
-        { sidebarHovers[0] ? <DrugsTab/> : null}
 
-        { sidebarHovers[1] ? <PatientsTab/> : null}
+        {/*{ sidebarHovers[0] ? <DrugsTab/> : null}*/}
+
+        {/*{ sidebarHovers[1] ? <PatientsTab/> : null}*/}
 
         { sidebarHovers[2] ? <div className="dashboard-content-background">profile?</div> : null}
 

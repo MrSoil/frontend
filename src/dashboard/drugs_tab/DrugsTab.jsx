@@ -1,4 +1,8 @@
 import * as React from "react";
+import Patients from "../drugs_tab/drugs_tab_general/Patients";
+import SelectedPatientTab from "../drugs_tab/selected_patient_tab/SelectedPatientTab";
+import {useState} from "react";
+import {useNavigate} from "react-router-dom";
 
 
 function getCurrentWeekDates() {
@@ -41,20 +45,29 @@ function getCurrentWeekDates() {
 function DayCard({ day, date, imageSrc })
 { return ( <div className="day-card"> <div className="day-card-header"> <div className="day-name">{day}</div> <div className="date">{date}</div> </div> <img src={imageSrc} alt="" className="day-card-image" /> <div className="create-list-text">Create Medication List</div> </div> ); }
 
-function DrugsTab() {
-    const daysData = [ { day: "Monday", date: "01/05/24", imageSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/a4ab907d848442f47848815a6d2679c7b121672f18253cbabfa134e38dc9e629?apiKey=873db62e82664057a5c151e6201a84f6&" }, { day: "Tuesday", date: "02/05/24", imageSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/a4ab907d848442f47848815a6d2679c7b121672f18253cbabfa134e38dc9e629?apiKey=873db62e82664057a5c151e6201a84f6&" }, { day: "Wednesday", date: "03/05/24", imageSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/a4ab907d848442f47848815a6d2679c7b121672f18253cbabfa134e38dc9e629?apiKey=873db62e82664057a5c151e6201a84f6&" }, { day: "Thursday", date: "04/04/24", imageSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/a4ab907d848442f47848815a6d2679c7b121672f18253cbabfa134e38dc9e629?apiKey=873db62e82664057a5c151e6201a84f6&" }, { day: "Friday", date: "05/04/24", imageSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/a4ab907d848442f47848815a6d2679c7b121672f18253cbabfa134e38dc9e629?apiKey=873db62e82664057a5c151e6201a84f6&" }, { day: "Saturday", date: "06/04/24", imageSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/a4ab907d848442f47848815a6d2679c7b121672f18253cbabfa134e38dc9e629?apiKey=873db62e82664057a5c151e6201a84f6&" }, { day: "Sunday", date: "07/04/24", imageSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/a4ab907d848442f47848815a6d2679c7b121672f18253cbabfa134e38dc9e629?apiKey=873db62e82664057a5c151e6201a84f6&" }, ];
-    const daysDates = getCurrentWeekDates()
+function DrugsTab({setSelectedPatient}) {
+  const navigate = useNavigate();
 
-return ( <div className="dashboard-content-container">
-    <div className="medications-container">
-        <h2 className="medications-title">Medications to be Prepared Weekly</h2>
-        <div className="divider" />
-        <div className="day-cards-container">
-            {daysData.map((dayData, index) =>
-            ( <DayCard key={index} day={dayData.day} date={daysDates[index]} imageSrc={dayData.imageSrc} /> ))}
+    const getGeneralTab = () => {
+        navigate("/dashboard/drugs")
+    }
+
+return (
+    <div className="dashboard-content-background">
+        <div className="dashboard-content-navigator">
+            <button className="navigator-button" onClick={getGeneralTab}
+            style={{margin: "0 0 5px 10px"}}>Manage Patients</button>
+            {
+            /*First Stage*/
+
+            }
         </div>
+        <div className="dashboard-content-container">
+        <Patients setSelectedPatient={setSelectedPatient}/>
+
     </div>
-</div>
-)}
+    </div>
+  );
+}
 
 export default DrugsTab

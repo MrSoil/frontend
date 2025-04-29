@@ -1,0 +1,89 @@
+.dashboard-drugs-profile-container {
+  display: flex;
+}
+
+.medicine-notes-container {
+  border-radius: 24px;
+  background-color: #fff;
+  display: inline-flex;
+  flex-direction: column;
+  max-width: 380px;
+  height: 49%;
+  gap: 0;
+  padding: 31px 12px 16px;
+  margin: 0 10px;
+}
+
+.blackout-content-container {
+  min-width: fit-content;
+  min-height: 120px;
+  display: grid;
+  position: relative;
+  border-radius: 30px;
+  background: #FFFFFF;
+  align-content: center;
+  padding: 2%;
+  max-height: 600px;
+}
+
+.blackout-content-container .update-row-container .formContainer {
+  width: 320px;
+}
+
+.blackout-content-container .formContainer label {
+  background-color: #FFFFFF;
+}
+
+.exit-container{
+  width: 100%;
+  bottom: 0;
+  position: relative;
+}
+
+
+.exit-container button {
+  display: block;
+  width: 40%;
+  height: 5vh;
+  border-radius: 25px;
+  border: none;
+  color: #FFFFFF;
+  font-size: 1em;
+  opacity: 0.5;
+  margin: 0 2%;
+}
+
+.exit-container button:hover {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.update-row-container{
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font: 16px Red Hat Display, -apple-system, Roboto, Helvetica, sans-serif;
+  color: #717070;
+}
+
+.blackout-content-container .formContainer input:placeholder-shown,
+.blackout-content-container .formContainer textarea:placeholder-shown{
+  font-style: italic;
+
+}
+
+.blackout-content-container .formContainer input::placeholder,
+.blackout-content-container .formContainer textarea::placeholder{
+  opacity: 0;
+}
+
+.blackout-content-container .formContainer input:focus::placeholder,
+.blackout-content-container .formContainer textarea:focus::placeholder{
+  opacity: 1;
+}
+
+.blackout-content-container .formContainer textarea{
+  min-height: 50px;
+  max-height: 250px;
+  resize: vertical
+}

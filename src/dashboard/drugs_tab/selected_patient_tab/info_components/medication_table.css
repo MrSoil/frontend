@@ -1,0 +1,77 @@
+.medication-table-container {
+  display: grid;
+  border-radius: 24px;
+  background-color: #fff;
+  flex-direction: column;
+  height: 450px;
+  width: 100%;
+  gap: 0;
+  padding: 12px;
+  margin: 0 20px 20px 0;
+}
+
+.medication-table {
+  width: 100%;
+}
+
+.medication-table .divider {
+  line-height: normal;
+  background-color: #c1c1c1;
+  color: #FFFFFF;
+  border-radius: 1px;
+  height: 1px;
+  width: 100%;
+  margin-top: 1%;
+  margin-bottom: 1%;
+}
+
+.medication-table h2 {
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+.medication-table h3 {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+
+.medication-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.medication-table th, td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.medication-table th {
+  background-color: #f2f2f2;
+}
+
+.sort-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.active-day {
+  display: inline-block;
+  padding: 5px;
+  margin: 2px;
+  background-color: #7c3aed;
+  color: white;
+  border-radius: 5px;
+}
+
+.inactive-day {
+  display: inline-block;
+  padding: 5px;
+  margin: 2px;
+  background-color: #e0e0e0;
+  color: #333;
+  border-radius: 5px;
+}

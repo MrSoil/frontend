@@ -12,9 +12,19 @@ import settingsIconImage from "../../assets/sidebar/icons-settings.png";
 
 
 
-function Sidebar({ setHover, sidebarHovers }) {
+function Sidebar() {
   const navigate = useNavigate();
   const { logout } = useAuth();
+
+    const [sidebarHovers, setSidebarHovers] = useState([ false, false, false, false ]);
+
+    const handleHoverChange = (index) => {
+        let newSidebarHovers = [false, false, false, false];
+        let hover_index_map = ["drugs", "patients", "x", "y"]
+        navigate("/dashboard/"+hover_index_map[index])
+        newSidebarHovers[index] = true;
+        setSidebarHovers(newSidebarHovers);
+    };
 
   const onHomeButtonClick = () => {
     navigate("/home")
@@ -36,7 +46,7 @@ function Sidebar({ setHover, sidebarHovers }) {
           </div>
 
           <button className={"sidebar-main-contents stat-button hover"}
-          onClick={() => setHover(0)}>
+          onClick={() => handleHoverChange(0)}>
               {sidebarHovers[0] ?
                   <img src={reportsIconImage} alt="reportsIcon"/>
                   :<img style={{ 'opacity': 0.2 }}
@@ -44,7 +54,7 @@ function Sidebar({ setHover, sidebarHovers }) {
           </button>
 
           <button className={"sidebar-main-contents stat-button hover"}
-          onClick={() => setHover(1)}>
+          onClick={() => handleHoverChange(1)}>
             {sidebarHovers[1] ?
                   <img src={patientIconImage} alt="patientIcon"/>
                   :<img style={{ 'opacity': 0.2 }}
@@ -56,7 +66,7 @@ function Sidebar({ setHover, sidebarHovers }) {
           </div>
 
           <button className={"sidebar-main-contents stat-button hover"}
-          onClick={() => setHover(2)}>
+          onClick={() => handleHoverChange(2)}>
             {sidebarHovers[2] ?
                   <img src={memberIconImage} alt="memberIcon" style={{ 'filter': 'invert(1)' }}/>
                   :<img style={{ 'opacity': 0.2, 'filter': 'invert(1)' }}
@@ -64,7 +74,7 @@ function Sidebar({ setHover, sidebarHovers }) {
           </button>
 
           <button className={"sidebar-main-contents stat-button hover"}
-          onClick={() => setHover(3)}>
+          onClick={() => handleHoverChange(3)}>
             {sidebarHovers[3] ?
                   <img src={settingsIconImage} alt="settingsIcon" style={{ 'filter': 'invert(1)' }}/>
                   :<img style={{ 'opacity': 0.2, 'filter': 'invert(1)' }}
