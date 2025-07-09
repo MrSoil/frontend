@@ -18,39 +18,124 @@ function PatientNotes({ note }) {
   );
 }
 
-function HCForm({ selectedPatient, setNewHCContainer }) {
+function HCForm({ selectedPatient, setNewHCContainer, isFilled=false }) {
 
   const onCancelCareClick = () => {
       setNewHCContainer(false)
   }
 
+  let hygieneCheckDailyMap = {
+    mouthCare: "Ağız Bakımı/Dişlerin Temizliği",
+    handFaceCare: "El-Yüz Temizliği",
+    earNoseCare: "Burun-Kulak Temizliği",
+    bottomCare: "Alt Bakımı",
+    bodyCare: "Vücut  Muayenesi Kontrolü",
+    rashCare: "Yara/Kızarıklık vb. kontrolü",
+    moistureCare: "Cildi Nemlendirme",
+  }
+  let hygieneCheckWeeklyMap = {
+    bathCare: "Banyo Yaptırılması",
+    handFootCare: "El ve Ayak Tırnaklarının Kesilmesi",
+    bodyHairCare: "İstenmeyen Tüylerin Temizliği",
+    hairCare: "Saç-Sakal Tıraşının Yapılması",
+    bedBathCare: "Yatak Banyosu/Vücut Silme/Yatakta Saç Yıkama",
+    bedSheetCare: "Yatak Takımlarının Değiştirilmesi",
+  }
+  let mealCheckMap = {
+    breakfastCare: "Kahvaltı",
+    lunchCare: "Öğle Yemeği",
+    midCare: "Ara Öğün",
+    dinnerCare: "Akşam Yemeği",
+    liquidCare: "Su ve Diğer Sıvı Alımı",
+  }
+  let postureCheckMap = {
+    walkable: "Mobil/Yürüyen Misafir",
+  }
+  let dressingCheckMap = {
+    isInjured: "Bası Yarası var mı?",
+    stage: "Kaçıncı Evre?",
+    dailyDressing: "Günlük Bası Yarası Pansumanı Yapıldı mı?",
+    needDressing: "Pansuman gerektiren bir durum var mı?",
+    isDressed: "Pansuman Yapıldı mı?",
+    catheter: "Katater Bakımı Yapıldı mı?"
+  }
+  let edemaCheckMap = {
+    edema: "Ödem var mı?",
+    edemaPart: "Hangi bölgede?",
+    liquidCheck: "Sıvı takibi yapıldı mı?"
+  }
+  let securityCheckMap = {
+    reason1: "Yerde takılacağı kablo vs. herhangi bir şey var mı? Giymiş olduğu terlik ve oda zemini güvenli mi?",
+    reason2: "Hemşire çağrı zilinin kullanıldı mı?",
+    reason3: "Gözlük kullanıyor ise erişebileceği bir yere konuldu mu?",
+    reason4: "Kenarlık koruması gerekli mi?",
+    reason5: "Düşme riski oluştu mu?"
+  }
+  let urineCheckMap = {
+    urine:  "İdrar Çıkışı (ml):",
+    stool: "Gaita Çıkışı Var mı?"
+  }
+
   const [hygieneCheckDaily, setHygieneCheckDaily] = useState({
-    mouthCare: false,
-    faceWash: false,
-    earCleaning: false,
-    bodyCheck: false,
+    mouthCare: isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckDaily"]["mouthCare"] : false,
+    handFaceCare: isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckDaily"]["handFaceCare"] : false,
+    earNoseCare: isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckDaily"]["earNoseCare"] : false,
+    bottomCare: isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckDaily"]["bottomCare"] : false,
+    bodyCare: isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckDaily"]["bodyCare"] : false,
+    rashCare: isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckDaily"]["rashCare"] : false,
+    moistureCare: isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckDaily"]["mouthCare"] : false,
   });
 
   const [hygieneCheckWeekly, setHygieneCheckWeekly] = useState({
-    mouthCare: false,
-    faceWash: false,
-    earCleaning: false,
-    bodyCheck: false,
+    bathCare: isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckWeekly"]["bathCare"] : false,
+    handFootCare: isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckWeekly"]["handFootCare"] : false,
+    bodyHairCare:  isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckWeekly"]["bodyHairCare"] : false,
+    hairCare:  isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckWeekly"]["hairCare"] : false,
+    bedBathCare:  isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckWeekly"]["bedBathCare"] : false,
+    bedSheetCare:  isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckWeekly"]["bedSheetCare"] : false,
   });
 
   const [mealCheck, setMealCheck] = useState({
-    mouthCare: false,
-    faceWash: false,
-    earCleaning: false,
-    bodyCheck: false,
+    breakfastCare: false,
+    lunchCare: false,
+    midCare: false,
+    dinnerCare: false,
+    liquidCare: false,
   });
 
   const [postureCheck, setPostureCheck] = useState({
-    mouthCare: false,
-    faceWash: false,
-    earCleaning: false,
-    bodyCheck: false,
+    walkable: false,
   });
+
+  const [dressingCheck, setDressingCheck] = useState({
+    isInjured: false,
+    stage: 1,
+    dailyDressing: false,
+    needDressing: false,
+    isDressed: false,
+    catheter: false
+  });
+
+  const [edemaCheck, setEdemaCheck] = useState({
+    edema: false,
+    edemaPart: "",
+    liquidCheck: false
+  });
+
+  const [securityCheck, setSecurityCheck] = useState({
+    reason1: false,
+    reason2: false,
+    reason3: false,
+    reason4: false,
+    reason5: false
+  });
+
+  const [urineCheck, setUrineCheck] = useState({
+    urine: 0,
+    stool: false
+  });
+
+
 
   const [feedingNote, setFeedingNote] = useState('');
   const [selectedNote, setSelectedNote] = useState('');
@@ -69,32 +154,12 @@ function HCForm({ selectedPatient, setNewHCContainer }) {
       note_data: "bbbbb",
     }])
 
-  const toggleHygieneDaily = (key) => {
-    setHygieneCheckDaily({
-      ...hygieneCheckDaily,
-      [key]: !hygieneCheckDaily[key],
+  const toggleList = (key, key_list, key_function) => {
+    key_function({
+      ...key_list,
+      [key]: !key_list[key],
     });
-  };
-
-  const toggleHygieneWeekly = (key) => {
-    setHygieneCheckWeekly({
-      ...hygieneCheckWeekly,
-      [key]: !hygieneCheckWeekly[key],
-    });
-  };
-
-  const toggleMealCheck = (key) => {
-    setMealCheck({
-      ...mealCheck,
-      [key]: !mealCheck[key],
-    });
-  };
-
-  const togglePosture = (key) => {
-    setPostureCheck({
-      ...postureCheck,
-      [key]: !postureCheck[key],
-    });
+    console.log(postureCheck)
   };
 
   const toggleRoomCheck = (index) => {
@@ -135,8 +200,8 @@ function HCForm({ selectedPatient, setNewHCContainer }) {
             <h4>Günlük Gereksinimler</h4>
             {Object.keys(hygieneCheckDaily).map((key) => (
               <div className="each-point" key={key}>
-                <label>{key}</label>
-                <input type="checkbox" checked={hygieneCheckDaily[key]} onChange={() => toggleHygieneDaily(key)} />
+                <label>{hygieneCheckDailyMap[key]}</label>
+                <input type="checkbox" checked={hygieneCheckDaily[key]} onChange={() => toggleList(key, hygieneCheckDaily, setHygieneCheckDaily)} />
               </div>
             ))}
           </div>
@@ -144,8 +209,8 @@ function HCForm({ selectedPatient, setNewHCContainer }) {
             <h4>Haftalık Gereksinimler</h4>
             {Object.keys(hygieneCheckWeekly).map((key) => (
               <div className="each-point" key={key}>
-                <label>{key}</label>
-                <input type="checkbox" checked={hygieneCheckWeekly[key]} onChange={() => toggleHygieneWeekly(key)} />
+                <label>{hygieneCheckWeeklyMap[key]}</label>
+                <input type="checkbox" checked={hygieneCheckWeekly[key]} onChange={() => toggleList(key, hygieneCheckWeekly, setHygieneCheckWeekly)} />
               </div>
             ))}
           </div>
@@ -156,28 +221,76 @@ function HCForm({ selectedPatient, setNewHCContainer }) {
           <div>
             {Object.keys(mealCheck).map((key) => (
               <div className="each-point" key={key}>
-                <label>{key}</label>
-                <input type="checkbox" checked={mealCheck[key]} onChange={() => toggleMealCheck(key)} />
+                <label>{mealCheckMap[key]}</label>
+                <input type="checkbox" checked={mealCheck[key]} onChange={() => toggleList(key, mealCheck, setMealCheck)} />
               </div>
             ))}
           </div>
-          <div style={{marginTop: "10px"}}>
-            <h4>Pozisyon Takibi</h4>
+          </div>
+          <div style={{marginTop: "20px"}}>
+          <h3>Pozisyon Takibi</h3>
+          <div className="divider-low-margin"></div>
+          <div>
             {Object.keys(postureCheck).map((key) => (
               <div className="each-point" key={key}>
-                <label>{key}</label>
-                <input type="checkbox" checked={postureCheck[key]} onChange={() => togglePosture(key)} />
+                <label>{postureCheckMap[key]}</label>
+                <input type="checkbox" checked={postureCheck[key]} onChange={() => toggleList(key, postureCheck, setPostureCheck)} />
               </div>
             ))}
           </div>
-          </div>
+        </div>
         </div>
 
+
         <div className="care-column">
-          <h3>Hijyen Gereksinimleri</h3>
           <div>
-            <h4>Günlük Gereksinimler</h4>
+          <h3>Pansuman ve Katater Bakımı</h3>
+          <div className="divider-low-margin"></div>
+          <div>
+            {Object.keys(dressingCheck).map((key) => (
+              <div className="each-point" key={key}>
+                <label>{dressingCheckMap[key]}</label>
+                <input type="checkbox" checked={dressingCheck[key]} onChange={() => toggleList(key, dressingCheck, setDressingCheck)} />
+              </div>
+            ))}
           </div>
+        </div>
+          <div style={{marginTop: "20px"}}>
+          <h3>Ödem Takibi</h3>
+          <div className="divider-low-margin"></div>
+          <div>
+            {Object.keys(edemaCheck).map((key) => (
+              <div className="each-point" key={key}>
+                <label>{edemaCheckMap[key]}</label>
+                <input type="checkbox" checked={edemaCheck[key]} onChange={() => toggleList(key, edemaCheck, setEdemaCheck)} />
+              </div>
+            ))}
+          </div>
+        </div>
+          <div style={{marginTop: "20px"}}>
+          <h3>Misafir Güvenliği</h3>
+          <div className="divider-low-margin"></div>
+          <div>
+            {Object.keys(securityCheck).map((key) => (
+              <div className="each-point" key={key}>
+                <label>{securityCheckMap[key]}</label>
+                <input type="checkbox" checked={securityCheck[key]} onChange={() => toggleList(key, securityCheck, setSecurityCheck)} />
+              </div>
+            ))}
+          </div>
+        </div>
+          <div style={{marginTop: "20px"}}>
+          <h3>İdrar ve Gaita Takibi</h3>
+          <div className="divider-low-margin"></div>
+          <div>
+            {Object.keys(urineCheck).map((key) => (
+              <div className="each-point" key={key}>
+                <label>{urineCheckMap[key]}</label>
+                <input type="checkbox" checked={urineCheck[key]} onChange={() => toggleList(key, urineCheck, setUrineCheck)} />
+              </div>
+            ))}
+          </div>
+        </div>
         </div>
 
         <div >
@@ -195,11 +308,14 @@ function HCForm({ selectedPatient, setNewHCContainer }) {
             <h5>Konu Başlığı</h5>
             <div className="half-care-note-submit">
               <select onChange={(e) => setSelectedNote(e.target.value)}>
-                <option>Başlık Seçiniz</option>
                 <option>Hijyen Gereksinimleri</option>
                 <option>Beslenme Takibi</option>
+                <option>Pozisyon Takibi</option>
+                <option>Pansuman ve Katater Bakımı</option>
+                <option>Ödem Takibi</option>
+                <option>Misafir Güvenliği</option>
               </select>
-              <button style={{"background-color": "#A695CC"}}>Not Ekle</button>
+              <button style={{"backgroundColor": "#A695CC"}}>Not Ekle</button>
             </div>
           </div>
 
@@ -214,8 +330,8 @@ function HCForm({ selectedPatient, setNewHCContainer }) {
             ))}
           </div>
           <label>Kontrol Eden Hemşire: İsa Yusuf ORAK</label>
-          <div style={{display: "inline-flex", "width": "100%", "justify-content": "center", "margin-bottom": "15px"}}>
-            <button style={{backgroundColor: "#A695CC", "margin-right": "5px"}}>İmza</button>
+          <div style={{display: "inline-flex", "width": "100%", "justifyContent": "center", "marginBottom": "15px"}}>
+            <button style={{backgroundColor: "#A695CC", "marginRight": "5px"}}>İmza</button>
             <button style={{backgroundColor: "#E77169"}} onClick={onCancelCareClick}>Geri</button>
           </div>
         </div>

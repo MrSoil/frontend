@@ -6,8 +6,8 @@
   height: 450px;
   width: 100%;
   gap: 0;
-  padding: 12px;
-  margin: 0 20px 20px 0;
+  padding: 10px 20px 10px 20px;
+  margin: 0;
 }
 
 .medication-table {
@@ -22,7 +22,7 @@
   height: 1px;
   width: 100%;
   margin-top: 1%;
-  margin-bottom: 1%;
+  margin-bottom: 0.3%;
 }
 
 .medication-table h2 {
@@ -31,8 +31,8 @@
 }
 
 .medication-table h3 {
-  margin-top: 5px;
-  margin-bottom: 5px;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
 
@@ -45,10 +45,47 @@
   padding: 10px;
   text-align: left;
   border-bottom: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+
 }
 
 .medication-table th {
   background-color: #f2f2f2;
+}
+
+.medication-table .scroll-table {
+  position: relative;
+  width: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  max-height: 300px;
+}
+
+.medication-table thead {
+  width: 100%;
+}
+
+.medication-table .blue-medic {
+  display: flex;
+  background-color: transparent;
+  cursor: pointer;
+  border: None;
+  border-radius: 24px;
+  text-align: center;
+  align-items: center;
+}
+
+.medication-table .blue-medic text {
+  text-align: center;
+  align-content: center;
+}
+
+.medication-table .blue-medic img {
+  text-align: center;
+  align-content: center;
+  width: 25px;
+  height: 25px;
+  margin: 0 5px 0 10px;
 }
 
 .sort-button {
@@ -60,18 +97,24 @@
 
 .active-day {
   display: inline-block;
-  padding: 5px;
   margin: 2px;
-  background-color: #7c3aed;
+  background-color: #A695CC;
   color: white;
-  border-radius: 5px;
+  border-radius: 24px;
+  width: 66px;
+  height: 28px;
+  text-align: center;
+  align-content: center;
 }
 
 .inactive-day {
   display: inline-block;
-  padding: 5px;
   margin: 2px;
   background-color: #e0e0e0;
-  color: #333;
-  border-radius: 5px;
+  color: black;
+  border-radius: 24px;
+  width: 66px;
+  height: 28px;
+  text-align: center;
+  align-content: center;
 }

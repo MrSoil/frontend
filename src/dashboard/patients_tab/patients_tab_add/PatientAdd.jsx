@@ -17,7 +17,7 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
       { value: 'vanilla', label: 'Vanilla' }
   ]
 
-  // hasta özlük
+  // region hasta özlük
   const [ image, setImage ] = useState("")
   const [ firstname, setFirstname ] = useState("")
   const [ lastname, setLastname ] = useState("")
@@ -45,7 +45,6 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
   const [ patientHeightError, setPatientHeightError ] = useState("")
   const [ patientWeightError, setPatientWeightError ] = useState("")
   // endregion
-
 
   // region hasta eğitim
   const [ education, setEducation ] = useState("")
@@ -84,7 +83,6 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
   const [ contactPatientGenderError, setContactPatientGenderError ] = useState("")
   const [ contactCurrentRelationshipError, setContactCurrentRelationshipError ] = useState("")
   // endregion
-
 
   // region danışan iletişim
   const [ contactRelation, setContactRelation ] = useState("")
@@ -252,46 +250,71 @@ const handleAdditionOnGoingCare = (tag) => {
             'Content-Type': 'application/json'
           },
         body: JSON.stringify(
-            {"email": user.email,
-                'type': 'new',
-                'patient': {
-                        "image": base64Image.replace(/^data:image\/(png|jpg|jpeg);base64,/, ""),
-                        "firstname": firstname,
-                        "lastname": lastname,
-                        "citizenID": citizenID,
-                        "motherName": motherName,
-                        "fatherName": fatherName,
-                        "dateOfBirth": dateOfBirth,
-                        "birthPlace": birthPlace,
-                        "patientGender": patientGender,
-                        "currentRelation": currentRelation,
-                        "patientHeight": patientHeight,
-                        "patientWeight": patientWeight,
-                        "deviceID": deviceID,
-                        "education": education,
-                        "workStatus": workStatus,
-                        "insurance": insurance,
-                        "vac": vac,
-                        "income": income,
-                        "backgroundInfo": backgroundInfo,
-                        "contactFirstname": contactFirstname,
-                        "contactLastname": contactLastname,
-                        "contactCitizenID": contactCitizenID,
-                        "contactMotherName": contactMotherName,
-                        "contactFatherName": contactFatherName,
-                        "contactDateOfBirth": contactDateOfBirth,
-                        "contactBirthPlace": contactBirthPlace,
-                        "contactPatientGender": contactPatientGender,
-                        "contactCurrentRelationship": contactCurrentRelationship,
-                        "contactRelation": contactRelation,
-                        "contactEducation": contactEducation,
-                        "contactWorkStatus": contactWorkStatus,
-                        "contactPhone": contactPhone,
-                        "contactAddress": contactAddress,
-                        "contactWorkAddress": contactWorkAddress,
-                        "contactEmail": contactEmail,
-                        "contactApply": contactApply,
-                        "contactVac": contactVac
+            {'email': user.email,
+                    'type': 'new',
+                    'patient_personal_info': {
+                        "section_1": {
+                            "image": base64Image.replace(/^data:image\/(png|jpg|jpeg);base64,/, ""),
+                            "firstname": firstname,
+                            "lastname": lastname,
+                            "citizenID": citizenID,
+                            "motherName": motherName,
+                            "fatherName": fatherName,
+                            "dateOfBirth": dateOfBirth,
+                            "birthPlace": birthPlace,
+                            "patientGender": patientGender,
+                            "currentRelation": currentRelation,
+                            "patientHeight": patientHeight,
+                            "patientWeight": patientWeight,
+                            "deviceID": deviceID,
+                            "education": education,
+                            "workStatus": workStatus,
+                            "insurance": insurance,
+                            "vac": vac,
+                            "income": income,
+                            "backgroundInfo": backgroundInfo
+                        },
+                        "section_2": {
+                            "contactFirstname": contactFirstname,
+                            "contactLastname": contactLastname,
+                            "contactCitizenID": contactCitizenID,
+                            "contactMotherName": contactMotherName,
+                            "contactFatherName": contactFatherName,
+                            "contactDateOfBirth": contactDateOfBirth,
+                            "contactBirthPlace": contactBirthPlace,
+                            "contactPatientGender": contactPatientGender,
+                            "contactCurrentRelationship": contactCurrentRelationship,
+                            "contactFirstnameError": contactFirstnameError,
+                            "contactLastnameError": contactLastnameError,
+                            "contactCitizenIDError": contactCitizenIDError,
+                            "contactMotherNameError": contactMotherNameError,
+                            "contactFatherNameError": contactFatherNameError,
+                            "contactDateOfBirthError": contactDateOfBirthError,
+                            "contactBirthPlaceError": contactBirthPlaceError,
+                            "contactPatientGenderError": contactPatientGenderError,
+                            "contactCurrentRelationshipError": contactCurrentRelationshipError,
+                            "contactRelation": contactRelation,
+                            "contactEducation": contactEducation,
+                            "contactWorkStatus": contactWorkStatus,
+                            "contactPhone": contactPhone,
+                            "contactAddress": contactAddress,
+                            "contactWorkAddress": contactWorkAddress,
+                            "contactEmail": contactEmail,
+                            "contactApply": contactApply,
+                            "contactVac": contactVac
+                        },
+                        "section_3": {
+                            "onGoingProblems": onGoingProblems,
+                            "oldProblems": oldProblems,
+                            "doctorContacts": doctorContacts,
+                            "oldMedicines": oldMedicines,
+                            "onGoingMedicines": onGoingMedicines,
+                            "system1": system1,
+                            "system2": system2,
+                            "system3": system3,
+                            "system4": system4
+                        },
+                        "section_4": {}
                 }
             })
         })
@@ -311,6 +334,7 @@ const handleAdditionOnGoingCare = (tag) => {
     }
 
   const onAddClick = () => {
+      console.log("TEst")
     let error_occurred = false;
     setFirstnameError("")
     setLastnameError("")
@@ -523,10 +547,11 @@ const handleAdditionOnGoingCare = (tag) => {
         error_occurred = true
     }
 
-    if (error_occurred){
-        return
-    }
+    // if (error_occurred){
+    //     return
+    // }
 
+    console.log("Test")
     addPatient()
 
     }
@@ -564,10 +589,10 @@ const handleAdditionOnGoingCare = (tag) => {
   <div className="main-container-add-patient">
       <div className="header-add-patient">
           {patientPage === 0 ? <button className="clicked">Danışan Özlük Bilgileri</button>:<button onClick={setPatientPage0}>Danışan Özlük Bilgileri</button>}
-          {patientPage === 1 ? <button className="clicked">Danışan Kontağının Bilgileri</button>:<button onClick={setPatientPage1}>Danışan Kontağının Bilgileri</button>}
-          {patientPage === 2 ? <button className="clicked">Danışan Psikolojik Durumu</button>:<button onClick={setPatientPage2}>Danışan Psikolojik Durumu</button>}
+          {patientPage === 1 ? <button className="clicked">Danışan Kontağının Özlük Bilgileri</button>:<button onClick={setPatientPage1}>Danışan Kontağının Özlük Bilgileri</button>}
+          {patientPage === 2 ? <button className="clicked">Danışan Sağlık Durumu</button>:<button onClick={setPatientPage2}>Danışan Sağlık Durumu</button>}
           {patientPage === 3 ? <button className="clicked">Danışan Bakım Durumu</button>:<button onClick={setPatientPage3}>Danışan Bakım Durumu</button>}
-          {patientPage === 4 ? <button className="clicked">Danışan Sağlık Durumu</button>:<button onClick={setPatientPage4}>Danışan Sağlık Durumu</button>}
+          {patientPage === 4 ? <button className="clicked">Danışan Psikolojik Durumu</button>:<button onClick={setPatientPage4}>Danışan Psikolojik Durumu</button>}
       </div>
       {
           patientPage === 0 ? <div className="container-add-patient">
@@ -981,7 +1006,7 @@ const handleAdditionOnGoingCare = (tag) => {
           </div>
       </div>:
           patientPage === 2 ? <div className="container-add-patient">
-          <h1 className="page-title">Danışan Sağlık Bilgileri</h1>
+          <h1 className="page-title">Danışan Sağlık Durumu</h1>
           <h1 className="page-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent finibus ipsum ac nibh bibendum, quis sodales orci elementum. Fusce gravida vel quam eleifend ultrices. </h1>
           <div className="information-block">
               <h2 className="section-title">Hastalıklar & İlaçlar</h2>
@@ -1113,13 +1138,13 @@ const handleAdditionOnGoingCare = (tag) => {
           <div className="divider">.</div>
           <div className="information-block">
               <div className="patient-add-button-container">
-                  <button style={{backgroundColor: "#E77169", float: "left"}} onClick={setPatientPageInc}>Back</button>
+                  <button style={{backgroundColor: "#E77169", float: "left"}} onClick={setPatientPageDecr}>Back</button>
                   <button style={{backgroundColor: "#A695CC", float: "right"}} onClick={setPatientPageInc}>Next</button>
               </div>
           </div>
       </div>:
           patientPage === 3 ? <div className="container-add-patient">
-          <h1 className="page-title">Danışan Sağlık Bilgileri</h1>
+          <h1 className="page-title">Danışan Bakım Durumu</h1>
           <h1 className="page-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent finibus ipsum ac nibh bibendum, quis sodales orci elementum. Fusce gravida vel quam eleifend ultrices. </h1>
           <div className="information-block">
               <h2 className="section-title">Hastalıklar & İlaçlar</h2>
@@ -1201,8 +1226,8 @@ const handleAdditionOnGoingCare = (tag) => {
           <div className="divider">.</div>
           <div className="information-block">
               <div className="patient-add-button-container">
-                  <button style={{backgroundColor: "#E77169", float: "left"}} onClick={setPatientPageInc}>Back</button>
-                  <button style={{backgroundColor: "#A695CC", float: "right"}} onClick={setPatientPageInc}>Next</button>
+                  <button style={{backgroundColor: "#E77169", float: "left"}} onClick={setPatientPageDecr}>Back</button>
+                  <button style={{backgroundColor: "#A695CC", float: "right"}} onClick={onAddClick}>Save</button>
               </div>
           </div>
       </div>:

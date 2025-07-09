@@ -31,8 +31,6 @@ function PatientsTab() {
                 selectedPatient ? <button className="navigator-button">Edit Patients</button>: null
 
             }
-            {/*Second Stage*/}
-
         </div>
         <div className="dashboard-content-container">
 

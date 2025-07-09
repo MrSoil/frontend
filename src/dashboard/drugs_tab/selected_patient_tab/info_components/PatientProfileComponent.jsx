@@ -211,14 +211,14 @@ function PatientProfileComponent({ selectedPatientOuter, setNewRoomContainer, se
      <article className="profile-container-drug-general">
          <div className="profile-container-drug-top">
             <PersonInfo
-              patientPhoto={selectedPatient.patient_photo}
-              name={selectedPatient.first_name}
-              surname={selectedPatient.last_name}
-              gender={selectedPatient.gender}
-              age={selectedPatient.date_of_birth}
-              bloodType={selectedPatient.blood_type}
-              height={selectedPatient.height}
-              weight={selectedPatient.weight}
+              patientPhoto={selectedPatient.patient_personal_info.section_1.image}
+              name={selectedPatient.patient_personal_info.section_1.firstname}
+              surname={selectedPatient.patient_personal_info.section_1.last_name}
+              gender={selectedPatient.patient_personal_info.section_1.patientGender}
+              age={selectedPatient.patient_personal_info.section_1.dateOfBirth}
+              bloodType="{selectedPatient.patient_personal_info.section_1.blood_type}"
+              height={selectedPatient.patient_personal_info.section_1.patientHeight}
+              weight={selectedPatient.patient_personal_info.section_1.patientWeight}
             />
             <hr className="separator" />
             <div className="room-info">

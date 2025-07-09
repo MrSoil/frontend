@@ -144,7 +144,7 @@ const VitalScore = ({ title, score, status }) => (
 );
 
 function PatientProfileComponent({ selectedPatient, setNewRoomContainer, setNewCareCategoryContainer }) {
-
+    console.log(selectedPatient)
     const handleNewRoom = () => {
         setNewRoomContainer(true)
     }
@@ -157,20 +157,20 @@ function PatientProfileComponent({ selectedPatient, setNewRoomContainer, setNewC
      <article className="profile-container-general">
          <div className="profile-container-top">
             <PersonInfo
-              patientPhoto={selectedPatient.patient_photo}
-              name={selectedPatient.first_name}
-              surname={selectedPatient.last_name}
-              gender={selectedPatient.gender}
-              age={selectedPatient.date_of_birth}
-              bloodType={selectedPatient.blood_type}
-              height={selectedPatient.height}
-              weight={selectedPatient.weight}
+              patientPhoto={selectedPatient.patient_personal_info.section_1.image}
+              name={selectedPatient.patient_personal_info.section_1.firstname}
+              surname={selectedPatient.patient_personal_info.section_1.last_name}
+              gender={selectedPatient.patient_personal_info.section_1.patientGender}
+              age={selectedPatient.patient_personal_info.section_1.dateOfBirth}
+              bloodType="{selectedPatient.patient_personal_info.section_1.blood_type}"
+              height={selectedPatient.patient_personal_info.section_1.patientHeight}
+              weight={selectedPatient.patient_personal_info.section_1.patientWeight}
             />
             <hr className="separator" />
             <div className="room-info">
                 <h3 className="title">Room</h3>
                 <div className="details">
-                  <p>{selectedPatient.floor_no}</p>
+                  <p>"selectedPatient.floor_no"</p>
                   <button className="change-room" onClick={handleNewRoom}>Change Room</button>
                 </div>
             </div>
@@ -178,7 +178,7 @@ function PatientProfileComponent({ selectedPatient, setNewRoomContainer, setNewC
             <div className="care-category">
             <h3 className="title">Care Category</h3>
             <div className="category">
-                <p>{selectedPatient.care_category}</p>
+                <p>"selectedPatient.care_category"</p>
                 <button className="change-category" onClick={handleNewCareCategory}>Change Category</button>
             </div>
           </div>
@@ -191,10 +191,10 @@ function PatientProfileComponent({ selectedPatient, setNewRoomContainer, setNewC
               <button className="see-details">See Details</button>
             </div>
             <hr className="separator"></hr>
-            {selectedPatient.patient_vitals.length !== 0 ? Object.keys(selectedPatient.patient_vitals).map(key => (
-              <VitalScore key={key} title={key} score={selectedPatient.patient_vitals[key]}
-                          status={getStatus(key, selectedPatient.patient_vitals[key])} />
-            )) : null}
+            {/*{selectedPatient.patient_vitals.length !== 0 ? Object.keys(selectedPatient.patient_vitals).map(key => (*/}
+            {/*  <VitalScore key={key} title={key} score={selectedPatient.patient_vitals[key]}*/}
+            {/*              status={getStatus(key, selectedPatient.patient_vitals[key])} />*/}
+            {/*)) : null}*/}
          </section>
          </div>
      </article>

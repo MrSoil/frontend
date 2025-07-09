@@ -58,7 +58,7 @@ function MedicineList({ selectedPatient, setNewMedicineContainer }) {
     <article className="medicine-container">
         <header className="medicine-header">Medicines</header>
         <div className="medicine-divider" />
-        <div style={{"overflow": "scroll", "overflow-x": "hidden"}}>
+        <div style={{"overflow": "scroll", "overflowX": "hidden"}}>
           {medicines.map((medicine, index) => (
             <MedicineStatus key={index} {...medicine} />
           ))}

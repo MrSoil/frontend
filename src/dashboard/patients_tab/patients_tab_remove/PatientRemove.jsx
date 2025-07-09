@@ -133,11 +133,10 @@ function PatientRemove({ setGeneralTab, setRemoveTab }) {
         <div className="patients-grid">
           {patients.filter((patient) =>
           {
-            let full_name = patient.first_name + " " + patient.last_name;
-            return patient.first_name.toLowerCase().includes(searchInput.toLowerCase()) ||
-                patient.last_name.toLowerCase().includes(searchInput.toLowerCase()) ||
-                full_name.toLowerCase().includes(searchInput.toLowerCase()) ||
-                patient.floor_no.toLowerCase().includes(searchInput.toLowerCase());
+            let full_name = patient.patient_personal_info.section_1.firstname + " " + patient.patient_personal_info.section_1.lastname;
+            return patient.patient_personal_info.section_1.firstname.toLowerCase().includes(searchInput.toLowerCase()) ||
+              patient.patient_personal_info.section_1.lastname.toLowerCase().includes(searchInput.toLowerCase()) ||
+              full_name.toLowerCase().includes(searchInput.toLowerCase());
           }).map((patient, index) => (
             <PatientCard key={index} patient={patient} setGeneralTab={setGeneralTab} setFunction={setRemovePatient} value={patient}/>
           ))}

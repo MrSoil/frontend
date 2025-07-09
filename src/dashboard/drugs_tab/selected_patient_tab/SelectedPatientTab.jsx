@@ -7,11 +7,17 @@ import Patients from "../drugs_tab_general/Patients";
 import {useNavigate} from "react-router-dom";
 import NotesList from "../../drugs_tab/selected_patient_tab/info_components/notesComponent";
 import MedicationTable from "./info_components/MedicationTable";
+import MedicationForm from "./info_components/MedicationForm";
+import MedicationSystemForm from "./info_components/MedicationSystemForm";
 
-function SelectedPatientTab({ selectedPatient }) {
+function SelectedPatientTab({ setSelectedPatient, selectedPatient }) {
     const [newRoomContainer, setNewRoomContainer] = useState(false)
     const [newNoteContainer, setNewNoteContainer] = useState(false)
     const [newCareCategoryContainer, setNewCareCategoryContainer] = useState(false)
+
+    const [newSystemMedicineContainer, setNewSystemMedicineContainer] = useState(false)
+    const [newMedicineContainer, setNewMedicineContainer] = useState(false)
+    const [medicineTabs, setMedicineTabs] = useState([false, false]);
 
     const [newNoteName, setNewNoteName] = useState("")
     const [newNoteDesc, setNewNoteDesc] = useState("")
@@ -88,22 +94,7 @@ function SelectedPatientTab({ selectedPatient }) {
             }
         </div>
         <div className="dashboard-content-container">
-            {newRoomContainer !== false ?
-          <div className="blackout-container">
-            <div className="blackout"></div>
-            <div className="blackout-content-container">
-                <div className={"formContainer"}>
-                <input
-                    placeholder=" "
-                    className={"formBox"} />
-                <label>New Room</label>
-              </div>
-                <div className="exit-container">
-                    <button style={{backgroundColor: "#A695CC", float: "right"}} >Submit</button>
-                </div>
-            </div>
-          </div>:
-          newNoteContainer !== false ?
+            {newNoteContainer !== false ?
           <div className="blackout-container">
             <div className="blackout"></div>
             <div className="blackout-content-container">
@@ -129,19 +120,30 @@ function SelectedPatientTab({ selectedPatient }) {
                 </div>
             </div>
           </div>
-          : newCareCategoryContainer !== false ?
+          : newMedicineContainer !== false ?
           <div className="blackout-container">
             <div className="blackout"></div>
-            <div className="blackout-content-container">
-                <div className={"formContainer"}>
-                <input
-                    placeholder=" "
-                    className={"formBox"} />
-                <label>New Care Category</label>
+            <div className="blackout-content-container" style={{"maxHeight": "800px"}}>
+          {/*      <div className={"formContainer"}>*/}
+          {/*      <input*/}
+          {/*          placeholder=" "*/}
+          {/*          className={"formBox"} />*/}
+          {/*      <label>New Care Category</label>*/}
+          {/*</div>*/}
+                <MedicationForm setSelectedPatient={setSelectedPatient} selectedPatient={selectedPatient} newMedicineContainer={newMedicineContainer} setNewMedicineContainer={setNewMedicineContainer}></MedicationForm>
+            </div>
           </div>
-                <div className="exit-container">
-                <button style={{backgroundColor: "#A695CC", float: "right"}} >Submit</button>
-              </div>
+          : newSystemMedicineContainer !== false ?
+          <div className="blackout-container">
+            <div className="blackout"></div>
+            <div className="blackout-content-container" style={{"maxHeight": "800px"}}>
+          {/*      <div className={"formContainer"}>*/}
+          {/*      <input*/}
+          {/*          placeholder=" "*/}
+          {/*          className={"formBox"} />*/}
+          {/*      <label>New Care Category</label>*/}
+          {/*</div>*/}
+                <MedicationSystemForm setNewSystemMedicineContainer={setNewSystemMedicineContainer}></MedicationSystemForm>
             </div>
           </div>
           : null}
@@ -155,7 +157,7 @@ function SelectedPatientTab({ selectedPatient }) {
       </div>
         <div className="dashboard-drugs-profile-container">
 
-         <MedicationTable selectedPatient={selectedPatient}/>
+         <MedicationTable setNewMedicineContainer={setNewMedicineContainer} selectedPatient={selectedPatient} setNewSystemMedicineContainer={setNewSystemMedicineContainer} />
       </div>
 
     </div>

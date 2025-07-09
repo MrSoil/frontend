@@ -107,7 +107,7 @@ h5 {
   margin: 5px 0 5px 0;
 }
 
-.content .half-medicine-column button {
+.content .half-medicine-column .custom-button button {
     width: 120px;
     height: 35px;
     border-radius: 25px;
@@ -198,9 +198,33 @@ select:hover {
 }
 
 .medicine-scroll {
-  height: 150px;
+  height: 520px;
   overflow: scroll;
   overflow-x: hidden;
   border: 1px solid #D2D2D2;
-  border-radius: 24px;
+  border-radius: 12px;
 }
+
+
+.tab-button button {
+  width: 160px;
+  height: 35px;
+  opacity: 1;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  padding: 8px 16px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #D2D2D2;
+  font: 13px "RedHatDisplay";
+  font-weight: 400;
+  line-height: 100%;
+  text-align: center;
+
+}
+
+.tab-button-clicked button {
+  background-color: #F6F0F6;
+  color: #FFFFFF;
+}
+

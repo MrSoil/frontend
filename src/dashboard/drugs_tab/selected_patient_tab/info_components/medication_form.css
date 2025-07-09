@@ -1,0 +1,119 @@
+.medication-form {
+  width: 820px;
+  background-color: #fff;
+  border-radius: 5px;
+  margin-top: -25px;
+}
+
+.medication-form .divider {
+  height: 1px;
+  width: 100%;
+  background-color: #D2D2D2;
+  margin: -10px 0 20px 0;
+}
+
+.medication-form .form-group {
+  display: flex;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.medication-form .form-ingroup {
+  display: grid;
+  width: 100%;
+}
+
+.form-ingroup label {
+  margin-bottom: 1px;
+  margin-left: 5px;
+  font: 600 16px "RedHatDisplay";
+}
+
+.medication-form select {
+  margin-top: 2px;
+  padding: 8px;
+  border-radius: 24px;
+  border: 1px solid #ccc;
+  width: 100%;
+  font: 400 14px "RedHatDisplay";
+  height: 40px;
+}
+
+
+.medication-form input {
+  margin-top: 5px;
+  padding: 8px;
+  border-radius: 24px;
+  border: 1px solid #ccc;
+  font: 400 14px "RedHatDisplay";
+  height: 40px;
+}
+
+.medication-form .period-toggle {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  text-align: left;
+  border: 1px solid #4caf50;
+  border-radius: 24px;
+  background-color: transparent;
+  cursor: pointer;
+  height: 50px;
+}
+
+.medication-form .period-toggle.active {
+  background-color: #f2f2f2;
+}
+
+.medication-form .details {
+  margin-bottom: 20px;
+}
+
+.medication-form .days {
+  display: flex;
+  flex-wrap: wrap;
+  width: 300%;
+}
+
+.form-period .active-day, .form-period .inactive-day {
+  border: 1px solid #ccc;
+  font: 400 14px "RedHatDisplay";
+  display: inline-block;
+  padding: 5px 10px;
+  margin: 2px;
+  border-radius: 24px;
+  cursor: pointer;
+  width: 87px;
+  height: 40px;
+  color: black;
+  background-color: #FFFFFF;
+}
+
+.medication-form .active-day {
+  color: white;
+  background-color: #A695CC;
+}
+
+.medication-form .form-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.medication-form .cancel-button, .save-button {
+  border: 1px solid #ccc;
+  padding: 10px 20px;
+  cursor: pointer;
+  width: 200px;
+  border-radius: 24px;
+  margin: 0 10px 0 10px;
+}
+
+.cancel-button {
+  background-color: #FFFFFF;
+}
+
+.save-button {
+  background-color: #4caf50;
+  color: white;
+}

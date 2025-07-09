@@ -6,16 +6,15 @@ function PatientCard({ patient, setGeneralTab, setFunction }) {
   const patientClickHandle = () => {
     setGeneralTab(false)
     setFunction(patient)
-    console.log(patient)
   }
 
   return (
     <div className="patient-card" onClick={patientClickHandle}>
       <div className="patient-info">
-        <img src={`data:image/*;base64,${patient.patient_photo}`}  alt={patient.first_name} className="patient-avatar" />
+        <img src={`data:image/*;base64,${patient.patient_personal_info.section_1.image}`}  alt={patient.patient_personal_info.section_1.firstname} className="patient-avatar" />
         <div className="patient-details">
-          <div className="patient-name">{patient.first_name} {patient.last_name}</div>
-          <div className="patient-location">{patient.floor_no}</div>
+          <div className="patient-name">{patient.patient_personal_info.section_1.firstname} {patient.patient_personal_info.section_1.lastname}</div>
+          <div className="patient-location">Bilinmiyor</div>
         </div>
       </div>
     </div>
@@ -85,11 +84,14 @@ function Patients({ setGeneralTab, setSelectedPatient }) {
       <div className="patients-grid">
         {patients.filter((patient) =>
         {
-          let full_name = patient.first_name + " " + patient.last_name;
-          return patient.first_name.toLowerCase().includes(searchInput.toLowerCase()) ||
-              patient.last_name.toLowerCase().includes(searchInput.toLowerCase()) ||
-              full_name.toLowerCase().includes(searchInput.toLowerCase()) ||
-              patient.floor_no.toLowerCase().includes(searchInput.toLowerCase());
+          // console.log(patient.patient_personal_info)
+
+          let full_name = patient.patient_personal_info.section_1.firstname + " " + patient.patient_personal_info.section_1.lastname;
+          return patient.patient_personal_info.section_1.firstname.toLowerCase().includes(searchInput.toLowerCase()) ||
+              patient.patient_personal_info.section_1.lastname.toLowerCase().includes(searchInput.toLowerCase()) ||
+              full_name.toLowerCase().includes(searchInput.toLowerCase());
+          // ||
+          //     patient.floor_no.toLowerCase().includes(searchInput.toLowerCase());
         }).map((patient, index) => (
           <PatientCard key={index} patient={patient} setGeneralTab={setGeneralTab} setFunction={setSelectedPatient} value={patient}/>
         ))}

@@ -1,0 +1,122 @@
+.medication-system-form {
+  width: 600px;
+  background-color: #fff;
+  border-radius: 5px;
+  margin-top: -25px;
+}
+
+
+.medication-system-form h2 {
+  margin-bottom: 20px;
+}
+
+.medication-system-form .form-container {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.medication-system-form .divider {
+  height: 1px;
+  width: 100%;
+  background-color: #D2D2D2;
+  margin: -10px 0 20px 0;
+}
+
+.medication-system-form .form-group {
+  display: flex;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.medication-system-form .form-ingroup {
+  display: grid;
+  width: 100%;
+}
+
+.medication-system-form input {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.medication-system-form label {
+  margin-bottom: 5px;
+  margin-left: 5px;
+  font: 600 16px "RedHatDisplay";
+}
+
+.medication-system-form input {
+  margin-top: 10px;
+  padding: 8px;
+  border-radius: 24px;
+  border: 1px solid #ccc;
+  font: 400 14px "RedHatDisplay";
+  height: 40px;
+}
+
+.medication-system-form .button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  margin-top: 10px;
+}
+
+.medication-system-form .add-button, .remove-button {
+  background-color: #00bcd4;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.medication-system-form .remove-button {
+  background-color: #f44336;
+}
+
+.medication-system-form .form-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.medication-system-form .cancel-button, .save-button {
+  border: 1px solid #ccc;
+  padding: 10px 20px;
+  cursor: pointer;
+  width: 200px;
+  border-radius: 24px;
+  margin: 0 10px 0 10px;
+}
+
+.cancel-button {
+  background-color: #FFFFFF;
+}
+
+.save-button {
+  background-color: #4caf50;
+  color: white;
+}
+
+
+.medication-system-form .blue-medic {
+  display: flex;
+  background-color: transparent;
+  cursor: pointer;
+  border: None;
+  border-radius: 24px;
+  text-align: center;
+  align-items: center;
+}
+
+.medication-system-form .blue-medic text {
+  text-align: center;
+  align-content: center;
+}
+
+.medication-system-form .blue-medic img {
+  text-align: center;
+  align-content: center;
+  width: 25px;
+  height: 25px;
+  margin: 0 5px 0 10px;
+}
