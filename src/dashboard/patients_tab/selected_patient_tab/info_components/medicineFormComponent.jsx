@@ -5,6 +5,15 @@ import './medicine_form_component.css'
 import {useEffect, useState} from "react";
 import { MuiThemeProvider, createTheme } from '@material-ui/core/styles';
 
+function getTodayForDjango() {
+  const today = new Date();
+  // const year = today.getFullYear();
+  // const month = String(today.getMonth() + 1).padStart(2, '0'); // getMonth is zero-based
+  // const day = String(today.getDate()).padStart(2, '0');
+  return today.toString();
+}
+
+
 const getGenderAge = ( age, gender ) => {
     const today = new Date();
     const birthDate = new Date(age);
@@ -19,38 +28,6 @@ const getGenderAge = ( age, gender ) => {
 
     return gender + ", " + str_age + " years old"
 };
-
-function MedicineStatus({medicine, index}) {
-  return (
-    // <article className="medicine-status">
-    //   <time className="medicine-date">{date}</time>
-    //   <h4 className="medicine-name">
-    //     {medicine} | {dosage}
-    //     <span className="dosage-detail">(2 doses)</span>
-    //   </h4>
-    //   <p className="medicine-timing">{timing}</p>
-    //   <div className="medicine-info">
-    //     <div className="satisfaction-status">
-    //       <span className="status-label">{satisfaction}</span>
-    //       <div className="status-indicator" />
-    //       <span className="label-text">Last Mod: {lastMod} h. ago</span>
-    //     </div>
-    //   </div>
-    // </article>
-
-      <tr key={index}>
-        <td>{medicine["name"]}</td>
-        <td>{medicine["dosage"]}</td>
-        <td>{medicine["category"]}</td>
-        <td>{medicine["period"]}</td>
-          <td style={{"borderRight": "None"}}>
-              {medicine["given"] ? "İlaç Hazırlandı" : null}
-              {medicine["given"] ? <input type="checkbox" checked={medicine["given"]} readOnly/> : null}
-          </td>
-      </tr>
-
-  );
-}
 
 const PersonInfo = ({ patientPhoto, name, surname, gender, age, bloodType, height, weight }) => (
   <div className="person-info" style={{"height": "70%","width": "100%", "border": "1px solid #D2D2D2"}}>
@@ -97,7 +74,7 @@ function PatientNotes({ note }) {
   );
 }
 
-function MedicineForm({ selectedPatient, setNewMedicineContainer }) {
+function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineContainer }) {
   const user = JSON.parse(localStorage.getItem("user"));
   const theme = createTheme({
     palette: {
@@ -109,6 +86,15 @@ function MedicineForm({ selectedPatient, setNewMedicineContainer }) {
       }
     }
   });
+
+   // already‐taken medicine IDs
+  const values = (selectedPatient.patient_given_medicines !== null) ? Object.values(selectedPatient.patient_given_medicines).flat().map(obj => obj["medicine_id"])
+      : [];
+
+  const [takenMeds, setTakenMeds] = useState(new Set(values));
+
+  // meds the user has just checked this session
+  const [selectedGivenMeds, setSelectedGivenMeds] = useState(new Set());
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -177,7 +163,17 @@ function MedicineForm({ selectedPatient, setNewMedicineContainer }) {
     });
   };
 
-    const getSystemMedicineList = (email) => {
+
+  const handleGivenChange = medId => {
+    setSelectedGivenMeds(prev => {
+      const next = new Set(prev);
+      if (next.has(medId)) next.delete(medId);
+      else next.add(medId);
+      return next;
+    });
+  };
+
+  const getSystemMedicineList = (email) => {
     fetch(`http://localhost:8000/api/patients/?email=${email}`, {
       method: "GET",
       headers: {
@@ -207,7 +203,8 @@ function MedicineForm({ selectedPatient, setNewMedicineContainer }) {
               dosage: record.medicine_data.medicine_dosage[period],
               fullness: record.medicine_data.fullness_options[period],
               days: record.medicine_data.selected_days[period],
-              period: periodMap[period]
+              period: periodMap[period],
+              given: false,
           });
 
           if (record.medicine_data.selected_period.morning && record.medicine_data.selected_days.morning.includes(today)) m.push(buildEntry("morning"));
@@ -218,6 +215,8 @@ function MedicineForm({ selectedPatient, setNewMedicineContainer }) {
         setDailyMedicinesM(m);
         setDailyMedicinesN(n);
         setDailyMedicinesE(e);
+
+
         setIsLoading(false);
 
       } else {
@@ -228,11 +227,74 @@ function MedicineForm({ selectedPatient, setNewMedicineContainer }) {
     .catch(error => {
         setIsLoading(true);
     });
+    };
+
+  const submitGivenMeds = () => {
+    const payload = Array.from(selectedGivenMeds).map(medicine_id => (
+        {
+            "patient_id": selectedPatient["patient_id"],
+            "email": user.email,
+            "type": "add_given_medicine",
+            "medicine_id": medicine_id,
+            "given": true,
+            "today_date": getTodayForDjango()
+        }
+    ));
+    console.log(payload)
+    // setTakenMeds(prev => new Set([...prev, ...selectedGivenMeds]));
+    // setSelectedGivenMeds(new Set());
+
+    for (let i = 0; i < payload.length; i++) {
+        fetch("http://localhost:8000/api/patients/", {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json'},
+          body: JSON.stringify({
+              "patient_id": payload[i]["patient_id"],
+              "email": payload[i]["email"],
+              "type": payload[i]["type"],
+              "medicine_id": payload[i]["medicine_id"],
+              "given": payload[i]["given"],
+              "today_date": payload[i]["today_date"]
+          })
+        })
+        .then(r => r.json())
+        .then(() => {
+          // merge newly given into takenMeds and clear selection
+          setTakenMeds(prev => new Set([...prev, ...selectedGivenMeds]));
+          setSelectedGivenMeds(new Set());
+        })
+        .catch(console.error);
+    }
+  };
+  const updateSelectedPatient = (email) => {
+    fetch(`http://localhost:8000/api/patients/?email=${email}`, {
+      method: "GET",
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(r => r.json())
+    .then(resp => {
+      // Assuming the backend sends back a JSON response indicating success or failure
+      if (resp.status === "success") {
+        const selectedPatientNew = resp.data[0];
+        if (selectedPatient !== selectedPatientNew){
+          setSelectedPatient(selectedPatientNew);
+        }
+      }
+    }
+    )
+    .catch(error => {
+    });
   };
 
   useEffect(() => {
+      updateSelectedPatient(user.email)
+    }, [takenMeds]);
+
+  useEffect(() => {
       getSystemMedicineList(user.email)
-    }, [selectedPatient]);
+    }, [selectedPatient, user.email]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -371,19 +433,67 @@ function MedicineForm({ selectedPatient, setNewMedicineContainer }) {
                       {/*  </tr>*/}
                       </thead>
                         {tabValue === 0 ? <tbody>
-                             {dailyMedicinesM.map((medicine, index) => (
-                                <MedicineStatus medicine={medicine} key={index} index={index}/>
-                             ))}
+                             {dailyMedicinesM.map( medicine => {
+                                const isTaken    = takenMeds.has(medicine.id);
+                                const isSelected = selectedGivenMeds.has(medicine.id);
+                                return (
+                                <tr key={medicine.id}>
+                                <td>{medicine["name"]}</td>
+                                <td>{medicine["dosage"]}</td>
+                                <td>{medicine["category"]}</td>
+                                <td>{medicine["period"]}</td>
+                                <td style={{"borderRight": "None"}}>
+                                  <input
+                                    type="checkbox"
+                                    disabled={isTaken}
+                                    checked={isTaken || isSelected}
+                                    onChange={() => handleGivenChange(medicine.id)}
+                                  />
+                                </td>
+                              </tr>);
+                             })}
                         </tbody> :
                          tabValue === 1 ? <tbody>
-                             {dailyMedicinesN.map((medicine, index) => (
-                                <MedicineStatus medicine={medicine} key={index} index={index}/>
-                             ))}
+                             {dailyMedicinesN.map( medicine => {
+                                const isTaken    = takenMeds.has(medicine.id);
+                                const isSelected = selectedGivenMeds.has(medicine.id);
+                                return (
+                                <tr key={medicine.id}>
+                                <td>{medicine["name"]}</td>
+                                <td>{medicine["dosage"]}</td>
+                                <td>{medicine["category"]}</td>
+                                <td>{medicine["period"]}</td>
+                                <td style={{"borderRight": "None"}}>
+                                  <input
+                                    type="checkbox"
+                                    disabled={isTaken}
+                                    checked={isTaken || isSelected}
+                                    onChange={() => handleGivenChange(medicine.id)}
+                                  />
+                                </td>
+                              </tr>);
+                             })}
                          </tbody> :
                          tabValue === 2 ? <tbody>
-                             {dailyMedicinesE.map((medicine, index) => (
-                                <MedicineStatus medicine={medicine} key={index} index={index}/>
-                             ))}
+                             {dailyMedicinesE.map( medicine => {
+                                const isTaken    = takenMeds.has(medicine.id);
+                                const isSelected = selectedGivenMeds.has(medicine.id);
+                                return (
+                                <tr key={medicine.id}>
+                                <td>{medicine["name"]}</td>
+                                <td>{medicine["dosage"]}</td>
+                                <td>{medicine["category"]}</td>
+                                <td>{medicine["period"]}</td>
+                                <td style={{"borderRight": "None"}}>
+                                  <input
+                                    type="checkbox"
+                                    disabled={isTaken}
+                                    checked={isTaken || isSelected}
+                                    onChange={() => handleGivenChange(medicine.id)}
+                                  />
+                                </td>
+                              </tr>);
+                             })}
                          </tbody> :
                             null}
                     </table>
@@ -399,7 +509,7 @@ function MedicineForm({ selectedPatient, setNewMedicineContainer }) {
             <h3>Kontrol Eden Hemşire:</h3>
             <label>İsa Yusuf ORAK</label>
           </div>
-            <button style={{backgroundColor: "#A695CC"}}>İmza</button>
+            <button style={{backgroundColor: "#A695CC"}} onClick={submitGivenMeds}>İmza</button>
           </div>
         </div>
         </div>

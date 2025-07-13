@@ -322,7 +322,7 @@ function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient
           //       </div>
           //   </div>
           // </div>
-          <Medicine_Form selectedPatient={selectedPatient} setNewMedicineContainer={setNewMedicineContainer}/>
+          <Medicine_Form selectedPatient={selectedPatient} setSelectedPatient={setSelectedPatient} setNewMedicineContainer={setNewMedicineContainer}/>
           : newNoteContainer !== false ?
           <div className="blackout-container">
             <div className="blackout"></div>
