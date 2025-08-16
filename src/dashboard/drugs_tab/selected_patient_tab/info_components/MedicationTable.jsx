@@ -2,128 +2,37 @@ import React, { useState, useEffect } from 'react';
 import './medication_table.css';
 import addDrugIcon from "../../../../assets/dashboard/icons-adddrug-blue.png";
 
-const initialData = [
-  {
-    name: 'Amoklavin-BID',
-    dosage: '1000 mg',
-    category: 'Antibiyotik',
-    time: 'Öğle İlaçları',
-    days: ['Pzt', 'Sal', 'Çar'],
-    prepared: false,
-  },
-  {
-    name: 'Amoklavin-BID',
-    dosage: '1000 mg',
-    category: 'Antibiyotik',
-    time: 'Akşam İlaçları',
-    days: ['Per', 'Cum'],
-    prepared: false,
-  },
-  {
-    name: 'B İlacı',
-    dosage: '200 mg',
-    category: 'Şeker İlacı',
-    time: 'Öğle İlaçları',
-    days: ['Pzt', 'Sal', 'Paz'],
-    prepared: false,
-  },
-    {
-    name: 'Amoklavin-BID',
-    dosage: '1000 mg',
-    category: 'Antibiyotik',
-    time: 'Öğle İlaçları',
-    days: ['Pzt', 'Sal', 'Çar'],
-    prepared: false,
-  },
-  {
-    name: 'Amoklavin-BID',
-    dosage: '1000 mg',
-    category: 'Antibiyotik',
-    time: 'Akşam İlaçları',
-    days: ['Per', 'Cum'],
-    prepared: false,
-  },
-  {
-    name: 'B İlacı',
-    dosage: '200 mg',
-    category: 'Şeker İlacı',
-    time: 'Öğle İlaçları',
-    days: ['Pzt', 'Sal', 'Paz'],
-    prepared: false,
-  },
-    {
-    name: 'Amoklavin-BID',
-    dosage: '1000 mg',
-    category: 'Antibiyotik',
-    time: 'Öğle İlaçları',
-    days: ['Pzt', 'Sal', 'Çar'],
-    prepared: false,
-  },
-  {
-    name: 'Amoklavin-BID',
-    dosage: '1000 mg',
-    category: 'Antibiyotik',
-    time: 'Akşam İlaçları',
-    days: ['Per', 'Cum'],
-    prepared: false,
-  },
-  {
-    name: 'B İlacı',
-    dosage: '200 mg',
-    category: 'Şeker İlacı',
-    time: 'Öğle İlaçları',
-    days: ['Pzt', 'Sal', 'Paz'],
-    prepared: false,
-  },
-    {
-    name: 'Amoklavin-BID',
-    dosage: '1000 mg',
-    category: 'Antibiyotik',
-    time: 'Öğle İlaçları',
-    days: ['Pzt', 'Sal', 'Çar'],
-    prepared: false,
-  },
-  {
-    name: 'Amoklavin-BID',
-    dosage: '1000 mg',
-    category: 'Antibiyotik',
-    time: 'Akşam İlaçları',
-    days: ['Per', 'Cum'],
-    prepared: false,
-  },
-  {
-    name: 'B İlacı',
-    dosage: '200 mg',
-    category: 'Şeker İlacı',
-    time: 'Öğle İlaçları',
-    days: ['Pzt', 'Sal', 'Paz'],
-    prepared: false,
-  },{
-    name: 'Amoklavin-BID',
-    dosage: '1000 mg',
-    category: 'Antibiyotik',
-    time: 'Öğle İlaçları',
-    days: ['Pzt', 'Sal', 'Çar'],
-    prepared: false,
-  },
-  {
-    name: 'Amoklavin-BID',
-    dosage: '1000 mg',
-    category: 'Antibiyotik',
-    time: 'Akşam İlaçları',
-    days: ['Per', 'Cum'],
-    prepared: false,
-  },
-  {
-    name: 'B İlacı',
-    dosage: '200 mg',
-    category: 'Şeker İlacı',
-    time: 'Öğle İlaçları',
-    days: ['Pzt', 'Sal', 'Paz'],
-    prepared: false,
-  },
+function isDateInCurrentWeek(date) {
+  if (!date) return false;
+  const now = new Date();
+  // Start of current week (Sunday)
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - now.getDay());
+  startOfWeek.setHours(0, 0, 0, 0);
+  // End of current week (Saturday)
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 6);
+  endOfWeek.setHours(23, 59, 59, 999);
 
-];
+  const inputDate = new Date(date);
+  return inputDate >= startOfWeek && inputDate <= endOfWeek;
+}
+
+function getTodayForDjango() {
+  const today = new Date();
+  return today.toString();
+}
+
+function reformatDjangoDate(djangoDateString) {
+  const d = new Date(djangoDateString);
+
+  // pull out zero-padded components
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yy = String(d.getFullYear() % 100).padStart(2, '0');
+
+  return `${dd}-${mm}-${yy}`;
+}
 
 const MedicationTable = ({setNewMedicineContainer, selectedPatient, setNewSystemMedicineContainer}) => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -141,6 +50,11 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setNewSystem
     'Cum':"Cuma",
     'Cts':"Cumartesi"
   }
+
+  const [preparedMeds, setPreparedMeds] = useState(new Set());
+
+  const [selectedPreparedMeds, setSelectedPreparedMeds] = useState(new Set());
+
 
   const handleAddMedicinePerson = (index) => {
     setNewMedicineContainer(true)
@@ -206,9 +120,20 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setNewSystem
               period: periodMap[period]
           });
 
-          if (record.medicine_data.selected_period.morning && record.medicine_data.selected_days.morning.includes(today)) all.push(buildEntry("morning"));
-          if (record.medicine_data.selected_period.noon    && record.medicine_data.selected_days.noon.includes(today))    all.push(buildEntry("noon"));
-          if (record.medicine_data.selected_period.evening && record.medicine_data.selected_days.evening.includes(today)) all.push(buildEntry("evening"));
+
+
+          if (record.medicine_data.selected_period.morning && record.medicine_data.selected_days.morning.includes(today)) {
+            let datum = buildEntry("morning")
+            all.push(datum);
+          }
+          if (record.medicine_data.selected_period.noon    && record.medicine_data.selected_days.noon.includes(today)) {
+            let datum = buildEntry("noon")
+            all.push(datum);
+          }
+          if (record.medicine_data.selected_period.evening && record.medicine_data.selected_days.evening.includes(today)) {
+            let datum = buildEntry("evening")
+            all.push(datum);
+          }
         });
 
         setData(all)
@@ -274,25 +199,29 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setNewSystem
             </tr>
           </thead>
             <tbody>
-            {data.map((entry, index) => (
-                  <tr key={index}>
-                    <td>{entry["name"]}</td>
-                    <td>{entry["dosage"]}</td>
-                    <td>{entry["category"]}</td>
-                    <td>{entry["period"]}</td>
-                    <td style={{"textAlign": "center"}}>
-                      {['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cts', 'Paz'].map((day) => (
-                          <span key={day} className={entry.days.includes(daysMap[day]) ? 'active-day' : 'inactive-day'}>
+            {data.map((entry, index) => {
+                  const isPrepared    = preparedMeds.has(entry.id);
+                  const isSelected = selectedPreparedMeds.has(entry.id);
+                  return (
+                      <tr key={index}>
+                        <td>{entry["name"]}</td>
+                        <td>{entry["dosage"]}</td>
+                        <td>{entry["category"]}</td>
+                        <td>{entry["period"]}</td>
+                        <td style={{"textAlign": "center"}}>
+                          {['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cts', 'Paz'].map((day) => (
+                              <span key={day} className={entry.days.includes(daysMap[day]) ? 'active-day' : 'inactive-day'}>
                       {day}
                     </span>
-                      ))}
-                    </td>
-                    <td style={{"borderRight": "None"}}>
-                      {"prepared" in entry ? "İlaç Hazırlandı" : null}
-                      {"prepared" in entry ? <input type="checkbox" checked={entry["prepared"]} readOnly/> : null}
-                    </td>
-                  </tr>
-              )
+                          ))}
+                        </td>
+                        <td style={{"borderRight": "None"}}>
+                          {"prepared" in entry ? "İlaç Hazırlandı" : null}
+                          {"prepared" in entry ? <input type="checkbox" disabled={isPrepared} checked={isPrepared || isSelected} readOnly/> : null}
+                        </td>
+                      </tr>
+                  )
+                }
             )}
           </tbody>
         </table>

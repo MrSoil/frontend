@@ -9,6 +9,12 @@ import HCList from "./info_components/hcComponent";
 import HC_Form from "./info_components/hcFormComponent";
 import Medicine_Form from "./info_components/medicineFormComponent";
 
+
+function getTodayForDjango() {
+  const today = new Date();
+  return today.toString();
+}
+
 function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient }) {
     const [newRoomContainer, setNewRoomContainer] = useState(false)
     const [newCareCategoryContainer, setNewCareCategoryContainer] = useState(false)
@@ -48,6 +54,7 @@ function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient
     const [newMedicineDescError, setNewMedicineDescError] = useState("")
     const [newMedicineDoseError, setNewMedicineDoseError] = useState("")
 
+    const [ medicinesDate, setMedicinesDate ] = useState(getTodayForDjango())
 
     const popMedicineTimeSlot = () => {
         const newTimes = [...newMedicineTimes];
@@ -322,7 +329,7 @@ function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient
           //       </div>
           //   </div>
           // </div>
-          <Medicine_Form selectedPatient={selectedPatient} setSelectedPatient={setSelectedPatient} setNewMedicineContainer={setNewMedicineContainer}/>
+          <Medicine_Form selectedPatient={selectedPatient} setSelectedPatient={setSelectedPatient} setNewMedicineContainer={setNewMedicineContainer} medicinesDate={medicinesDate}/>
           : newNoteContainer !== false ?
           <div className="blackout-container">
             <div className="blackout"></div>
@@ -357,7 +364,9 @@ function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient
                                   setNewCareCategoryContainer={setNewCareCategoryContainer}/>
          <div>
              <MedicineList selectedPatient={selectedPatient}
-                       setNewMedicineContainer={setNewMedicineContainer}/>
+                        setNewMedicineContainer={setNewMedicineContainer}
+                        medicinesDate={medicinesDate}
+                        setMedicinesDate={setMedicinesDate}/>
              <HCList selectedPatient={selectedPatient}
                     setNewHCContainer={setNewHCContainer}/>
 

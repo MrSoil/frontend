@@ -7,12 +7,19 @@ import { MuiThemeProvider, createTheme } from '@material-ui/core/styles';
 
 function getTodayForDjango() {
   const today = new Date();
-  // const year = today.getFullYear();
-  // const month = String(today.getMonth() + 1).padStart(2, '0'); // getMonth is zero-based
-  // const day = String(today.getDate()).padStart(2, '0');
   return today.toString();
 }
 
+function reformatDjangoDate(djangoDateString) {
+  const d = new Date(djangoDateString);
+
+  // pull out zero-padded components
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yy = String(d.getFullYear() % 100).padStart(2, '0');
+
+  return `${dd}-${mm}-${yy}`;
+}
 
 const getGenderAge = ( age, gender ) => {
     const today = new Date();
@@ -74,7 +81,7 @@ function PatientNotes({ note }) {
   );
 }
 
-function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineContainer }) {
+function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineContainer, medicinesDate }) {
   const user = JSON.parse(localStorage.getItem("user"));
   const theme = createTheme({
     palette: {
@@ -86,9 +93,12 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
       }
     }
   });
-
+  const dict_key = reformatDjangoDate(medicinesDate)
+  console.log(dict_key)
+  console.log(selectedPatient.patient_given_medicines)
    // already‐taken medicine IDs
-  const values = (selectedPatient.patient_given_medicines !== null) ? Object.values(selectedPatient.patient_given_medicines).flat().map(obj => obj["medicine_id"])
+  const values = (selectedPatient.patient_given_medicines !== null) & (dict_key in selectedPatient.patient_given_medicines)
+      ? selectedPatient.patient_given_medicines[dict_key].map(obj => obj["medicine_id"])
       : [];
 
   const [takenMeds, setTakenMeds] = useState(new Set(values));
@@ -190,8 +200,8 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
           "noon": "Öğlen",
           "evening": "Akşam"
         };
-        const daysShort = ['Pazar','Pazartest','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
-        const today     = daysShort[new Date().getDay()];
+        const daysShort = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+        const today     = daysShort[new Date(medicinesDate).getDay()];
 
         const m = [], n = [], e = [];
 
