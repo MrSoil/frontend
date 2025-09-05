@@ -9,19 +9,6 @@ function getTodayForDjango() {
 function MedicineStatus({ string_date, date, clickFunction }) {
   return (
     <article className="medicine-status" onClick={() => clickFunction(date)}>
-      {/*<time className="medicine-date">{date}</time>*/}
-      {/*<h3 className="medicine-name">*/}
-      {/*  {medicine} | {dosage}*/}
-      {/*  <span className="dosage-detail">(2 doses)</span>*/}
-      {/*</h3>*/}
-      {/*<p className="medicine-timing">{timing}</p>*/}
-      {/*<div className="medicine-info">*/}
-      {/*  <div className="satisfaction-status">*/}
-      {/*    <span className="status-label">{satisfaction}</span>*/}
-      {/*    <div className="status-indicator" />*/}
-      {/*    <span className="label-text">Last Mod: {lastMod} h. ago</span>*/}
-      {/*  </div>*/}
-      {/*</div>*/}
         <h3 className="medicine-name">
             {string_date}
         <span className="dosage-detail">(2 doses)</span>
@@ -73,7 +60,6 @@ function MedicineList({ selectedPatient, setNewMedicineContainer, medicinesDate,
         <div className="medicine-divider" />
         <div style={{alignSelf: "center", marginLeft: "3%"}}>
             <button className="medicines-button" onClick={() => handleNewMedicine()}>Bugünün İlaçları</button>
-            <button className="medicines-button">Submit</button>
         </div>
     </article>
   );

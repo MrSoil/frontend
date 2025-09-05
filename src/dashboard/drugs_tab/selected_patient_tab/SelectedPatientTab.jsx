@@ -86,11 +86,12 @@ function SelectedPatientTab({ setSelectedPatient, selectedPatient }) {
   return (
        <div className="dashboard-content-background">
         <div className="dashboard-content-navigator">
+            <div className="dashboard-logo-design">SUGR.</div>
             <button className="navigator-button" onClick={getGeneralTab}
-            style={{margin: "0 0 5px 10px"}}>Manage Patients</button>
+            >/ Müşteri İlaçları</button>
             {
             /*First Stage*/
-
+            <button className="navigator-button">/ {selectedPatient.patient_personal_info.section_1.firstname} {selectedPatient.patient_personal_info.section_1.lastname}</button>
             }
         </div>
         <div className="dashboard-content-container">
@@ -157,7 +158,7 @@ function SelectedPatientTab({ setSelectedPatient, selectedPatient }) {
       </div>
         <div className="dashboard-drugs-profile-container">
 
-         <MedicationTable setNewMedicineContainer={setNewMedicineContainer} selectedPatient={selectedPatient} setNewSystemMedicineContainer={setNewSystemMedicineContainer} />
+         <MedicationTable setNewMedicineContainer={setNewMedicineContainer} selectedPatient={selectedPatient} setSelectedPatient={setSelectedPatient} setNewSystemMedicineContainer={setNewSystemMedicineContainer} />
       </div>
 
     </div>

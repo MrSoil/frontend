@@ -22,8 +22,9 @@ function PatientsTab() {
   return (
     <div className="dashboard-content-background">
         <div className="dashboard-content-navigator">
+            <div className="dashboard-logo-design">SUGR.</div>
             <button className="navigator-button" onClick={getGeneralTab}
-            style={{margin: "0 0 5px 10px"}}>Manage Patients</button>
+            >/ Müşteri Yönetimi</button>
             {
             /*First Stage*/
                 addTab ? <button className="navigator-button">Add Patients</button>:

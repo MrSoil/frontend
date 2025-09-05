@@ -5,17 +5,21 @@
   "dependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.0-placeholder-for-preset-env.2",
     "@builder.io/react": "^3.2.6",
-    "@material-ui/core": "^4.12.4",
-    "@material-ui/system": "^4.12.2",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.1",
+    "@mui/material": "^7.3.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "ajv": "^8.17.1",
+    "ajv-keywords": "^5.1.0",
     "react": "^18.2.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
-    "react-scripts": "5.0.1",
+    "react-scripts": "^5.0.1",
     "react-select": "^5.8.3",
     "react-tag-input": "^6.10.6",
     "web-vitals": "^2.1.4"
@@ -43,5 +47,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "overrides": {}
 }

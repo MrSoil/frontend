@@ -216,7 +216,7 @@ function PatientProfileComponent({ selectedPatientOuter, setNewRoomContainer, se
               surname={selectedPatient.patient_personal_info.section_1.last_name}
               gender={selectedPatient.patient_personal_info.section_1.patientGender}
               age={selectedPatient.patient_personal_info.section_1.dateOfBirth}
-              bloodType="{selectedPatient.patient_personal_info.section_1.blood_type}"
+              bloodType={selectedPatient.patient_personal_info.section_1.bloodType.toUpperCase()}
               height={selectedPatient.patient_personal_info.section_1.patientHeight}
               weight={selectedPatient.patient_personal_info.section_1.patientWeight}
             />
@@ -224,7 +224,7 @@ function PatientProfileComponent({ selectedPatientOuter, setNewRoomContainer, se
             <div className="room-info">
                 <h3 className="title">Room</h3>
                 <div className="details">
-                  <p>{selectedPatient.floor_no}</p>
+                  <p>{selectedPatient.patient_personal_info.section_1.patientRoom}</p>
                 </div>
             </div>
 

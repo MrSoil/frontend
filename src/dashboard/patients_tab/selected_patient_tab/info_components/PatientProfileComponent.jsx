@@ -162,7 +162,7 @@ function PatientProfileComponent({ selectedPatient, setNewRoomContainer, setNewC
               surname={selectedPatient.patient_personal_info.section_1.last_name}
               gender={selectedPatient.patient_personal_info.section_1.patientGender}
               age={selectedPatient.patient_personal_info.section_1.dateOfBirth}
-              bloodType="{selectedPatient.patient_personal_info.section_1.blood_type}"
+              bloodType={selectedPatient.patient_personal_info.section_1.bloodType.toUpperCase()}
               height={selectedPatient.patient_personal_info.section_1.patientHeight}
               weight={selectedPatient.patient_personal_info.section_1.patientWeight}
             />
@@ -170,7 +170,7 @@ function PatientProfileComponent({ selectedPatient, setNewRoomContainer, setNewC
             <div className="room-info">
                 <h3 className="title">Room</h3>
                 <div className="details">
-                  <p>"selectedPatient.floor_no"</p>
+                  <p>{selectedPatient.patient_personal_info.section_1.patientRoom}</p>
                   <button className="change-room" onClick={handleNewRoom}>Change Room</button>
                 </div>
             </div>
@@ -178,7 +178,7 @@ function PatientProfileComponent({ selectedPatient, setNewRoomContainer, setNewC
             <div className="care-category">
             <h3 className="title">Care Category</h3>
             <div className="category">
-                <p>"selectedPatient.care_category"</p>
+                <p></p>
                 <button className="change-category" onClick={handleNewCareCategory}>Change Category</button>
             </div>
           </div>

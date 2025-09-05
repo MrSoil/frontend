@@ -91,7 +91,7 @@ const [fullnessOptions, setFullnessOptions] = useState({
                 'medicine_data': {
                     "name": selectedMedicineName,
                     "category": selectedMedicineCategory,
-                    "selected_period": selectedPeriod,
+                    "selected_periods": selectedPeriod,
                     "selected_days": selectedDays,
                     "fullness_options": fullnessOptions,
                     "medicine_dosage": medicineDosage

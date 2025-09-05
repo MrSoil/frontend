@@ -55,6 +55,7 @@ function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient
     const [newMedicineDoseError, setNewMedicineDoseError] = useState("")
 
     const [ medicinesDate, setMedicinesDate ] = useState(getTodayForDjango())
+    const [ hcDate, setHcDate ] = useState(getTodayForDjango())
 
     const popMedicineTimeSlot = () => {
         const newTimes = [...newMedicineTimes];
@@ -241,94 +242,6 @@ function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient
             </div>
           </div>
           : newMedicineContainer !== false ?
-          // <div className="blackout-container">
-          //   <div className="blackout"></div>
-          //   <div className="blackout-content-container">
-          //       <div className="update-row-container">
-          //           <div className={"formContainer"} style={{"marginBottom": "10px"}} >
-          //               <input
-          //                   value={newMedicineName}
-          //                   placeholder=" i.e. Majezik"
-          //                   onChange={ev => setNewMedicineName(ev.target.value)}
-          //                   onFocus={ev => setNewMedicineNameError("")}
-          //                   className={"formBox"} />
-          //               {newMedicineNameError !== "" ? <label className="errorLabel">Medicine Name</label>: null}
-          //               {newMedicineNameError === "" ? <label>Medicine Name</label>: null}
-          //           </div>
-          //           <div className={"formContainer"} style={{"marginBottom": "10px"}} >
-          //                   <input
-          //                       value={newMedicineDose}
-          //                       placeholder=" i.e. 100 mg, 1 dose etc."
-          //                       onChange={ev => setNewMedicineDose(ev.target.value)}
-          //                       onFocus={ev => setNewMedicineDoseError("")}
-          //                       className={"formBox"} />
-          //                   {newMedicineDoseError !== "" ? <label className="errorLabel">Medicine Dose</label>: null}
-          //                   {newMedicineDoseError === "" ? <label>Medicine Dose</label>: null}
-          //               </div>
-          //       </div>
-          //       <div style={{"overflowY": "scroll", "maxHeight": "300px", "padding": "5px", "zIndex": "999"}}>
-          //           <div className="update-row-container">
-          //               {/*<select*/}
-          //               {/*    onChange={ev => setNewMedicineDay(ev.target.value)}*/}
-          //               {/*    className={"formBox"}>*/}
-          //               {/*    <option hidden selected={true} value="">--Select a Day--</option>*/}
-          //               {/*    <option value="Sunday">Sunday</option>*/}
-          //               {/*    <option value="Monday">Monday</option>*/}
-          //               {/*    <option value="Tuesday">Tuesday</option>*/}
-          //               {/*    <option value="Wednesday">Wednesday</option>*/}
-          //               {/*    <option value="Thursday">Thursday</option>*/}
-          //               {/*    <option value="Friday">Friday</option>*/}
-          //               {/*    <option value="Saturday">Saturday</option>*/}
-          //               {/*</select>*/}
-          //               <Select
-          //                   isMulti
-          //                   name="days"
-          //                   options={days}
-          //                   className={"Select"}
-          //                   // className="basic-multi-select"
-          //                   classNamePrefix="select"
-          //                   value={newMedicineDay}
-          //                   onChange={ev => setNewMedicineDay(ev)}
-          //                   placeholder="--Select a Day--"
-          //               />
-          //               Time Slots:
-          //               <button className={"miniAdd"} onClick={addMedicineTimeSlot} >+</button>
-          //
-          //               {newMedicineRemove ? <button className={"miniRemove"} onClick={popMedicineTimeSlot} >-</button> : <button className={"miniDisabled"}>-</button>}
-          //
-          //             </div>
-          //           <div id={"inputFieldsContainer"}>
-          //               {newMedicineTimes.map((time, index) => (
-          //                 <div key={index} className="formContainer">
-          //                   <input
-          //                     type="time"
-          //                     className="formBox"
-          //                     value={newMedicineTimes[index]}
-          //                     onChange={(event) => handleTimeChange(index, event)}
-          //                   />
-          //                   <label>Medicine Time</label>
-          //
-          //                 </div>
-          //               ))}
-          //           </div>
-          //
-          //       </div>
-          //       <div className={"formContainer"} style={{height: "fit-content"}}>
-          //           <textarea
-          //               value={newMedicineDesc}
-          //               placeholder=""
-          //               onChange={ev => setNewMedicineDesc(ev.target.value)}
-          //               onFocus={ev => setNewMedicineDescError("")}
-          //               className={"formBox"}></textarea>
-          //           {newMedicineDescError !== "" ? <label className="errorLabel">Medicine Description</label>: null}
-          //           {newMedicineDescError === "" ? <label>Medicine Description</label>: null}
-          //       </div>
-          //       <div className="exit-container">
-          //           <button style={{backgroundColor: "#E77169", float: "left"}} onClick={cancelNewMedicine} >Cancel</button>
-          //           <button style={{backgroundColor: "#A695CC", float: "right"}} onClick={addNewMedicine} >Submit</button>
-          //       </div>
-          //   </div>
-          // </div>
           <Medicine_Form selectedPatient={selectedPatient} setSelectedPatient={setSelectedPatient} setNewMedicineContainer={setNewMedicineContainer} medicinesDate={medicinesDate}/>
           : newNoteContainer !== false ?
           <div className="blackout-container">
@@ -358,7 +271,9 @@ function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient
           </div>
           : newHCContainer !== false ?
           <HC_Form selectedPatient={selectedPatient}
-                    setNewHCContainer={setNewHCContainer}/> : null}
+                   setSelectedPatient={setSelectedPatient}
+                    setNewHCContainer={setNewHCContainer}
+                    hcDate={hcDate}/> : null}
          <PatientProfileComponent selectedPatient={selectedPatient}
                                   setNewRoomContainer={setNewRoomContainer}
                                   setNewCareCategoryContainer={setNewCareCategoryContainer}/>
@@ -368,7 +283,9 @@ function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient
                         medicinesDate={medicinesDate}
                         setMedicinesDate={setMedicinesDate}/>
              <HCList selectedPatient={selectedPatient}
-                    setNewHCContainer={setNewHCContainer}/>
+                    setNewHCContainer={setNewHCContainer}
+                    hcDate={hcDate}
+                    setHcDate={setHcDate}/>
 
          </div>
          <div>

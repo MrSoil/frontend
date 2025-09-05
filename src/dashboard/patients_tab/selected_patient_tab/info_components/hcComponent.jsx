@@ -1,64 +1,65 @@
 import * as React from "react";
 import './hc_component.css'
 
+function getTodayForDjango() {
+  const today = new Date();
+  return today.toString();
+}
 
-function HCStatus({ date, hc, dosage, timing, lastMod }) {
+function HcStatus({ string_date, date, clickFunction }) {
   return (
-    <article className="hc-status">
-      <time className="hc-date">{date}</time>
-      <h3 className="hc-name">
-        {hc} | {dosage}
+    <article className="hc-status" onClick={() => clickFunction(date)}>
+        <h3 className="hc-name">
+            {string_date}
         <span className="dosage-detail">(2 doses)</span>
       </h3>
-      <p className="hc-timing">{timing}</p>
-      <div className="hc-info">
-      <span className="label-text">Last Mod: {lastMod} h. ago</span>
-      </div>
+       <time className="hc-date">{date}</time>
+
     </article>
   );
 }
 
-function HCList({ selectedPatient, setNewHCContainer }) {
-  const signed_hc = [
-    {
-      date: "15.09.23 | Permanently",
-      hc: "hc A",
-      dosage: "12 mg",
-      timing: "Every morning | Full",
-      lastMod: "16",
-    },
-    {
-      date: "19.05.24 | 26.05.24",
-      hc: "hc B",
-      dosage: "24 mg",
-      timing: "Every 12 hours | Full",
-      lastMod: "13",
-    },
-    {
-      date: "19.05.24 | 26.05.24",
-      hc: "hc C",
-      dosage: "1000 mg",
-      timing: "Every night | Hungry",
-      lastMod: "16",
-    },
-  ];
+function getLastSixDaysForDjango() {
+  const daysOfWeek = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+  const out = [];
 
-  const handleNewHC = () => {
+  for (let i = 1; i <= 6; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+
+    out.push({
+      string_date: daysOfWeek[d.getDay()],
+      date:  Date.prototype.toString.call(d)
+    });
+  }
+
+  return out;
+}
+
+function HCList({ selectedPatient, setNewHCContainer, hcDate, setHcDate }) {
+  const hcs = getLastSixDaysForDjango();
+
+  const handleNewHc = (new_date = getTodayForDjango()) => {
+      console.log(new_date)
+      setHcDate(new_date)
       setNewHCContainer(true)
   }
 
   return (
     <article className="hc-container">
-        <header className="hc-header">hcs</header>
+        <header className="hc-header">Hcs</header>
         <div className="hc-divider" />
         <div style={{"overflow": "scroll", "overflowX": "hidden"}}>
-          {signed_hc.map((each_hc, index) => (
-            <HCStatus key={index} {...each_hc} />
+          {hcs.map((hc, index) => (
+            <HcStatus key={index}
+                            setHcsDate={setHcDate}
+                            setNewHCContainer={setNewHCContainer}
+                            clickFunction={handleNewHc} {...hc} />
           ))}
         </div>
         <div className="hc-divider" />
         <div style={{alignSelf: "center", marginLeft: "3%"}}>
-            <button className="hcs-button" onClick={handleNewHC}>Sign Health Care</button>
+            <button className="hcs-button" onClick={() => handleNewHc()}>Bugünün İlaçları</button>
         </div>
     </article>
   );

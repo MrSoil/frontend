@@ -1,9 +1,8 @@
 import * as React from "react";
-import Tab from "@material-ui/core/Tab";
-import Tabs from "@material-ui/core/Tabs";
 import './medicine_form_component.css'
 import {useEffect, useState} from "react";
-import { MuiThemeProvider, createTheme } from '@material-ui/core/styles';
+import { Tab, Tabs } from '@mui/material';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 function getTodayForDjango() {
   const today = new Date();
@@ -95,16 +94,16 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
   });
   const dict_key = reformatDjangoDate(medicinesDate)
   console.log(dict_key)
-  console.log(selectedPatient.patient_given_medicines)
    // already‐taken medicine IDs
-  const values = (selectedPatient.patient_given_medicines !== null) & (dict_key in selectedPatient.patient_given_medicines)
-      ? selectedPatient.patient_given_medicines[dict_key].map(obj => obj["medicine_id"])
-      : [];
 
-  const [takenMeds, setTakenMeds] = useState(new Set(values));
+  const [takenMeds_M, setTakenMeds_M] = useState(new Set());
+  const [takenMeds_N, setTakenMeds_N] = useState(new Set());
+  const [takenMeds_E, setTakenMeds_E] = useState(new Set());
 
   // meds the user has just checked this session
-  const [selectedGivenMeds, setSelectedGivenMeds] = useState(new Set());
+  const [selectedGivenMeds_M, setSelectedGivenMeds_M] = useState(new Set());
+  const [selectedGivenMeds_E, setSelectedGivenMeds_E] = useState(new Set());
+  const [selectedGivenMeds_N, setSelectedGivenMeds_N] = useState(new Set());
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -174,8 +173,8 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
   };
 
 
-  const handleGivenChange = medId => {
-    setSelectedGivenMeds(prev => {
+  const handleGivenChange_M = medId => {
+    setSelectedGivenMeds_M(prev => {
       const next = new Set(prev);
       if (next.has(medId)) next.delete(medId);
       else next.add(medId);
@@ -183,73 +182,60 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
     });
   };
 
-  const getSystemMedicineList = (email) => {
-    fetch(`http://localhost:8000/api/patients/?email=${email}`, {
-      method: "GET",
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(r => r.json())
-    .then(resp => {
-      // Assuming the backend sends back a JSON response indicating success or failure
-      if (resp.status === "success") {
-        const meds = resp.data[0]["patient_medicines"];
-        const periodMap = {
-          "morning": "Sabah",
-          "noon": "Öğlen",
-          "evening": "Akşam"
-        };
-        const daysShort = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
-        const today     = daysShort[new Date(medicinesDate).getDay()];
-
-        const m = [], n = [], e = [];
-
-        Object.entries(meds).forEach(([medId, record]) => {
-          const buildEntry = (period) => ({
-              id: medId,
-              name: record.medicine_data.name,
-              category: record.medicine_data.category,
-              dosage: record.medicine_data.medicine_dosage[period],
-              fullness: record.medicine_data.fullness_options[period],
-              days: record.medicine_data.selected_days[period],
-              period: periodMap[period],
-              given: false,
-          });
-
-          if (record.medicine_data.selected_period.morning && record.medicine_data.selected_days.morning.includes(today)) m.push(buildEntry("morning"));
-          if (record.medicine_data.selected_period.noon    && record.medicine_data.selected_days.noon.includes(today))    n.push(buildEntry("noon"));
-          if (record.medicine_data.selected_period.evening && record.medicine_data.selected_days.evening.includes(today)) e.push(buildEntry("evening"));
-        });
-
-        setDailyMedicinesM(m);
-        setDailyMedicinesN(n);
-        setDailyMedicinesE(e);
-
-
-        setIsLoading(false);
-
-      } else {
-        setIsLoading(true);
-      }
-    }
-    )
-    .catch(error => {
-        setIsLoading(true);
+    const handleGivenChange_N = medId => {
+    setSelectedGivenMeds_N(prev => {
+      const next = new Set(prev);
+      if (next.has(medId)) next.delete(medId);
+      else next.add(medId);
+      return next;
     });
-    };
+  };
+
+      const handleGivenChange_E = medId => {
+    setSelectedGivenMeds_E(prev => {
+      const next = new Set(prev);
+      if (next.has(medId)) next.delete(medId);
+      else next.add(medId);
+      return next;
+    });
+  };
 
   const submitGivenMeds = () => {
-    const payload = Array.from(selectedGivenMeds).map(medicine_id => (
+    const payload_M = Array.from(selectedGivenMeds_M).map(medicine_id => (
         {
             "patient_id": selectedPatient["patient_id"],
             "email": user.email,
             "type": "add_given_medicine",
             "medicine_id": medicine_id,
-            "given": true,
+            "period": "morning",
             "today_date": getTodayForDjango()
         }
     ));
+
+    const payload_N = Array.from(selectedGivenMeds_N).map(medicine_id => (
+        {
+            "patient_id": selectedPatient["patient_id"],
+            "email": user.email,
+            "type": "add_given_medicine",
+            "medicine_id": medicine_id,
+            "period": "noon",
+            "today_date": getTodayForDjango()
+        }
+    ));
+
+    const payload_E = Array.from(selectedGivenMeds_E).map(medicine_id => (
+        {
+            "patient_id": selectedPatient["patient_id"],
+            "email": user.email,
+            "type": "add_given_medicine",
+            "medicine_id": medicine_id,
+            "period": "evening",
+            "today_date": getTodayForDjango()
+        }
+    ));
+
+    const payload = payload_M.concat(payload_N).concat(payload_E)
+
     console.log(payload)
     // setTakenMeds(prev => new Set([...prev, ...selectedGivenMeds]));
     // setSelectedGivenMeds(new Set());
@@ -263,20 +249,27 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
               "email": payload[i]["email"],
               "type": payload[i]["type"],
               "medicine_id": payload[i]["medicine_id"],
-              "given": payload[i]["given"],
+              "period": payload[i]["period"],
               "today_date": payload[i]["today_date"]
           })
         })
         .then(r => r.json())
         .then(() => {
           // merge newly given into takenMeds and clear selection
-          setTakenMeds(prev => new Set([...prev, ...selectedGivenMeds]));
-          setSelectedGivenMeds(new Set());
+          setTakenMeds_M(prev => new Set([...prev, ...selectedGivenMeds_M]));
+          setTakenMeds_N(prev => new Set([...prev, ...selectedGivenMeds_N]));
+          setTakenMeds_E(prev => new Set([...prev, ...selectedGivenMeds_E]));
+
+          setSelectedGivenMeds_M(new Set());
+          setSelectedGivenMeds_N(new Set());
+          setSelectedGivenMeds_E(new Set());
         })
         .catch(console.error);
     }
   };
+
   const updateSelectedPatient = (email) => {
+    setIsLoading(true);
     fetch(`http://localhost:8000/api/patients/?email=${email}`, {
       method: "GET",
       headers: {
@@ -291,20 +284,62 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
         if (selectedPatient !== selectedPatientNew){
           setSelectedPatient(selectedPatientNew);
         }
+        const values_M = []
+        const values_N = []
+        const values_E = []
+
+        for (var key in selectedPatientNew.patient_medicines) {
+          var medicine = selectedPatientNew.patient_medicines[key];
+          if (dict_key in medicine["medicine_data"]["given_dates"]["morning"]) values_M.push(medicine["medicine_id"])
+          if (dict_key in medicine["medicine_data"]["given_dates"]["noon"]) values_N.push(medicine["medicine_id"])
+          if (dict_key in medicine["medicine_data"]["given_dates"]["evening"]) values_E.push(medicine["medicine_id"])
+        }
+        setTakenMeds_M(new Set(values_M))
+        setTakenMeds_N(new Set(values_N))
+        setTakenMeds_E(new Set(values_E))
+
+        const meds = selectedPatientNew["patient_medicines"];
+        const periodMap = {
+          "morning": "Sabah",
+          "noon": "Öğlen",
+          "evening": "Akşam"
+        };
+        const daysShort = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+        const today     = daysShort[new Date(medicinesDate).getDay()];
+
+        const m = [], n = [], e = [];
+        Object.entries(meds).forEach(([medId, record]) => {
+          const buildEntry = (period) => ({
+              id: medId,
+              name: record.medicine_data.name,
+              category: record.medicine_data.category,
+              dosage: record.medicine_data.medicine_dosage[period],
+              fullness: record.medicine_data.fullness_options[period],
+              days: record.medicine_data.selected_days[period],
+              period: periodMap[period],
+              given: getTodayForDjango() in record.medicine_data.given_dates[period],
+          });
+
+          if (record.medicine_data.selected_periods.morning && record.medicine_data.selected_days.morning.includes(today)) m.push(buildEntry("morning"));
+          if (record.medicine_data.selected_periods.noon    && record.medicine_data.selected_days.noon.includes(today))    n.push(buildEntry("noon"));
+          if (record.medicine_data.selected_periods.evening && record.medicine_data.selected_days.evening.includes(today)) e.push(buildEntry("evening"));
+
+        });
+
+        setDailyMedicinesM(m);
+        setDailyMedicinesN(n);
+        setDailyMedicinesE(e);
+
+        setIsLoading(false);
+
       }
     }
     )
-    .catch(error => {
-    });
   };
 
   useEffect(() => {
       updateSelectedPatient(user.email)
-    }, [takenMeds]);
-
-  useEffect(() => {
-      getSystemMedicineList(user.email)
-    }, [selectedPatient, user.email]);
+    }, [user.email]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -336,7 +371,7 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
               surname={selectedPatient.patient_personal_info.section_1.last_name}
               gender={selectedPatient.patient_personal_info.section_1.patientGender}
               age={selectedPatient.patient_personal_info.section_1.dateOfBirth}
-              bloodType="{selectedPatient.patient_personal_info.section_1.blood_type}"
+              bloodType={selectedPatient.patient_personal_info.section_1.bloodType.toUpperCase()}
               height={selectedPatient.patient_personal_info.section_1.patientHeight}
               weight={selectedPatient.patient_personal_info.section_1.patientWeight}
               />
@@ -373,7 +408,7 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
           <div className="half-medicine-column" style={{"height": "650px"}}>
           <h3>Günlük İlaç Takibi</h3>
           <div style={{"display": "grid", "height": "90%", "marginTop": "10px"}}>
-              <MuiThemeProvider theme={theme}>
+              <ThemeProvider theme={theme}>
             <Tabs
                 textColor={'primary'} indicatorColor={'secondary'}
                 className="tab-button"
@@ -389,7 +424,7 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
                 <Tab label="Öğlen İçilecek İlaçlar"/>
                 <Tab label="Akşam İçilecek İlaçlar"/>
             </Tabs>
-                  </MuiThemeProvider>
+                  </ThemeProvider>
               <div className="medicine-scroll" style={{marginTop: "10px"}}>
                     <table style={{width: "100%"}}>
                       <thead>
@@ -444,8 +479,8 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
                       </thead>
                         {tabValue === 0 ? <tbody>
                              {dailyMedicinesM.map( medicine => {
-                                const isTaken    = takenMeds.has(medicine.id);
-                                const isSelected = selectedGivenMeds.has(medicine.id);
+                                const isTaken    = takenMeds_M.has(medicine.id);
+                                const isSelected = selectedGivenMeds_M.has(medicine.id);
                                 return (
                                 <tr key={medicine.id}>
                                 <td>{medicine["name"]}</td>
@@ -457,7 +492,7 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
                                     type="checkbox"
                                     disabled={isTaken}
                                     checked={isTaken || isSelected}
-                                    onChange={() => handleGivenChange(medicine.id)}
+                                    onChange={() => handleGivenChange_M(medicine.id)}
                                   />
                                 </td>
                               </tr>);
@@ -465,8 +500,8 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
                         </tbody> :
                          tabValue === 1 ? <tbody>
                              {dailyMedicinesN.map( medicine => {
-                                const isTaken    = takenMeds.has(medicine.id);
-                                const isSelected = selectedGivenMeds.has(medicine.id);
+                                const isTaken    = takenMeds_N.has(medicine.id);
+                                const isSelected = selectedGivenMeds_N.has(medicine.id);
                                 return (
                                 <tr key={medicine.id}>
                                 <td>{medicine["name"]}</td>
@@ -478,7 +513,7 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
                                     type="checkbox"
                                     disabled={isTaken}
                                     checked={isTaken || isSelected}
-                                    onChange={() => handleGivenChange(medicine.id)}
+                                    onChange={() => handleGivenChange_N(medicine.id)}
                                   />
                                 </td>
                               </tr>);
@@ -486,8 +521,8 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
                          </tbody> :
                          tabValue === 2 ? <tbody>
                              {dailyMedicinesE.map( medicine => {
-                                const isTaken    = takenMeds.has(medicine.id);
-                                const isSelected = selectedGivenMeds.has(medicine.id);
+                                const isTaken    = takenMeds_E.has(medicine.id);
+                                const isSelected = selectedGivenMeds_E.has(medicine.id);
                                 return (
                                 <tr key={medicine.id}>
                                 <td>{medicine["name"]}</td>
@@ -499,7 +534,7 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
                                     type="checkbox"
                                     disabled={isTaken}
                                     checked={isTaken || isSelected}
-                                    onChange={() => handleGivenChange(medicine.id)}
+                                    onChange={() => handleGivenChange_E(medicine.id)}
                                   />
                                 </td>
                               </tr>);
@@ -519,7 +554,7 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
             <h3>Kontrol Eden Hemşire:</h3>
             <label>İsa Yusuf ORAK</label>
           </div>
-            <button style={{backgroundColor: "#A695CC"}} onClick={submitGivenMeds}>İmza</button>
+          <button style={{backgroundColor: "#A695CC"}} onClick={submitGivenMeds}>İmza</button>
           </div>
         </div>
         </div>

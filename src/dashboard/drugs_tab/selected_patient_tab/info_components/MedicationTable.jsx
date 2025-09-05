@@ -2,6 +2,23 @@ import React, { useState, useEffect } from 'react';
 import './medication_table.css';
 import addDrugIcon from "../../../../assets/dashboard/icons-adddrug-blue.png";
 
+
+const getDatesUntilMonday = () => {
+    const dates = [];
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    const day = start.getDay();
+    const daysToMonday = (1 - day + 7) % 7; // 0 if today is Monday
+    const offsetStart = 0;
+
+    for (let i = offsetStart; i <= daysToMonday; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    dates.push(d.toString());
+    }
+    return dates;
+};
+
 function isDateInCurrentWeek(date) {
   if (!date) return false;
   const now = new Date();
@@ -34,7 +51,7 @@ function reformatDjangoDate(djangoDateString) {
   return `${dd}-${mm}-${yy}`;
 }
 
-const MedicationTable = ({setNewMedicineContainer, selectedPatient, setNewSystemMedicineContainer}) => {
+const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedPatient, setNewSystemMedicineContainer}) => {
   const user = JSON.parse(localStorage.getItem("user"));
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState([]);
@@ -51,6 +68,8 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setNewSystem
     'Cts':"Cumartesi"
   }
 
+  const today = getTodayForDjango();
+
   const [preparedMeds, setPreparedMeds] = useState(new Set());
 
   const [selectedPreparedMeds, setSelectedPreparedMeds] = useState(new Set());
@@ -63,6 +82,15 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setNewSystem
   const handleAddMedicineSystem = (index) => {
     setNewSystemMedicineContainer(true)
 
+  };
+
+   const handlePrepareChange = medId => {
+    setSelectedPreparedMeds(prev => {
+      const next = new Set(prev);
+      if (next.has(medId)) next.delete(medId);
+      else next.add(medId);
+      return next;
+    });
   };
 
   const requestSort = (key) => {
@@ -96,47 +124,7 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setNewSystem
     .then(resp => {
       // Assuming the backend sends back a JSON response indicating success or failure
       if (resp.status === "success") {
-        const meds = resp.data[0]["patient_medicines"];
-        const daysShort = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
-        const periodMap = {
-          "morning": "Sabah",
-          "noon": "Öğlen",
-          "evening": "Akşam"
-        };
 
-        const today     = daysShort[new Date().getDay()];
-
-        const all = [];
-
-        Object.entries(meds).forEach(([medId, record]) => {
-          const buildEntry = (period) => ({
-              id: medId,
-              name: record.medicine_data.name,
-              category: record.medicine_data.category,
-              dosage: record.medicine_data.medicine_dosage[period],
-              fullness: record.medicine_data.fullness_options[period],
-              days: record.medicine_data.selected_days[period],
-              prepared: record.medicine_data.prepared[period],
-              period: periodMap[period]
-          });
-
-
-
-          if (record.medicine_data.selected_period.morning && record.medicine_data.selected_days.morning.includes(today)) {
-            let datum = buildEntry("morning")
-            all.push(datum);
-          }
-          if (record.medicine_data.selected_period.noon    && record.medicine_data.selected_days.noon.includes(today)) {
-            let datum = buildEntry("noon")
-            all.push(datum);
-          }
-          if (record.medicine_data.selected_period.evening && record.medicine_data.selected_days.evening.includes(today)) {
-            let datum = buildEntry("evening")
-            all.push(datum);
-          }
-        });
-
-        setData(all)
         setIsLoading(false);
 
       } else {
@@ -149,9 +137,112 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setNewSystem
     });
   };
 
+  const submitGivenMeds = () => {
+      setIsLoading(true)
+    const payload = Array.from(selectedPreparedMeds).flatMap(medicine_id =>
+        getDatesUntilMonday().map(today_date => ({
+        patient_id: selectedPatient.patient_id,
+        email: user.email,
+        type: "add_prepared_medicine",
+        medicine_id: medicine_id,
+        today_date: today_date,
+        }))
+    );
+    console.log(payload)
+
+    for (let i = 0; i < payload.length; i++) {
+        fetch("http://localhost:8000/api/patients/", {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json'},
+          body: JSON.stringify({
+              "patient_id": payload[i]["patient_id"],
+              "email": payload[i]["email"],
+              "type": payload[i]["type"],
+              "medicine_id": payload[i]["medicine_id"],
+              "today_date": payload[i]["today_date"]
+          })
+        })
+        .then(r => r.json())
+        .then(() => {
+          // merge newly given into takenMeds and clear selection
+          setPreparedMeds(prev => new Set([...prev, ...selectedPreparedMeds]));
+          setSelectedPreparedMeds(new Set());
+
+        })
+        .catch(console.error);
+    }
+    setIsLoading(false)
+  };
+
+  const updateSelectedPatient = (email) => {
+    setIsLoading(true)
+    fetch(`http://localhost:8000/api/patients/?email=${email}`, {
+      method: "GET",
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(r => r.json())
+    .then(resp => {
+      // Assuming the backend sends back a JSON response indicating success or failure
+      if (resp.status === "success") {
+        const selectedPatientNew = resp.data[0];
+        if (selectedPatient !== selectedPatientNew){
+          setSelectedPatient(selectedPatientNew);
+        }
+        const values = []
+
+        for (var key in selectedPatientNew.patient_medicines) {
+            var medicine = selectedPatientNew.patient_medicines[key];
+            if (reformatDjangoDate(getTodayForDjango()) in medicine["medicine_data"]["prepared_dates"]) values.push(key)
+        }
+        console.log(values)
+        setPreparedMeds(new Set(values))
+
+        const meds = resp.data[0]["patient_medicines"];
+        const daysShort = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+        const periodMap = {
+          "morning": "Sabah",
+          "noon": "Öğlen",
+          "evening": "Akşam"
+        };
+
+        const today     = daysShort[new Date().getDay()];
+        const all = [];
+
+        Object.entries(meds).forEach(([medId, record]) => {
+          const buildEntry = (period) => ({
+              id: medId,
+              name: record.medicine_data.name,
+              category: record.medicine_data.category,
+              dosage: record.medicine_data.medicine_dosage[period],
+              fullness: record.medicine_data.fullness_options[period],
+              days: record.medicine_data.selected_days[period],
+              prepared: getTodayForDjango() in record.medicine_data.prepared_dates,
+              period: periodMap[period]
+          });
+
+
+          if (record.medicine_data.selected_periods.morning && record.medicine_data.selected_days.morning.includes(today)) all.push(buildEntry("morning"));
+          if (record.medicine_data.selected_periods.noon    && record.medicine_data.selected_days.noon.includes(today))    all.push(buildEntry("noon"));
+          if (record.medicine_data.selected_periods.evening && record.medicine_data.selected_days.evening.includes(today)) all.push(buildEntry("evening"));
+
+        });
+
+        setData(all)
+        setIsLoading(false)
+
+      }
+    }
+    )
+    .catch(error => {
+        setIsLoading(true)
+    });
+  };
+
   useEffect(() => {
-      getSystemMedicineList(user.email)
-    }, [selectedPatient]);
+      updateSelectedPatient(user.email)
+    }, [user.email]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -170,7 +261,7 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setNewSystem
         </div>
 
       </div>
-        <div className="scroll-table">
+      <div className="scroll-table">
         <table>
           <thead>
           <tr>
@@ -216,8 +307,11 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setNewSystem
                           ))}
                         </td>
                         <td style={{"borderRight": "None"}}>
-                          {"prepared" in entry ? "İlaç Hazırlandı" : null}
-                          {"prepared" in entry ? <input type="checkbox" disabled={isPrepared} checked={isPrepared || isSelected} readOnly/> : null}
+                          <input
+                              type="checkbox"
+                              disabled={isPrepared}
+                              checked={isPrepared || isSelected}
+                              onChange={() => handlePrepareChange(entry.id)}/>
                         </td>
                       </tr>
                   )
@@ -226,6 +320,8 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setNewSystem
           </tbody>
         </table>
       </div>
+      <div className="divider" />
+      <button className="general-button" onClick={submitGivenMeds}>İmza</button>
     </div>
     </div>
 

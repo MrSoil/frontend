@@ -1,4 +1,4 @@
-import { React, useState } from 'react';
+import { React, useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import {useAuth} from "../../home/AuthContext";
 import "./sidebar.css"
@@ -13,6 +13,7 @@ import settingsIconImage from "../../assets/sidebar/icons-settings.png";
 
 
 function Sidebar() {
+  let hover_index_map = ["drugs", "patients", "x", "y"]
   const navigate = useNavigate();
   const { logout } = useAuth();
 
@@ -20,7 +21,6 @@ function Sidebar() {
 
     const handleHoverChange = (index) => {
         let newSidebarHovers = [false, false, false, false];
-        let hover_index_map = ["drugs", "patients", "x", "y"]
         navigate("/dashboard/"+hover_index_map[index])
         newSidebarHovers[index] = true;
         setSidebarHovers(newSidebarHovers);
@@ -30,6 +30,22 @@ function Sidebar() {
     navigate("/home")
   }
 
+  const updateSidebar = () => {
+      console.log(window.location.href)
+      let current_url = window.location.href
+      for (let i = 0; i <= hover_index_map.length; i++) {
+          if (current_url.includes(hover_index_map[i])) {
+            let newSidebarHovers = [false, false, false, false];
+            newSidebarHovers[i] = true;
+            setSidebarHovers(newSidebarHovers);
+          }
+      }
+
+  }
+
+  useEffect(() => {
+      updateSidebar();
+  }, [window.location.href]);
 
   return (
     <div className="sidebar">

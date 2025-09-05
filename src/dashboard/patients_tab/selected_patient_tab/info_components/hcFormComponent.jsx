@@ -1,7 +1,22 @@
 import * as React from "react";
 import './hc_form_component.css'
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
+function getTodayForDjango() {
+  const today = new Date();
+  return today.toString();
+}
+
+function reformatDjangoDate(djangoDateString) {
+  const d = new Date(djangoDateString);
+
+  // pull out zero-padded components
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yy = String(d.getFullYear() % 100).padStart(2, '0');
+
+  return `${dd}-${mm}-${yy}`;
+}
 
 function PatientNotes({ note }) {
     let date = note["note_date"]
@@ -18,7 +33,8 @@ function PatientNotes({ note }) {
   );
 }
 
-function HCForm({ selectedPatient, setNewHCContainer, isFilled=false }) {
+function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate }) {
+  const user = JSON.parse(localStorage.getItem("user"));
 
   const onCancelCareClick = () => {
       setNewHCContainer(false)
@@ -76,23 +92,29 @@ function HCForm({ selectedPatient, setNewHCContainer, isFilled=false }) {
     stool: "Gaita Çıkışı Var mı?"
   }
 
+  const dict_key = reformatDjangoDate(hcDate)
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [ hcType, setHcType ] = useState("day")
+
   const [hygieneCheckDaily, setHygieneCheckDaily] = useState({
-    mouthCare: isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckDaily"]["mouthCare"] : false,
-    handFaceCare: isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckDaily"]["handFaceCare"] : false,
-    earNoseCare: isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckDaily"]["earNoseCare"] : false,
-    bottomCare: isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckDaily"]["bottomCare"] : false,
-    bodyCare: isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckDaily"]["bodyCare"] : false,
-    rashCare: isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckDaily"]["rashCare"] : false,
-    moistureCare: isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckDaily"]["mouthCare"] : false,
+    mouthCare: false,
+    handFaceCare: false,
+    earNoseCare: false,
+    bottomCare: false,
+    bodyCare: false,
+    rashCare: false,
+    moistureCare: false,
   });
 
   const [hygieneCheckWeekly, setHygieneCheckWeekly] = useState({
-    bathCare: isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckWeekly"]["bathCare"] : false,
-    handFootCare: isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckWeekly"]["handFootCare"] : false,
-    bodyHairCare:  isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckWeekly"]["bodyHairCare"] : false,
-    hairCare:  isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckWeekly"]["hairCare"] : false,
-    bedBathCare:  isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckWeekly"]["bedBathCare"] : false,
-    bedSheetCare:  isFilled && selectedPatient["patient_signed_hc"].length !== 0 ? selectedPatient["patient_signed_hc"][-1]["hygieneCheckWeekly"]["bedSheetCare"] : false,
+    bathCare: false,
+    handFootCare: false,
+    bodyHairCare:  false,
+    hairCare:  false,
+    bedBathCare:  false,
+    bedSheetCare:  false,
   });
 
   const [mealCheck, setMealCheck] = useState({
@@ -135,14 +157,12 @@ function HCForm({ selectedPatient, setNewHCContainer, isFilled=false }) {
     stool: false
   });
 
-
-
-  const [feedingNote, setFeedingNote] = useState('');
-  const [selectedNote, setSelectedNote] = useState('');
-
   const [roomChecks, setRoomChecks] = useState(
     new Array(12).fill(false)
   );
+
+  const [feedingNote, setFeedingNote] = useState('');
+  const [selectedNote, setSelectedNote] = useState('');
 
   const [oldNotes, setOldNotes] = useState([{
       note_date: "15.09.23",
@@ -159,7 +179,6 @@ function HCForm({ selectedPatient, setNewHCContainer, isFilled=false }) {
       ...key_list,
       [key]: !key_list[key],
     });
-    console.log(postureCheck)
   };
 
   const toggleRoomCheck = (index) => {
@@ -167,6 +186,162 @@ function HCForm({ selectedPatient, setNewHCContainer, isFilled=false }) {
       i === index ? !check : check
     ));
   };
+  const handleToggleHcType = () => {
+    console.log(hcType)
+    const nextMode = hcType === "day" ? "night" : "day";
+    console.log(nextMode)
+    console.log("---")
+
+    setHcType(nextMode);
+    setIsLoading(true)
+    updateSelectedPatient(user.email, nextMode)
+  };
+  const submitSignedHC = () => {
+    const hcs = selectedPatient["patient_signed_hc"];
+    let payload = {}
+    if (dict_key in hcs && hcType in hcs[dict_key]) {
+      payload = {
+        "patient_id": selectedPatient["patient_id"],
+        "email": user.email,
+        "type": "update_signed_hc",
+        "signed_hc_id": hcs[dict_key][hcType].at(-1)["signed_hc_id"],
+        "signed_hc_type": hcType,
+        "today_date": getTodayForDjango()
+      }
+    }
+    else {
+      payload = {
+        "patient_id": selectedPatient["patient_id"],
+        "email": user.email,
+        "type": "add_signed_hc",
+        "signed_hc_type": hcType,
+        "today_date": getTodayForDjango()
+      }
+    }
+    payload["signed_hc_data"] = {
+      "hygieneCheckDaily": hygieneCheckDaily,
+      "hygieneCheckWeekly": hygieneCheckWeekly,
+      "mealCheck": mealCheck,
+      "postureCheck": postureCheck,
+      "dressingCheck": dressingCheck,
+      "edemaCheck": edemaCheck,
+      "securityCheck": securityCheck,
+      "urineCheck": urineCheck,
+      "roomChecks": roomChecks
+    }
+    // setTakenMeds(prev => new Set([...prev, ...selectedGivenMeds]));
+    // setSelectedGivenMeds(new Set());
+
+    fetch("http://localhost:8000/api/patients/", {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      })
+      .then(r => r.json())
+      .then(() => {
+      })
+      .catch(console.error);
+  };
+
+  const updateSelectedPatient = (email, hc_type) => {
+    setIsLoading(true);
+    fetch(`http://localhost:8000/api/patients/?email=${email}`, {
+      method: "GET",
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(r => r.json())
+    .then(resp => {
+      // Assuming the backend sends back a JSON response indicating success or failure
+      if (resp.status === "success") {
+        const selectedPatientNew = resp.data[0];
+        if (selectedPatient !== selectedPatientNew){
+          setSelectedPatient(selectedPatientNew);
+        }
+        const hcs = selectedPatientNew["patient_signed_hc"];
+
+        if (dict_key in hcs && hc_type in hcs[dict_key]) {
+           let hc = hcs[dict_key][hc_type].at(-1)["signed_hc_data"];
+           setHygieneCheckDaily(hc["hygieneCheckDaily"])
+           setHygieneCheckWeekly(hc["hygieneCheckWeekly"])
+           setMealCheck(hc["mealCheck"])
+           setPostureCheck(hc["postureCheck"])
+           setDressingCheck(hc["dressingCheck"])
+           setEdemaCheck(hc["edemaCheck"])
+           setSecurityCheck(hc["securityCheck"])
+           setUrineCheck(hc["urineCheck"])
+           setRoomChecks(hc["roomChecks"])
+        }
+        else {
+          setHygieneCheckDaily({
+            mouthCare: false,
+            handFaceCare: false,
+            earNoseCare: false,
+            bottomCare: false,
+            bodyCare: false,
+            rashCare: false,
+            moistureCare: false,
+          })
+          setHygieneCheckWeekly({
+            bathCare: false,
+            handFootCare: false,
+            bodyHairCare:  false,
+            hairCare:  false,
+            bedBathCare:  false,
+            bedSheetCare:  false,
+          })
+          setMealCheck({
+            breakfastCare: false,
+            lunchCare: false,
+            midCare: false,
+            dinnerCare: false,
+            liquidCare: false,
+          })
+          setPostureCheck({
+            walkable: false,
+          })
+          setDressingCheck({
+            isInjured: false,
+            stage: 1,
+            dailyDressing: false,
+            needDressing: false,
+            isDressed: false,
+            catheter: false
+          })
+          setEdemaCheck({
+            edema: false,
+            edemaPart: "",
+            liquidCheck: false
+          })
+          setSecurityCheck({
+            reason1: false,
+            reason2: false,
+            reason3: false,
+            reason4: false,
+            reason5: false
+          })
+          setUrineCheck({
+            urine: 0,
+            stool: false
+          })
+          setRoomChecks(
+              new Array(12).fill(false)
+          )
+        }
+        setIsLoading(false);
+      }
+    }
+    )
+  };
+
+  useEffect(() => {
+      updateSelectedPatient(user.email, hcType)
+    }, [user.email]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="blackout-container">
@@ -176,6 +351,9 @@ function HCForm({ selectedPatient, setNewHCContainer, isFilled=false }) {
       <div className="content">
         <div className="header">
           <h2>Bakım - Aktif Yaşam</h2>
+          <button onClick={handleToggleHcType} aria-pressed={hcType === "night"}>
+          {hcType === "day" ? "Switch to night" : "Switch to day"}
+          </button>
         </div>
         <div className="header" style={{justifyContent: "center"}}>
           <h3>Ahmet John Sugardoeoğlu</h3>
@@ -331,7 +509,7 @@ function HCForm({ selectedPatient, setNewHCContainer, isFilled=false }) {
           </div>
           <label>Kontrol Eden Hemşire: İsa Yusuf ORAK</label>
           <div style={{display: "inline-flex", "width": "100%", "justifyContent": "center", "marginBottom": "15px"}}>
-            <button style={{backgroundColor: "#A695CC", "marginRight": "5px"}}>İmza</button>
+            <button style={{backgroundColor: "#A695CC", "marginRight": "5px"}} onClick={submitSignedHC}>İmza</button>
             <button style={{backgroundColor: "#E77169"}} onClick={onCancelCareClick}>Geri</button>
           </div>
         </div>
