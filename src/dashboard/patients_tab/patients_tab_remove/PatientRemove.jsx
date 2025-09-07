@@ -5,16 +5,15 @@ function PatientCard({ patient, setGeneralTab, setFunction }) {
   const patientClickHandle = () => {
     setGeneralTab(false)
     setFunction(patient)
-    console.log(patient)
   }
 
   return (
     <div className="patient-card" onClick={patientClickHandle}>
       <div className="patient-info">
-        <img src={`data:image/*;base64,${patient.patient_photo}`}  alt={patient.first_name} className="patient-avatar" />
+        <img src={`data:image/*;base64,${patient.patient_personal_info.section_1.image}`}  alt={patient.patient_personal_info.section_1.firstname} className="patient-avatar" />
         <div className="patient-details">
-          <div className="patient-name">{patient.first_name} {patient.last_name}</div>
-          <div className="patient-location">{patient.floor_no}</div>
+          <div className="patient-name">{patient.patient_personal_info.section_1.firstname} {patient.patient_personal_info.section_1.lastname}</div>
+          <div className="patient-location">{patient.patient_personal_info.section_1.patientGender}</div>
         </div>
       </div>
     </div>
@@ -44,8 +43,6 @@ function PatientRemove({ setGeneralTab, setRemoveTab }) {
   }
 
   const onRemoveClick = () => {
-    console.log(removePatient)
-
     fetch(`http://localhost:8000/api/patients/?email=${user.email}&type=delete_patient&patient_id=${removePatient.patient_id}`, {
       method: "DELETE",
       headers: {
@@ -119,10 +116,10 @@ function PatientRemove({ setGeneralTab, setRemoveTab }) {
           : null}
       <div className="remove-patients-container">
         <header className="patients-header">
-          <h1 className="patients-title">Patients</h1>
+          <h1 className="patients-title">Danışan Kayıtları</h1>
           <div className="search-container">
             <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/73cfc69292ab17af86d8b52564eb88a46395310b083bdbeb1a13a02d459da66b?apiKey=873db62e82664057a5c151e6201a84f6&" alt="Search icon" className="search-icon" />
-            <input className="search-text" onChange={handleChange} value={searchInput} placeholder="Hasta Ara"/>
+            <input className="search-text" onChange={handleChange} value={searchInput} placeholder="Danışan Ara"/>
           </div>
           {/*<div className="sort-container">*/}
           {/*  <div className="sort-label">Sort by</div>*/}
@@ -142,7 +139,7 @@ function PatientRemove({ setGeneralTab, setRemoveTab }) {
           ))}
         </div>
         <div className="patient-remove-button-container" style={{left: 0, width: "50%"}}>
-          <button style={{backgroundColor: "#E77169", float: "left"}} onClick={onClickBack}>Back</button>
+          <button style={{backgroundColor: "#E77169", float: "left"}} onClick={onClickBack}>Geri</button>
         </div>
       </div>
     </div>

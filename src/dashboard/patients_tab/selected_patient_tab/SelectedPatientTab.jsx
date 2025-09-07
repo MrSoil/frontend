@@ -9,6 +9,23 @@ import HCList from "./info_components/hcComponent";
 import HC_Form from "./info_components/hcFormComponent";
 import Medicine_Form from "./info_components/medicineFormComponent";
 
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import {Box,
+        Grid,
+        Stack,
+        TextField,
+        Button,
+        Checkbox,
+        FormControlLabel,
+        Dialog,
+        DialogTitle,
+        DialogContent,
+        DialogActions,
+        InputAdornment,
+        IconButton,
+        ThemeProvider,
+        createTheme,
+      } from "@mui/material";
 
 function getTodayForDjango() {
   const today = new Date();
@@ -148,11 +165,6 @@ function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient
         // console.error('Error:', error);
         // window.alert("Patient is NOT saved!");
         // });
-            console.log(newMedicineName)
-            console.log(newMedicineDose)
-            console.log(newMedicineDay)
-            console.log(newMedicineTimes)
-            console.log(newMedicineDesc)
     }
 
         let error_occurred = false;
@@ -193,14 +205,12 @@ function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient
     }
 
     useEffect(() => {
-        console.log('The newMedicineTimes has been updated to:', newMedicineTimes);
         if (newMedicineTimes.length === 0) {
             setNewMedicineRemove(false)
         }
     }, [newMedicineTimes]);
 
     useEffect(() => {
-        console.log('The newMedicineRemove has been updated to:', newMedicineRemove);
     }, [newMedicineRemove]);
 
   return (
@@ -274,24 +284,36 @@ function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient
                    setSelectedPatient={setSelectedPatient}
                     setNewHCContainer={setNewHCContainer}
                     hcDate={hcDate}/> : null}
-         <PatientProfileComponent selectedPatient={selectedPatient}
+              <Stack style={{'marginLeft': '20px'}} sx={{ width: 1, height: 1 }} spacing={2}>
+              <Grid container spacing={2} sx={{ width: 1, height: 1 }}>
+                <Grid size={6} sx={{ width: 0.25, height: 0.985 }}>
+
+                  <PatientProfileComponent selectedPatient={selectedPatient}
                                   setNewRoomContainer={setNewRoomContainer}
                                   setNewCareCategoryContainer={setNewCareCategoryContainer}/>
-         <div>
-             <MedicineList selectedPatient={selectedPatient}
-                        setNewMedicineContainer={setNewMedicineContainer}
-                        medicinesDate={medicinesDate}
-                        setMedicinesDate={setMedicinesDate}/>
-             <HCList selectedPatient={selectedPatient}
-                    setNewHCContainer={setNewHCContainer}
-                    hcDate={hcDate}
-                    setHcDate={setHcDate}/>
+                </Grid>
+                <Grid size={6} sx={{ width: 0.70, height: 1 }}>
+                  <Box sx={{ height: 1/2 }}>
+                     <MedicineList selectedPatient={selectedPatient}
+                                setNewMedicineContainer={setNewMedicineContainer}
+                                medicinesDate={medicinesDate}
+                                setMedicinesDate={setMedicinesDate}/>
+                  </Box>
+                  <Box sx={{ height: 1/2 }}>
+                     <HCList selectedPatient={selectedPatient}
+                            setNewHCContainer={setNewHCContainer}
+                            hcDate={hcDate}
+                            setHcDate={setHcDate}/>
+                  </Box>
+                    </Grid>
+                </Grid>
+              </Stack>
 
-         </div>
-         <div>
-             <NotesList selectedPatient={selectedPatient}
-                        setNewNoteContainer={setNewNoteContainer}/>
-         </div>
+
+         {/*<div>*/}
+         {/*    <NotesList selectedPatient={selectedPatient}*/}
+         {/*               setNewNoteContainer={setNewNoteContainer}/>*/}
+         {/*</div>*/}
       </div>
   );
 }

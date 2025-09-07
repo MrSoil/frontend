@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useNavigate } from "react-router-dom";
 import './medicines_component.css'
 
 function getTodayForDjango() {
@@ -37,19 +38,24 @@ function getLastSixDaysForDjango() {
 }
 
 function MedicineList({ selectedPatient, setNewMedicineContainer, medicinesDate, setMedicinesDate }) {
-  const medicines = getLastSixDaysForDjango();
+    const user = JSON.parse(localStorage.getItem("user"));
+    const navigate = useNavigate();
+    const medicines = getLastSixDaysForDjango();
 
   const handleNewMedicine = (new_date = getTodayForDjango()) => {
-      console.log(new_date)
       setMedicinesDate(new_date)
       setNewMedicineContainer(true)
   }
 
+  const handleEditMedicine = (new_date = getTodayForDjango()) => {
+    navigate("/dashboard/drugs/patient/" + selectedPatient.patient_id)
+  }
+
   return (
     <article className="medicine-container">
-        <header className="medicine-header">Medicines</header>
+        <header className="medicine-header">İlaçlar</header>
         <div className="medicine-divider" />
-        <div style={{"overflow": "scroll", "overflowX": "hidden"}}>
+        <div style={{"overflow": "scroll", "overflowX": "hidden", "height": "200px"}}>
           {medicines.map((medicine, index) => (
             <MedicineStatus key={index}
                             setMedicinesDate={setMedicinesDate}
@@ -60,6 +66,7 @@ function MedicineList({ selectedPatient, setNewMedicineContainer, medicinesDate,
         <div className="medicine-divider" />
         <div style={{alignSelf: "center", marginLeft: "3%"}}>
             <button className="medicines-button" onClick={() => handleNewMedicine()}>Bugünün İlaçları</button>
+            <button className="medicines-button" onClick={() => handleEditMedicine()}>İlaçları Düzenle</button>
         </div>
     </article>
   );

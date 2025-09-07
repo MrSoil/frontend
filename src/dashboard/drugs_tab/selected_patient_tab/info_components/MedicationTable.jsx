@@ -113,30 +113,6 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
     });
   };
 
-  const getSystemMedicineList = (email) => {
-    fetch(`http://localhost:8000/api/patients/?email=${email}`, {
-      method: "GET",
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(r => r.json())
-    .then(resp => {
-      // Assuming the backend sends back a JSON response indicating success or failure
-      if (resp.status === "success") {
-
-        setIsLoading(false);
-
-      } else {
-        setIsLoading(true);
-      }
-    }
-    )
-    .catch(error => {
-        setIsLoading(true);
-    });
-  };
-
   const submitGivenMeds = () => {
       setIsLoading(true)
     const payload = Array.from(selectedPreparedMeds).flatMap(medicine_id =>
@@ -148,7 +124,6 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
         today_date: today_date,
         }))
     );
-    console.log(payload)
 
     for (let i = 0; i < payload.length; i++) {
         fetch("http://localhost:8000/api/patients/", {
@@ -196,7 +171,6 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
             var medicine = selectedPatientNew.patient_medicines[key];
             if (reformatDjangoDate(getTodayForDjango()) in medicine["medicine_data"]["prepared_dates"]) values.push(key)
         }
-        console.log(values)
         setPreparedMeds(new Set(values))
 
         const meds = resp.data[0]["patient_medicines"];

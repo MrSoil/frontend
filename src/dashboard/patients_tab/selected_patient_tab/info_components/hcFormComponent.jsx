@@ -164,15 +164,13 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
   const [feedingNote, setFeedingNote] = useState('');
   const [selectedNote, setSelectedNote] = useState('');
 
-  const [oldNotes, setOldNotes] = useState([{
-      note_date: "15.09.23",
-      note_title: "Test1",
-      note_data: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    },{
-      note_date: "15.09.23",
-      note_title: "Test2",
-      note_data: "bbbbb",
-    }])
+  const [oldNotes, setOldNotes] = useState([
+    // {
+    //   note_date: "15.09.23",
+    //   note_title: "Test1",
+    //   note_data: "",
+    // }
+    ])
 
   const toggleList = (key, key_list, key_function) => {
     key_function({
@@ -187,10 +185,7 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
     ));
   };
   const handleToggleHcType = () => {
-    console.log(hcType)
     const nextMode = hcType === "day" ? "night" : "day";
-    console.log(nextMode)
-    console.log("---")
 
     setHcType(nextMode);
     setIsLoading(true)
@@ -507,7 +502,7 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
               </div>
             ))}
           </div>
-          <label>Kontrol Eden Hemşire: İsa Yusuf ORAK</label>
+          <label>Kontrol Eden Hemşire: {user.email}</label>
           <div style={{display: "inline-flex", "width": "100%", "justifyContent": "center", "marginBottom": "15px"}}>
             <button style={{backgroundColor: "#A695CC", "marginRight": "5px"}} onClick={submitSignedHC}>İmza</button>
             <button style={{backgroundColor: "#E77169"}} onClick={onCancelCareClick}>Geri</button>

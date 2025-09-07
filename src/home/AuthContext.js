@@ -47,7 +47,6 @@ export const AuthProvider = ({ children }) => {
        if (confirm) {
          localStorage.removeItem('user');
          setIsAuthenticated(false);
-         console.log("ok!")
        }
     };
 

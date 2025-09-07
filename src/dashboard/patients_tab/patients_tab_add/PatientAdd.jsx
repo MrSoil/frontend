@@ -344,7 +344,6 @@ const handleAdditionOnGoingCare = (tag) => {
     }
 
   const onAddClick = () => {
-      console.log("TEst")
     let error_occurred = false;
     setFirstnameError("")
     setLastnameError("")
@@ -549,7 +548,6 @@ const handleAdditionOnGoingCare = (tag) => {
     //     return
     // }
 
-    console.log("Test")
     addPatient()
 
     }
@@ -602,7 +600,7 @@ const handleAdditionOnGoingCare = (tag) => {
                       {!image ? <div><img
                               src="https://cdn.builder.io/api/v1/image/assets/TEMP/e5168a45362de20f7f0b317084f0918f3bb13f3a77ad5e08dfd70c170e760f86?apiKey=873db62e82664057a5c151e6201a84f6&"
                               alt={"addPhotographAlt"} className="photograph"/>
-                              <p>Add Photograph</p></div>
+                              <p>Fotoğraf Ekleyiniz</p></div>
                           : <img for="file-input" src={URL.createObjectURL(image)} alt="Uploaded"/>
                       }
                   </label>
@@ -899,8 +897,8 @@ const handleAdditionOnGoingCare = (tag) => {
           <div className="divider">.</div>
           <div className="information-block">
               <div className="patient-add-button-container">
-                  <button style={{backgroundColor: "#E77169", float: "left"}} onClick={onCancelClick}>Cancel</button>
-                  <button style={{backgroundColor: "#A695CC", float: "right"}} onClick={setPatientPageInc}>Next</button>
+                  <button style={{backgroundColor: "#E77169", float: "left"}} onClick={onCancelClick}>İptal</button>
+                  <button style={{backgroundColor: "#A695CC", float: "right"}} onClick={setPatientPageInc}>İleri</button>
               </div>
           </div>
       </div>:
@@ -1196,8 +1194,8 @@ const handleAdditionOnGoingCare = (tag) => {
           <div className="divider">.</div>
           <div className="information-block">
               <div className="patient-add-button-container">
-                  <button style={{backgroundColor: "#E77169", float: "left"}} onClick={setPatientPageDecr}>Back</button>
-                  <button style={{backgroundColor: "#A695CC", float: "right"}} onClick={setPatientPageInc}>Next</button>
+                  <button style={{backgroundColor: "#E77169", float: "left"}} onClick={setPatientPageDecr}>Geri</button>
+                  <button style={{backgroundColor: "#A695CC", float: "right"}} onClick={setPatientPageInc}>İleri</button>
               </div>
           </div>
       </div>:
@@ -1520,8 +1518,8 @@ const handleAdditionOnGoingCare = (tag) => {
           <div className="divider">.</div>
           <div className="information-block">
               <div className="patient-add-button-container">
-                  <button style={{backgroundColor: "#E77169", float: "left"}} onClick={setPatientPageDecr}>Back</button>
-                  <button style={{backgroundColor: "#A695CC", float: "right"}} onClick={setPatientPageInc}>Next</button>
+                  <button style={{backgroundColor: "#E77169", float: "left"}} onClick={setPatientPageDecr}>Geri</button>
+                  <button style={{backgroundColor: "#A695CC", float: "right"}} onClick={setPatientPageInc}>İleri</button>
               </div>
           </div>
       </div>:
@@ -1698,8 +1696,8 @@ const handleAdditionOnGoingCare = (tag) => {
           <div className="divider">.</div>
           <div className="information-block">
               <div className="patient-add-button-container">
-                  <button style={{backgroundColor: "#E77169", float: "left"}} onClick={setPatientPageDecr}>Back</button>
-                  <button style={{backgroundColor: "#A695CC", float: "right"}} onClick={onAddClick}>Save</button>
+                  <button style={{backgroundColor: "#E77169", float: "left"}} onClick={setPatientPageDecr}>Geri</button>
+                  <button style={{backgroundColor: "#A695CC", float: "right"}} onClick={onAddClick}>Kaydet</button>
               </div>
           </div>
       </div>:

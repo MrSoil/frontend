@@ -11,6 +11,8 @@ import MedicationForm from "./info_components/MedicationForm";
 import MedicationSystemForm from "./info_components/MedicationSystemForm";
 
 function SelectedPatientTab({ setSelectedPatient, selectedPatient }) {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const [isLoading, setIsLoading] = useState(true);
     const [newRoomContainer, setNewRoomContainer] = useState(false)
     const [newNoteContainer, setNewNoteContainer] = useState(false)
     const [newCareCategoryContainer, setNewCareCategoryContainer] = useState(false)
@@ -24,64 +26,44 @@ function SelectedPatientTab({ setSelectedPatient, selectedPatient }) {
     const cancelNewNote = () => {
         setNewNoteContainer(false)
     }
-    const addNewMedicine = () => {
-
-        const addMedicine = async () => {
-        // fetch("http://localhost:8000/api/patients/", {
-        // method: "POST",
-        // headers: {
-        //     'Content-Type': 'application/json'
-        //   },
-        // body: JSON.stringify(
-        //     {"email": user.email,
-        //         'type': 'new',
-        //         'first_name': firstname,
-        //         'last_name': lastname,
-        //         'device_id': deviceID,
-        //         'patient_id': citizenID,
-        //         'floor_no': floorNo,
-        //         'care_category': careCategory,
-        //         'date_of_birth': dateOfBirth,
-        //         'blood_type': bloodType,
-        //         'height': patientHeight,
-        //         'weight': patientWeight,
-        //         'gender': patientGender,
-        //         'contact_first_name': contactFirstname,
-        //         'contact_last_name': contactFirstname,
-        //         'contact_phone_no': contactPhoneNo,
-        //         'patient_photo': base64Image.replace(/^data:image\/(png|jpg|jpeg);base64,/, "")
-        //     })
-        // })
-        // .then(response => response.json())
-        // .then(data => {
-        // if ('success' === data['status']) {
-        //     window.alert("Patient is successfully saved.")
-        //     setNewMedicineContainer(false)
-        // } else {
-        //     window.alert("Patient is NOT saved!")
-        // }
-        // })
-        // .catch(error => {
-        // console.error('Error:', error);
-        // window.alert("Patient is NOT saved!");
-        // });
-    }
-
-        let error_occurred = false;
-
-        if (error_occurred){
-            return
-        }
-
-        addMedicine()
-
-    }
 
     const navigate = useNavigate();
 
     const getGeneralTab = () => {
         navigate("/dashboard/drugs")
     }
+
+    const updateSelectedPatient = (email) => {
+    setIsLoading(true)
+    fetch(`http://localhost:8000/api/patients/?email=${email}`, {
+      method: "GET",
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(r => r.json())
+    .then(resp => {
+      // Assuming the backend sends back a JSON response indicating success or failure
+      if (resp.status === "success") {
+        const selectedPatientNew = resp.data[0];
+        if (selectedPatient !== selectedPatientNew){
+          setSelectedPatient(selectedPatientNew);
+        }
+      setIsLoading(false)
+      }
+    }
+    ).catch(error => {
+        setIsLoading(true)
+    });
+  };
+
+  useEffect(() => {
+      updateSelectedPatient(user.email)
+    }, [user.email]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
        <div className="dashboard-content-background">

@@ -1,11 +1,8 @@
 .hc-container {
   display: grid;
   background-color: #fff;
-  width: 600px;
-  height: 49%;
   border-radius: 24px;
   padding: 30px 0 12px 0;
-  margin: 0 0 0 3%;
 }
 .hc-header {
   color: #343738;
@@ -27,7 +24,12 @@
   align-items: start;
   font-weight: 400;
   background-color: #F6F0F6;
+  cursor: pointer;
 }
+.hc-status:hover {
+  opacity: 0.7;
+}
+
 .hc-status:nth-child(odd) {
   background-color: #FFFFFF;
 }

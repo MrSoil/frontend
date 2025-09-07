@@ -10,6 +10,11 @@ body {
     background-color: #28252F;
 }
 
+.body, html {
+    overflow: hidden; /* Optional: prevent scroll */
+}
+
+
 .mainContainer {
     display: flex;
     align-items: center;
@@ -24,6 +29,8 @@ body {
   font-size: 55px;
   font-weight: bold;
   color: #FBFBFB;
+  justify-content: left;
+  text-align: left !important;
 }
 
 .subTitleContainer {
@@ -33,6 +40,7 @@ body {
   font-style: italic;
   color: #98979B;
   justify-content: left;
+  text-align: left !important;
 }
 
 .resultContainer, .historyItem {
@@ -60,9 +68,6 @@ body {
   height: 260px;
 }
 
-.body, html {
-    overflow: hidden; /* Optional: prevent scroll */
-}
 
 .imageContainer {
     min-height: 100%;
@@ -94,6 +99,7 @@ body {
     height: auto;
 }
 
+
 .registerContainer{
     width: 660px;
     left: 934px;
@@ -112,6 +118,11 @@ body {
     height: 750px;
     width: 86vw;
     background-color: transparent;
+}
+
+.loginFormContainer {
+    text-align: center;
+    width: 660px;
 }
 
 

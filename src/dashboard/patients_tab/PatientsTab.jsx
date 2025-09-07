@@ -27,9 +27,9 @@ function PatientsTab() {
             >/ Müşteri Yönetimi</button>
             {
             /*First Stage*/
-                addTab ? <button className="navigator-button">Add Patients</button>:
-                removeTab ? <button className="navigator-button">Remove Patients</button>:
-                selectedPatient ? <button className="navigator-button">Edit Patients</button>: null
+                addTab ? <button className="navigator-button">/ Müşteri Ekle</button>:
+                removeTab ? <button className="navigator-button">/ Müşteri Sil</button>:
+                selectedPatient ? <button className="navigator-button">/ Müşteri Düzenle</button>: null
 
             }
         </div>

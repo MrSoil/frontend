@@ -10,6 +10,7 @@
     cursor: pointer;
     display: inline-block;
     color: #C1C1C1;
+    padding-right: 1px;
 }
 
 .dashboard-content-navigator .navigator-button:hover {

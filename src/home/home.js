@@ -1,6 +1,9 @@
 import React from "react"
 import { useNavigate } from "react-router-dom";
 import {useAuth} from "./AuthContext";
+import {Stack,
+        Button
+      } from "@mui/material";
 
 const Home = (props) => {
     const { email } = props
@@ -39,36 +42,19 @@ const Home = (props) => {
     <div className="mainContainer">
         <div className="homeContainer">
             <div className="titleContainer" style={{ alignItems: 'center' }}>
-                <div>Welcome!</div>
+                <div>Hoş Geldiniz!</div>
             </div>
-            {isAuthenticated === false ? <div>
-                <input
-                    className="inputButton"
-                    type="button"
-                    onClick={onLoginButtonClick}
-                    value={isAuthenticated ? "Log out" : "Log in"}/>
-                {isAuthenticated ? (
-                    <div>Your email address is {email}</div>
-                ) : (
-                    <div/>
-                )}
-            </div>: null}
+            {isAuthenticated === false ?
+            <Stack container spacing={2}>
+                    <Button className="inputButton" variant="contained" onClick={onLoginButtonClick}>Giriş Yap</Button>
+                    <Button className="inputButton" variant="contained" onClick={onRegisterButtonClick}>Kayıt Ol</Button>
+            </Stack> : null}
 
-            {isAuthenticated === false ? <div>
-                <input
-                    className="inputButton"
-                    type="button"
-                    onClick={onRegisterButtonClick}
-                    value={"Register"}/>
-            </div>: null}
 
-            {isAuthenticated === true ? <div>
-                <input
-                    className="inputButton"
-                    type="button"
-                    onClick={onDashboardButtonClick}
-                    value={"Dashboard"}/>
-            </div>: null}
+            {isAuthenticated === true ?
+            <Stack container spacing={2}>
+                    <Button className="inputButton" variant="contained" onClick={onDashboardButtonClick}>Ana Sayfa</Button>
+            </Stack>: null}
 
         </div>
     </div>

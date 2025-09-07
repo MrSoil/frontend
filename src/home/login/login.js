@@ -2,18 +2,70 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {useAuth} from "../AuthContext";
 import homeImage from '../../assets/home/aiworks 9.png';
+import { FormControl, InputLabel, TextField, Button } from '@mui/material';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import InputAdornment from '@mui/material/InputAdornment';
+import { IconButton } from '@mui/material';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+
 
 const Login = (props) => {
+    const theme = createTheme({
+    palette: {
+        primary: { main: "#98979B" },
+        secondary: { main: "#98979B" },
+        },
+    components: {
+    // Always use outlined TextField
+        MuiTextField: {
+        defaultProps: { variant: "outlined" },
+        },
+    // Outline + input text color
+    MuiOutlinedInput: {
+        styleOverrides: {
+        root: {
+        "& .MuiOutlinedInput-notchedOutline": {
+        borderColor: "#98979B",
+        },
+        "&:hover .MuiOutlinedInput-notchedOutline": {
+        borderColor: "#98979B",
+        },
+        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+        borderColor: "#98979B",
+        },
+        "& .MuiInputBase-input": {
+        color: "#98979B",
+        },
+        },
+        },
+        },
+    // Label color (idle and focused)
+    MuiInputLabel: {
+        styleOverrides: {
+        root: {
+        color: "#98979B",
+        "&.Mui-focused": { color: "#98979B" },
+        },
+        },
+        },
+        },
+    });
+
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [emailError, setEmailError] = useState("")
     const [passwordError, setPasswordError] = useState("")
     const { isAuthenticated, setIsAuthenticated } = useAuth();
 
+    const [showPassword, setShowPassword] = useState(false);
+    const handleClickShowPassword = () => setShowPassword(!showPassword);
+
     const navigate = useNavigate();
 
+
+
     useEffect(() => {
-        console.log(isAuthenticated)
         if (isAuthenticated === true)
             navigate("/home")
     });
@@ -67,42 +119,66 @@ const Login = (props) => {
         });
         };
 
-    return <div className={"mainContainer"}>
+    return <ThemeProvider theme={theme}>
+        <div className={"mainContainer"}>
             <div className={"imageContainer"}>
                 <img src={homeImage} alt="SugrHome"/>
             </div>
             <div className={"loginContainer"}>
-                <div className={"titleContainer"}>Login</div>
-                <div className={"subTitleContainer"}>for wellbeing</div>
+                <div className={"titleContainer"}>Giriş Yap</div>
+                <div className={"subTitleContainer"}>daha iyileri için</div>
                 <br/>
-                <div className={"formContainer"}>
-                    <input
-                        value={email}
-                        placeholder=" "
-                        onChange={ev => setEmail(ev.target.value)}
-                        className={"formBox"} />
-                    {emailError !== "" ? <label className="errorLabel">{emailError}</label>: null}
-                    {emailError === "" ? <label>E-mail</label>: null}
-                </div>
-                <div className={"formContainer"}>
-                    <input
-                        value={password}
-                        placeholder=" "
-                        onChange={ev => setPassword(ev.target.value)}
-                        className={"formBox"} />
-                    {passwordError !== "" ? <label className="errorLabel">{passwordError}</label>: null}
-                    {passwordError === "" ? <label>Password</label>: null}
-                </div>
-                <div>
-                    <input
-                        id={'button'}
-                        className={"inputButton"}
-                        type="button"
-                        onClick={onButtonClick}
-                        value={"Login"} />
+                <div className={"loginFormContainer"}>
+                    <FormControl className={"FormControl"} fullWidth sx={{ m: 1 }}>
+                        {emailError !== "" ? ( <InputLabel className="outlined-adornment-email">{emailError}</InputLabel> ) : null}
+                        <TextField id="login-email"
+                                   label="E-mail"
+                                   type="email"
+                                   value={email}
+                                   onChange={(e) => setEmail(e.target.value)}
+                                   error={Boolean(emailError)}
+                                   helperText={emailError || " "} />
+                    </FormControl>
+
+                    <FormControl fullWidth sx={{ m: 1 }}>
+                        {passwordError !== "" ? ( <InputLabel className="outlined-adornment-password">{passwordError}</InputLabel> ) : null}
+                        <TextField id="login-password"
+                                   label="Şifre"
+                                   type={showPassword ? "text" : "password"} // <-- This is where the magic happens
+                                   value={password}
+                                   onChange={(e) => setPassword(e.target.value)}
+                                   error={Boolean(passwordError)}
+                                   helperText={passwordError || " "}
+                        InputProps={{ // <-- This is where the toggle button is added.
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              style={{ color: "#98979B" }}
+                              aria-label="toggle password visibility"
+                              onClick={handleClickShowPassword}
+                            >
+                              {showPassword ? <Visibility /> : <VisibilityOff />}
+                            </IconButton>
+                          </InputAdornment>
+                        )
+                      }}
+                        />
+                    </FormControl>
+                    <FormControl fullWidth sx={{ m: 1 }}>
+                        <Button id="button"
+                                className="inputButton"
+                                variant="contained"
+                                color="primary"
+                                onClick={onButtonClick}
+                                fullWidth
+                        > Giriş Yap
+                        </Button>
+                    </FormControl>
+
                 </div>
             </div>
         </div>
+     </ThemeProvider>
 }
 
 export default Login

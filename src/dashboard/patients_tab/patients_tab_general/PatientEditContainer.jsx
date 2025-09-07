@@ -49,21 +49,21 @@ function PatientEditContainer({ setGeneralTab, setAddTab, setRemoveTab }) {
         <div className="dashboard-add-patient-container">
             <div style={{float: "left"}}><img className="addPatientLogo" src={addPatientIconImage} alt="addPatient"/></div>
             <div style={{display: "grid"}}>
-            <h1>Add Patient</h1>
+            <h1>Danışan Kaydı Ekle</h1>
             <br/>
-            <h2>You can add a patient from this section...</h2>
+            <h2>Bu alanda danışan kayıtları oluşturabilirsiniz :)</h2>
             <br/>
-            <button style={{backgroundColor: "#A695CC"}} onClick={onAddPatient}>Add Patient</button>
+            <button style={{backgroundColor: "#A695CC"}} onClick={onAddPatient}>Kayıt Ekle</button>
             </div>
         </div>
         <div className="dashboard-remove-patient-container">
             <div style={{float: "left"}}><img className="removePatientLogo" src={removePatientIconImage} alt="removePatient"/></div>
             <div style={{display: "grid"}}>
-            <h1>Remove Patient</h1>
+            <h1>Danışan Kaydı Sil</h1>
             <br/>
-            <h2>You can remove a patient from this section...</h2>
+            <h2>Bu alanda danışan kayıtlarını silebilirsiniz.</h2>
             <br/>
-            <button style={{backgroundColor: "#E77169"}} onClick={onRemovePatient}>Remove Patient</button>
+            <button style={{backgroundColor: "#E77169"}} onClick={onRemovePatient}>Kayıt Sil</button>
             </div>
         </div>
         {/*<BuilderComponent model="page" content={content} />*/}

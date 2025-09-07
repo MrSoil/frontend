@@ -14,7 +14,7 @@ function PatientCard({ patient, setGeneralTab, setFunction }) {
         <img src={`data:image/*;base64,${patient.patient_personal_info.section_1.image}`}  alt={patient.patient_personal_info.section_1.firstname} className="patient-avatar" />
         <div className="patient-details">
           <div className="patient-name">{patient.patient_personal_info.section_1.firstname} {patient.patient_personal_info.section_1.lastname}</div>
-          <div className="patient-location">Bilinmiyor</div>
+          <div className="patient-location">{patient.patient_personal_info.section_1.patientGender}</div>
         </div>
       </div>
     </div>
@@ -70,10 +70,10 @@ function Patients({ setGeneralTab, setSelectedPatient }) {
   return (
     <div className="patients-container">
       <header className="patients-header">
-        <h1 className="patients-title">Patients</h1>
+        <h1 className="patients-title">Danışan Kayıtları</h1>
         <div className="search-container">
           <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/73cfc69292ab17af86d8b52564eb88a46395310b083bdbeb1a13a02d459da66b?apiKey=873db62e82664057a5c151e6201a84f6&" alt="Search icon" className="search-icon" />
-          <input className="search-text" onChange={handleChange} value={searchInput} placeholder="Hasta Ara"/>
+          <input className="search-text" onChange={handleChange} value={searchInput} placeholder="Danışan Ara"/>
         </div>
         {/*<div className="sort-container">*/}
         {/*  <div className="sort-label">Sort by</div>*/}
@@ -84,7 +84,6 @@ function Patients({ setGeneralTab, setSelectedPatient }) {
       <div className="patients-grid">
         {patients.filter((patient) =>
         {
-          // console.log(patient.patient_personal_info)
 
           let full_name = patient.patient_personal_info.section_1.firstname + " " + patient.patient_personal_info.section_1.lastname;
           return patient.patient_personal_info.section_1.firstname.toLowerCase().includes(searchInput.toLowerCase()) ||

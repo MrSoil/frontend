@@ -32,7 +32,7 @@ const getGenderAge = ( age, gender ) => {
         str_age--;
     }
 
-    return gender + ", " + str_age + " years old"
+    return gender + ", " + str_age + " yaşında"
 };
 
 const PersonInfo = ({ patientPhoto, name, surname, gender, age, bloodType, height, weight }) => (
@@ -93,7 +93,6 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
     }
   });
   const dict_key = reformatDjangoDate(medicinesDate)
-  console.log(dict_key)
    // already‐taken medicine IDs
 
   const [takenMeds_M, setTakenMeds_M] = useState(new Set());
@@ -121,15 +120,13 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
   const [feedingNote, setFeedingNote] = useState('');
   const [selectedNoteTitle, setSelectedNoteTitle] = useState('');
 
-  const [oldNotes, setOldNotes] = useState([{
-      note_date: "15.09.23",
-      note_title: "Test1",
-      note_data: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    },{
-      note_date: "15.09.23",
-      note_title: "Test2",
-      note_data: "bbbbb",
-    }])
+  const [oldNotes, setOldNotes] = useState([
+    // {
+    //   note_date: "15.09.23",
+    //   note_title: "Test1",
+    //   note_data: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    // }
+    ])
 
   const toggleDailyMedicinesM = (key) => {
     setDailyMedicinesM({
@@ -236,7 +233,6 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
 
     const payload = payload_M.concat(payload_N).concat(payload_E)
 
-    console.log(payload)
     // setTakenMeds(prev => new Set([...prev, ...selectedGivenMeds]));
     // setSelectedGivenMeds(new Set());
 
@@ -552,7 +548,7 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
 
           <div style={{display: "grid", "width": "100%"}}>
             <h3>Kontrol Eden Hemşire:</h3>
-            <label>İsa Yusuf ORAK</label>
+            <label>{user.email}</label>
           </div>
           <button style={{backgroundColor: "#A695CC"}} onClick={submitGivenMeds}>İmza</button>
           </div>

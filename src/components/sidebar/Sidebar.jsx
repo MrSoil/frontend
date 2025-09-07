@@ -31,7 +31,6 @@ function Sidebar() {
   }
 
   const updateSidebar = () => {
-      console.log(window.location.href)
       let current_url = window.location.href
       for (let i = 0; i <= hover_index_map.length; i++) {
           if (current_url.includes(hover_index_map[i])) {

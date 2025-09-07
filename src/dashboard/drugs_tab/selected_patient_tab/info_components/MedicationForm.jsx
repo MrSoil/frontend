@@ -13,6 +13,17 @@ const MedicationForm = ({setSelectedPatient, selectedPatient, newMedicineContain
   const [selectedMedicineCategory, setSelectedMedicineCategory] = useState("")
 
 
+  const handleMedicineCategory = (category) => {
+    const names = systemMedicines.filter(m => m.medicine_data.medicine_category === category).map(m => m.medicine_data.medicine_name);
+
+    setSystemMedicineNames(names);
+    setSelectedMedicineCategory(category)
+    console.log(systemMedicines)
+    console.log(names)
+  };
+
+
+
   const [selectedPeriod, setSelectedPeriod] = useState({
     morning: false,
     noon: false,
@@ -71,14 +82,6 @@ const [fullnessOptions, setFullnessOptions] = useState({
   };
 
   const handleSubmit = () => {
-    console.log('Selected Periods:', selectedPeriod);
-    console.log('Selected Days:', selectedDays);
-    console.log('Selected Fullness:', fullnessOptions);
-    console.log('Selected Dosage:', medicineDosage);
-    console.log('Patient ID:', selectedPatient["patient_id"]);
-    console.log('Patient Name:', selectedMedicineName);
-    console.log('Patient Category:', selectedMedicineCategory);
-
     fetch("http://localhost:8000/api/patients/", {
     method: "PUT",
     headers: {
@@ -162,7 +165,7 @@ const [fullnessOptions, setFullnessOptions] = useState({
     .then(resp => {
       // Assuming the backend sends back a JSON response indicating success or failure
       if (resp.status === "success") {
-        const selectedPatientNew = resp.data;
+        const selectedPatientNew = resp.data[0];
         if (selectedPatient !== selectedPatientNew){
           setSelectedPatient(selectedPatientNew);
         }
@@ -191,7 +194,7 @@ const [fullnessOptions, setFullnessOptions] = useState({
           <label>İlaç Kategorisi</label>
           <select
               value={selectedMedicineCategory}
-              onChange={(e) => setSelectedMedicineCategory(e.target.value)}>
+              onChange={(e) => handleMedicineCategory(e.target.value)}>
             <option value="" selected disabled hidden>Kategori Seçiniz</option>
             {systemMedicineCategories.map((each_category, index) => (
               <option key={index}>{each_category}</option>

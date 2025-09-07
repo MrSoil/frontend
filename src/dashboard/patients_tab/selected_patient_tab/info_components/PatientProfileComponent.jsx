@@ -14,7 +14,7 @@ const getGenderAge = ( age, gender ) => {
         str_age--;
     }
 
-    return gender + ", " + str_age + " years old"
+    return gender + ", " + str_age + " yaşında"
 };
 
 const getStatus = ( title, score ) => {
@@ -144,7 +144,6 @@ const VitalScore = ({ title, score, status }) => (
 );
 
 function PatientProfileComponent({ selectedPatient, setNewRoomContainer, setNewCareCategoryContainer }) {
-    console.log(selectedPatient)
     const handleNewRoom = () => {
         setNewRoomContainer(true)
     }
@@ -168,7 +167,7 @@ function PatientProfileComponent({ selectedPatient, setNewRoomContainer, setNewC
             />
             <hr className="separator" />
             <div className="room-info">
-                <h3 className="title">Room</h3>
+                <h3 className="title">Oda</h3>
                 <div className="details">
                   <p>{selectedPatient.patient_personal_info.section_1.patientRoom}</p>
                   <button className="change-room" onClick={handleNewRoom}>Change Room</button>
@@ -176,18 +175,18 @@ function PatientProfileComponent({ selectedPatient, setNewRoomContainer, setNewC
             </div>
             <hr className="separator" />
             <div className="care-category">
-            <h3 className="title">Care Category</h3>
-            <div className="category">
-                <p></p>
-                <button className="change-category" onClick={handleNewCareCategory}>Change Category</button>
-            </div>
+                <h3 className="title">Sağlık Kategorisi</h3>
+                <div className="category">
+                    <p>Normal</p>
+                    <button className="change-category" onClick={handleNewCareCategory}>Change Category</button>
+                </div>
           </div>
             <hr className="separator" />
          </div>
          <div className="profile-container-bottom">
             <section className="vital-scores">
             <div className="vitals-title">
-              <h3 className="title">Vital Scores</h3>
+              <h3 className="title">Sağlık Değerleri</h3>
               <button className="see-details">See Details</button>
             </div>
             <hr className="separator"></hr>

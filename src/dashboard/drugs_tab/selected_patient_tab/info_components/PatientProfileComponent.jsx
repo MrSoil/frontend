@@ -16,7 +16,7 @@ const getGenderAge = ( age, gender ) => {
         str_age--;
     }
 
-    return gender + ", " + str_age + " years old"
+    return gender + ", " + str_age + " yaşında"
 };
 
 const getStatus = ( title, score ) => {
@@ -176,16 +176,12 @@ function PatientProfileComponent({ selectedPatientOuter, setNewRoomContainer, se
           if (resp.status === "success") {
             let patients = resp.data;
             for (let i = 0; i < patients.length; i++) {
-                console.log(patients[i].patient_id)
-                console.log(params.id)
-              if (params.id == patients[i].patient_id) {
+              if (params.id === patients[i].patient_id) {
                 setSelectedPatient(patients[i])
-                console.log(patients[i])
                 setIsLoading(false);
               }
             }
           } else {
-              console.log("TEST")
             setIsLoading(true);
           }
         }
@@ -222,7 +218,7 @@ function PatientProfileComponent({ selectedPatientOuter, setNewRoomContainer, se
             />
             <hr className="separator" />
             <div className="room-info">
-                <h3 className="title">Room</h3>
+                <h3 className="title">Oda</h3>
                 <div className="details">
                   <p>{selectedPatient.patient_personal_info.section_1.patientRoom}</p>
                 </div>

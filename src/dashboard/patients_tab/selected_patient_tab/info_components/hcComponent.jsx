@@ -40,16 +40,15 @@ function HCList({ selectedPatient, setNewHCContainer, hcDate, setHcDate }) {
   const hcs = getLastSixDaysForDjango();
 
   const handleNewHc = (new_date = getTodayForDjango()) => {
-      console.log(new_date)
       setHcDate(new_date)
       setNewHCContainer(true)
   }
 
   return (
     <article className="hc-container">
-        <header className="hc-header">Hcs</header>
+        <header className="hc-header">Sağlık Raporları</header>
         <div className="hc-divider" />
-        <div style={{"overflow": "scroll", "overflowX": "hidden"}}>
+        <div style={{"overflow": "scroll", "overflowX": "hidden", "height": "200px"}}>
           {hcs.map((hc, index) => (
             <HcStatus key={index}
                             setHcsDate={setHcDate}
@@ -59,7 +58,7 @@ function HCList({ selectedPatient, setNewHCContainer, hcDate, setHcDate }) {
         </div>
         <div className="hc-divider" />
         <div style={{alignSelf: "center", marginLeft: "3%"}}>
-            <button className="hcs-button" onClick={() => handleNewHc()}>Bugünün İlaçları</button>
+            <button className="hcs-button" onClick={() => handleNewHc()}>Bugünün Sağlık Raporu</button>
         </div>
     </article>
   );

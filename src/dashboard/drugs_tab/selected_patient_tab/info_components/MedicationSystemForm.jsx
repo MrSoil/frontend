@@ -26,7 +26,6 @@ const MedicationSystemForm = ({setNewSystemMedicineContainer}) => {
   };
 
   const handleSubmit = () => {
-    console.log('Medications:', medications);
     medications.forEach(function (medication, index) {
         fetch("http://localhost:8000/api/medicines/", {
     method: "POST",
