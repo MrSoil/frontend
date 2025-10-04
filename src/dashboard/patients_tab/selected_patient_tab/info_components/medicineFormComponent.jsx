@@ -3,6 +3,9 @@ import './medicine_form_component.css'
 import {useEffect, useState} from "react";
 import { Tab, Tabs } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
+
 
 function getTodayForDjango() {
   const today = new Date();
@@ -266,7 +269,7 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
 
   const updateSelectedPatient = (email) => {
     setIsLoading(true);
-    fetch(`http://localhost:8000/api/patients/?email=${email}`, {
+    fetch(`http://localhost:8000/api/patients/?email=${email}&patient_id=${selectedPatient.patient_id}`, {
       method: "GET",
       headers: {
         'Content-Type': 'application/json'
@@ -338,7 +341,11 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
     }, [user.email]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+    <Box sx={{ display: 'flex' }}>
+      <CircularProgress />
+    </Box>
+  );
   }
 
   return (

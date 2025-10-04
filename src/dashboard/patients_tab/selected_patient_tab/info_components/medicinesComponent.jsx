@@ -8,13 +8,15 @@ function getTodayForDjango() {
 }
 
 function MedicineStatus({ string_date, date, clickFunction }) {
+  var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  var mydate = new Date(date);
+
   return (
     <article className="medicine-status" onClick={() => clickFunction(date)}>
         <h3 className="medicine-name">
             {string_date}
-        <span className="dosage-detail">(2 doses)</span>
       </h3>
-       <time className="medicine-date">{date}</time>
+       <time className="medicine-date">{mydate.toLocaleString(options)}</time>
 
     </article>
   );

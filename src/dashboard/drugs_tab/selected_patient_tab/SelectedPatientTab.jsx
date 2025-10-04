@@ -9,6 +9,8 @@ import NotesList from "../../drugs_tab/selected_patient_tab/info_components/note
 import MedicationTable from "./info_components/MedicationTable";
 import MedicationForm from "./info_components/MedicationForm";
 import MedicationSystemForm from "./info_components/MedicationSystemForm";
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 function SelectedPatientTab({ setSelectedPatient, selectedPatient }) {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -34,35 +36,42 @@ function SelectedPatientTab({ setSelectedPatient, selectedPatient }) {
     }
 
     const updateSelectedPatient = (email) => {
-    setIsLoading(true)
-    fetch(`http://localhost:8000/api/patients/?email=${email}`, {
-      method: "GET",
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(r => r.json())
-    .then(resp => {
-      // Assuming the backend sends back a JSON response indicating success or failure
-      if (resp.status === "success") {
-        const selectedPatientNew = resp.data[0];
-        if (selectedPatient !== selectedPatientNew){
-          setSelectedPatient(selectedPatientNew);
-        }
-      setIsLoading(false)
-      }
-    }
-    ).catch(error => {
+        let patient_id = window.location.pathname.split("/");
+        patient_id = patient_id[patient_id.length - 1];
+
         setIsLoading(true)
-    });
-  };
+        fetch(`http://localhost:8000/api/patients/?email=${email}&patient_id=${patient_id}`, {
+          method: "GET",
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(r => r.json())
+        .then(resp => {
+          // Assuming the backend sends back a JSON response indicating success or failure
+          if (resp.status === "success") {
+            const selectedPatientNew = resp.data[0];
+            if (selectedPatient !== selectedPatientNew){
+              setSelectedPatient(selectedPatientNew);
+            }
+          setIsLoading(false)
+          }
+        }
+        ).catch(error => {
+            setIsLoading(true)
+        });
+    };
 
   useEffect(() => {
       updateSelectedPatient(user.email)
     }, [user.email]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+    <Box sx={{ display: 'flex' }}>
+      <CircularProgress />
+    </Box>
+  );
   }
 
   return (

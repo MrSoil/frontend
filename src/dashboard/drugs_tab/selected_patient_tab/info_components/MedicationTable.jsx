@@ -1,20 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import './medication_table.css';
 import addDrugIcon from "../../../../assets/dashboard/icons-adddrug-blue.png";
+import PlaylistAddRoundedIcon from '@mui/icons-material/PlaylistAddRounded';
+import PlaylistAddCheckCircleIcon from '@mui/icons-material/PlaylistAddCheckCircle';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import CancelIcon from '@mui/icons-material/Cancel';
+
+import CircularProgress from '@mui/material/CircularProgress';
+import {
+ThemeProvider,
+createTheme,
+Box,
+Typography,
+Button,
+Checkbox,
+} from '@mui/material';
+
+const theme = createTheme({
+    palette: {
+      secondary: {
+        main: 'rgb(166, 149, 204)'
+      },
+      primary: {
+        main: 'rgb(166, 149, 204)'
+      }
+    }
+});
 
 
-const getDatesUntilMonday = () => {
+const getNextDates = () => {
     const dates = [];
     const start = new Date();
     start.setHours(0, 0, 0, 0);
     const day = start.getDay();
-    const daysToMonday = (1 - day + 7) % 7; // 0 if today is Monday
-    const offsetStart = 0;
 
-    for (let i = offsetStart; i <= daysToMonday; i++) {
-    const d = new Date(start);
-    d.setDate(start.getDate() + i);
-    dates.push(d.toString());
+    for (let i = 0; i <= 7; i++) {
+        const d = new Date(start);
+        d.setDate(start.getDate() + i);
+        dates.push(d.toString());
     }
     return dates;
 };
@@ -73,6 +96,7 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
   const [preparedMeds, setPreparedMeds] = useState(new Set());
 
   const [selectedPreparedMeds, setSelectedPreparedMeds] = useState(new Set());
+  const [selectedPreparedMedsDelete, setSelectedPreparedMedsDelete] = useState(new Set());
 
 
   const handleAddMedicinePerson = (index) => {
@@ -86,6 +110,15 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
 
    const handlePrepareChange = medId => {
     setSelectedPreparedMeds(prev => {
+      const next = new Set(prev);
+      if (next.has(medId)) next.delete(medId);
+      else next.add(medId);
+      return next;
+    });
+  };
+
+   const handlePrepareDeleteChange = medId => {
+    setSelectedPreparedMedsDelete(prev => {
       const next = new Set(prev);
       if (next.has(medId)) next.delete(medId);
       else next.add(medId);
@@ -113,16 +146,18 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
     });
   };
 
+
   const submitGivenMeds = () => {
-      setIsLoading(true)
-    const payload = Array.from(selectedPreparedMeds).flatMap(medicine_id =>
-        getDatesUntilMonday().map(today_date => ({
+    setIsLoading(true)
+    let fail = false
+    const payload = Array.from(selectedPreparedMeds).map(medicine_id =>
+        ({
         patient_id: selectedPatient.patient_id,
         email: user.email,
         type: "add_prepared_medicine",
         medicine_id: medicine_id,
-        today_date: today_date,
-        }))
+        prepared_dates: getNextDates(),
+        })
     );
 
     for (let i = 0; i < payload.length; i++) {
@@ -134,7 +169,7 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
               "email": payload[i]["email"],
               "type": payload[i]["type"],
               "medicine_id": payload[i]["medicine_id"],
-              "today_date": payload[i]["today_date"]
+              "prepared_dates": payload[i]["prepared_dates"]
           })
         })
         .then(r => r.json())
@@ -142,16 +177,74 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
           // merge newly given into takenMeds and clear selection
           setPreparedMeds(prev => new Set([...prev, ...selectedPreparedMeds]));
           setSelectedPreparedMeds(new Set());
-
+          window.alert("Hazırlanan İlaçların Bilgisi Başarıyla Kaydedildi!")
         })
-        .catch(console.error);
+        .catch(error => {
+            console.error('Error:', error);
+            fail = true
+        });
+
     }
-    setIsLoading(false)
+    if (fail) {
+        window.alert("Hazırlanan İlaçların Bilgisi Kaydedilemedi!");
+    }
+    else {
+        window.alert("Hazırlanan İlaçların Bilgisi Başarıyla Kaydedildi!")
+        setIsLoading(false)
+    }
+
+  };
+
+
+  const submitDeletedMeds = () => {
+    setIsLoading(true)
+    let fail = false
+    const payload = {
+        patient_id: selectedPatient.patient_id,
+        email: user.email,
+        type: "delete_medicines",
+        medicine_ids: Array.from(selectedPreparedMedsDelete)
+    };
+
+    console.log(payload)
+
+    fetch("http://localhost:8000/api/patients/", {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json'},
+      body: JSON.stringify({
+          "patient_id": payload["patient_id"],
+          "email": payload["email"],
+          "type": payload["type"],
+          "medicine_ids": payload["medicine_ids"]
+      })
+    })
+    .then(r => r.json())
+    .then(() => {
+      setSelectedPreparedMedsDelete(new Set());
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        fail = true
+    });
+
+    if (fail) {
+        window.alert("İlaçların Bilgisi Kaldırılamadı!");
+    }
+    else {
+        window.alert("İlaçların Bilgisi Başarıyla Kaldırıldı!")
+        setIsLoading(false)
+    }
+
+  };
+
+  const submitMeds = () => {
+    submitGivenMeds()
+    submitDeletedMeds()
   };
 
   const updateSelectedPatient = (email) => {
     setIsLoading(true)
-    fetch(`http://localhost:8000/api/patients/?email=${email}`, {
+    fetch(`http://localhost:8000/api/patients/?email=${email}&patient_id=${selectedPatient.patient_id}`, {
       method: "GET",
       headers: {
         'Content-Type': 'application/json'
@@ -219,86 +312,143 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
     }, [user.email]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+    <Box sx={{ display: 'flex' }}>
+      <CircularProgress />
+    </Box>
+  );
   }
 
   return (
-    <div className="medication-table-container">
-      <div className="medication-table">
-      <h2>Haftalık İlaç Hazırlama</h2>
-      <div className="divider" />
-      <div>
-        <div style={{"display": "flex"}}>
-        <h3>Tüm İlaçlar</h3>
-        <button className="blue-medic" onClick={handleAddMedicinePerson}> <img src={addDrugIcon} alt="addMedicine"/> <div style={{"alignContent": "center", "color": "#16CBE0", "font": "700 14px 'RedHatDisplay'"}}> Kişiye İlaç Ekle </div> </button>
-        <button className="blue-medic" onClick={handleAddMedicineSystem}> <img src={addDrugIcon} alt="addMedicine"/> <div style={{"alignContent": "center", "color": "#16CBE0", "font": "700 14px 'RedHatDisplay'"}}> Sisteme İlaç Ekle </div> </button>
-        </div>
+<ThemeProvider theme={theme}>
+<Box className="medication-table-container">
+<Box className="medication-table">
+<Typography className="Typography" variant="h5" >Haftalık İlaç Hazırlama</Typography>
+<div className="divider" />
 
-      </div>
-      <div className="scroll-table">
-        <table>
-          <thead>
+    <Box>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <Typography className="Typography" variant="h6" sx={{ flexGrow: 1 }}>
+          Tüm İlaçlar
+        </Typography>
+
+        <Button
+          variant="outlined"
+          color="info"
+          onClick={handleAddMedicinePerson}
+          startIcon={
+            <Box component="img" src={addDrugIcon} alt="addMedicine" sx={{ width: 18, height: 18 }} />
+          }
+          className="blue-medic"
+        >
+          <Box sx={{ alignContent: "center", color: "#16CBE0", font: "700 14px 'RedHatDisplay'" }}>
+            Kişiye İlaç Ekle
+          </Box>
+        </Button>
+
+        <Button
+          variant="outlined"
+          color="info"
+          onClick={handleAddMedicineSystem}
+          startIcon={
+            <Box component="img" src={addDrugIcon} alt="addMedicine" sx={{ width: 18, height: 18 }} />
+          }
+          className="blue-medic"
+        >
+          <Box sx={{ alignContent: "center", color: "#16CBE0", font: "700 14px 'RedHatDisplay'" }}>
+            Sisteme İlaç Ekle
+          </Box>
+        </Button>
+      </Box>
+    </Box>
+
+    <div className="scroll-table">
+      <table>
+        <thead>
           <tr>
-              <th>
-                <button onClick={() => requestSort('name')} className="sort-button">
-                  İlaç Adı
-                </button>
-              </th>
-              <th>
-                <button onClick={() => requestSort('dosage')} className="sort-button">
-                  Dozaj (miligram)
-                </button>
-              </th>
-              <th>
-                <button onClick={() => requestSort('category')} className="sort-button">
-                  İlaç Kategorisi
-                </button>
-              </th>
-              <th>
-                <button onClick={() => requestSort('time')} className="sort-button">
-                  İlaç Zamanı
-                </button>
-              </th>
-              <th>Günler</th>
-              <th style={{"borderRight": "None"}}>İşlemler</th>
-            </tr>
-          </thead>
-            <tbody>
-            {data.map((entry, index) => {
-                  const isPrepared    = preparedMeds.has(entry.id);
-                  const isSelected = selectedPreparedMeds.has(entry.id);
-                  return (
-                      <tr key={index}>
-                        <td>{entry["name"]}</td>
-                        <td>{entry["dosage"]}</td>
-                        <td>{entry["category"]}</td>
-                        <td>{entry["period"]}</td>
-                        <td style={{"textAlign": "center"}}>
-                          {['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cts', 'Paz'].map((day) => (
-                              <span key={day} className={entry.days.includes(daysMap[day]) ? 'active-day' : 'inactive-day'}>
+            <th>
+              <Button onClick={() => requestSort("name")} className="sort-button" variant="text">
+                İlaç Adı
+              </Button>
+            </th>
+            <th>
+              <Button onClick={() => requestSort("dosage")} className="sort-button" variant="text">
+                Dozaj (miligram)
+              </Button>
+            </th>
+            <th>
+              <Button onClick={() => requestSort("category")} className="sort-button" variant="text">
+                İlaç Kategorisi
+              </Button>
+            </th>
+            <th>
+              <Button onClick={() => requestSort("time")} className="sort-button" variant="text">
+                İlaç Zamanı
+              </Button>
+            </th>
+            <th><
+                Button className="sort-button" variant="text">
+                Günler
+              </Button>
+            </th>
+             <th><
+                Button className="sort-button" variant="text">
+                İşlemler
+              </Button>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((entry, index) => {
+            const isPrepared = preparedMeds.has(entry.id);
+            const isSelected = selectedPreparedMeds.has(entry.id);
+            const isSelectedDelete = selectedPreparedMedsDelete.has(entry.id);
+            return (
+              <tr key={index}>
+                <td>{entry["name"]}</td>
+                <td>{entry["dosage"]}</td>
+                <td>{entry["category"]}</td>
+                <td>{entry["period"]}</td>
+                <td style={{ textAlign: "center" }}>
+                  {["Pzt", "Sal", "Çar", "Per", "Cum", "Cts", "Paz"].map((day) => (
+                    <span
+                      key={day}
+                      className={entry.days.includes(daysMap[day]) ? "active-day" : "inactive-day"}
+                    >
                       {day}
                     </span>
-                          ))}
-                        </td>
-                        <td style={{"borderRight": "None"}}>
-                          <input
-                              type="checkbox"
-                              disabled={isPrepared}
-                              checked={isPrepared || isSelected}
-                              onChange={() => handlePrepareChange(entry.id)}/>
-                        </td>
-                      </tr>
-                  )
-                }
-            )}
-          </tbody>
-        </table>
-      </div>
-      <div className="divider" />
-      <button className="general-button" onClick={submitGivenMeds}>İmza</button>
-    </div>
+                  ))}
+                </td>
+                <td style={{ borderRight: "None" }}>
+                    <Checkbox
+                    disabled={isPrepared}
+                    checked={isPrepared || isSelected}
+                    onChange={() => handlePrepareChange(entry.id)}
+                    color="success"
+                    icon={<PlaylistAddRoundedIcon />}
+                    checkedIcon={<PlaylistAddCheckCircleIcon />}
+                    />
+                    <Checkbox
+                    checked={isSelectedDelete}
+                    onChange={() => handlePrepareDeleteChange(entry.id)}
+                    color="error"
+                    icon={< CancelOutlinedIcon/>}
+                    checkedIcon={<CancelIcon />}
+                    />
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
 
-  );
+    <div className="divider" />
+    <Button className="Button" variant="contained" color="primary" onClick={submitMeds}>
+      İmza
+    </Button>
+  </Box>
+</Box>
+</ThemeProvider> )
 };
 export default MedicationTable;

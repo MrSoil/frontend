@@ -2,7 +2,8 @@ import * as React from "react";
 import './patient_profile_component.css'
 import {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
-
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 const getGenderAge = ( age, gender ) => {
     const today = new Date();
@@ -200,7 +201,11 @@ function PatientProfileComponent({ selectedPatientOuter, setNewRoomContainer, se
 
 
     if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+    <Box sx={{ display: 'flex' }}>
+      <CircularProgress />
+    </Box>
+  );
     }
 
     return (

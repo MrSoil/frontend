@@ -2,6 +2,8 @@ import * as React from "react";
 import {useEffect, useState} from "react";
 import './patients_tab_general.css'
 import {useNavigate} from "react-router-dom";
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 function PatientCard({ patient, setSelectedPatient }) {
   const navigate = useNavigate();
@@ -67,7 +69,11 @@ function Patients({setSelectedPatient}) {
 
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+    <Box sx={{ display: 'flex' }}>
+      <CircularProgress />
+    </Box>
+  );
   }
 
   return (

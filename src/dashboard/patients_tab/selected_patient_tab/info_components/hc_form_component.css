@@ -12,12 +12,13 @@
   color: #343738;
 }
 
-.header {
+.headerHC {
   display: flex;
-  justify-content: space-between;
-  padding: 5px;
-  border-radius: 8px;
-  height: 30px;
+    justify-content: space-between;
+    padding: 5px;
+    border-radius: 8px;
+    height: 50px;
+    width: 100%;
 }
 
 .header h2, h3, h4, h5 {
@@ -28,6 +29,12 @@
 h5 {
   margin: 5px 0 10px 0;
   align-content: center;
+}
+
+
+.AccordionDetails {
+  max-height: 500px;
+  overflow-y: auto;
 }
 
 .content {
@@ -45,8 +52,12 @@ h5 {
   border: 1px solid #D2D2D2;
 }
 
+
+.Button.MuiButton-contained {
+  font: 12px "RedHatDisplay";
+}
+
 .half-care-column {
-  height: 365px;
   width: 450px;
   padding: 15px;
   background-color: #EEF7F44D;
@@ -106,25 +117,7 @@ h5 {
   margin: 5px 0 5px 0;
 }
 
-.content .half-care-column button {
-    width: 100px;
-    height: 25px;
-    border-radius: 25px;
-    border: none;
-    color: #FFFFFF;
-    font-size: 1em;
-    opacity: 0.5;
-}
 
-.half-care-note-submit button {
-  width: 48%;
-  height: 35px;
-  text-align: center;
-  border-radius: 24px;
-  border: none;
-  color: #FFFFFF;
-  opacity: 0.5;
-}
 
 .half-care-note-submit {
   display: flex;
@@ -196,3 +189,41 @@ select {
 select:hover {
   border: 1px solid black;
 }
+
+.TypographyHC.MuiButton-outlined {
+    width: fit-content;
+    height: 40px;
+    border-radius: 24px;
+    padding: 3px 16px;
+}
+
+.TypographyHC.MuiOutlinedInput-root {
+    width: 220px;
+    border: None;
+    border-radius: 24px;
+    margin: 5px 5px 0;
+    padding: 3px 22px;
+}
+
+.TypographyHC.MuiTypography-subtitle1 {
+  font: bold 17px "RedHatDisplay";
+  margin-left: 5px;
+}
+
+.TypographyHC.MuiTypography-body2 {
+  margin-top: 10px;
+  font: bold 18px "RedHatDisplay";
+  margin-left: 5px;
+
+}
+
+.TypographyHC.MuiTypography-h6 {
+  font: bold 20px "RedHatDisplay";
+
+}
+
+.TypographyHC.MuiTypography-h5 {
+  font: bold 22px "RedHatDisplay";
+  margin-left: 10px;
+}
+

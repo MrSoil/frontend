@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './medication_form.css';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 const MedicationForm = ({setSelectedPatient, selectedPatient, newMedicineContainer, setNewMedicineContainer}) => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -155,7 +157,7 @@ const [fullnessOptions, setFullnessOptions] = useState({
   };
 
   const updateSelectedPatient = (email) => {
-    fetch(`http://localhost:8000/api/patients/?email=${email}`, {
+    fetch(`http://localhost:8000/api/patients/?email=${email}&patient_id=${selectedPatient.patient_id}`, {
       method: "GET",
       headers: {
         'Content-Type': 'application/json'
@@ -181,7 +183,11 @@ const [fullnessOptions, setFullnessOptions] = useState({
     }, [selectedPatient]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+   return (
+    <Box sx={{ display: 'flex' }}>
+      <CircularProgress />
+    </Box>
+  );
   }
 
   return (

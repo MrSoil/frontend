@@ -18,10 +18,10 @@
   border: none;
 }
 .hc-status {
-  display: grid;
+  display: flex;
   margin: 0;
   padding: 10px 0;
-  align-items: start;
+  justify-content: space-between;
   font-weight: 400;
   background-color: #F6F0F6;
   cursor: pointer;
@@ -36,7 +36,7 @@
 .hc-date {
   color: #717070;
   margin: 2px 1vw;
-  font: 12px "RedHatDisplay";
+  font: 15px "RedHatDisplay";
 }
 .hc-name {
   color: rgba(52, 55, 56, 1);

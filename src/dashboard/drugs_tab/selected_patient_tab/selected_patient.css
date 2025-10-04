@@ -62,7 +62,7 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  font: 16px Red Hat Display, -apple-system, Roboto, Helvetica, sans-serif;
+  font: 16px Red Hat Display, sans-serif;
   color: #717070;
 }
 
