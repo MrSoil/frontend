@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import './patients_tab_remove.css'
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import { API_BASE_URL } from "../../../config";
 
 function PatientCard({ patient, setGeneralTab, setFunction }) {
   const patientClickHandle = () => {
@@ -46,7 +47,7 @@ function PatientRemove({ setGeneralTab, setRemoveTab }) {
   }
 
   const onRemoveClick = () => {
-    fetch(`http://localhost:8000/api/patients/?email=${user.email}&type=delete_patient&patient_id=${removePatient.patient_id}`, {
+    fetch(`${API_BASE_URL}/patients/?email=${user.email}&type=delete_patient&patient_id=${removePatient.patient_id}`, {
       method: "DELETE",
       headers: {
         'Content-Type': 'application/json'
@@ -70,7 +71,7 @@ function PatientRemove({ setGeneralTab, setRemoveTab }) {
 
   const getPatients = (email) => {
 
-    fetch(`http://localhost:8000/api/patients/?email=${email}`, {
+    fetch(`${API_BASE_URL}/patients/?email=${email}`, {
       method: "GET",
       headers: {
         'Content-Type': 'application/json'

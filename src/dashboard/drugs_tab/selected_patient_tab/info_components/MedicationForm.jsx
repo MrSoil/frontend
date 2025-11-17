@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './medication_form.css';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import { API_BASE_URL } from "../../../../config";
 
 const MedicationForm = ({setSelectedPatient, selectedPatient, newMedicineContainer, setNewMedicineContainer}) => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -84,7 +85,7 @@ const [fullnessOptions, setFullnessOptions] = useState({
   };
 
   const handleSubmit = () => {
-    fetch("http://localhost:8000/api/patients/", {
+    fetch(`${API_BASE_URL}/patients/`, {
     method: "PUT",
     headers: {
         'Content-Type': 'application/json'
@@ -107,7 +108,10 @@ const [fullnessOptions, setFullnessOptions] = useState({
     .then(data => {
     if ('success' === data['status']) {
         window.alert("İlaç Sisteme Başarıyla Eklendi!")
-        handleCancel()
+        // Update patient data first, then close the form
+        updateSelectedPatient(user.email).then(() => {
+          handleCancel()
+        })
     } else {
         window.alert("İlaç Sisteme Eklenemedi!")
     }
@@ -119,12 +123,11 @@ const [fullnessOptions, setFullnessOptions] = useState({
   };
 
   const handleCancel = () => {
-    updateSelectedPatient(user.email)
     setNewMedicineContainer(false)
   };
 
   const getSystemMedicineList = (email) => {
-    fetch(`http://localhost:8000/api/medicines/?email=${email}`, {
+    fetch(`${API_BASE_URL}/medicines/?email=${email}`, {
       method: "GET",
       headers: {
         'Content-Type': 'application/json'
@@ -157,7 +160,7 @@ const [fullnessOptions, setFullnessOptions] = useState({
   };
 
   const updateSelectedPatient = (email) => {
-    fetch(`http://localhost:8000/api/patients/?email=${email}&patient_id=${selectedPatient.patient_id}`, {
+    return fetch(`${API_BASE_URL}/patients/?email=${email}&patient_id=${selectedPatient.patient_id}`, {
       method: "GET",
       headers: {
         'Content-Type': 'application/json'
@@ -168,13 +171,13 @@ const [fullnessOptions, setFullnessOptions] = useState({
       // Assuming the backend sends back a JSON response indicating success or failure
       if (resp.status === "success") {
         const selectedPatientNew = resp.data[0];
-        if (selectedPatient !== selectedPatientNew){
-          setSelectedPatient(selectedPatientNew);
-        }
+        setSelectedPatient(selectedPatientNew);
+        return selectedPatientNew;
       }
     }
     )
     .catch(error => {
+      console.error('Error updating patient:', error);
     });
   };
 

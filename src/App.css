@@ -108,8 +108,8 @@ body {
 
 .dashboard-content-background {
     position: absolute !important;
-    top: 50px;
-    left: 155px;
+    top: 20px;
+    left: 180px;
 }
 
 .dashboard-content-container {

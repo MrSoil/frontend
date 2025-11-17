@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import homeImage from "../../assets/home/aiworks 9.png";
+import { API_BASE_URL } from '../../config';
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import {Box,
         Grid,
@@ -163,7 +164,7 @@ const Register = () => {
   };
 
   const register = () => {
-  fetch("http://localhost:8000/api/register/", {
+  fetch(`${API_BASE_URL}/register/`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({

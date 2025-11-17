@@ -3,7 +3,7 @@
   justify-content: center;
   position: relative;
   height: 100%; /* Full-height: stretch from top to bottom */
-  width: 8rem; /* Set the width */
+  width: 90px; /* Set the width */
   z-index: 1; /* Stay on top */
   top: 0; /* Stay at the top */
   background-color: #FFFFFF; /* Black */
@@ -50,6 +50,7 @@
 
 
 .home-button {
+  display: None;
   height: fit-content;
   width: 100%;
   top: 1.5rem;

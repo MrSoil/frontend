@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config';
 
 const AuthContext = createContext(null);
 
@@ -15,7 +16,7 @@ export const AuthProvider = ({ children }) => {
       return;
     }
 
-    fetch("http://localhost:8000/api/verify/", {
+    fetch(`${API_BASE_URL}/verify/`, {
       method: "POST",
       headers: {
         'Content-Type': 'application/json',

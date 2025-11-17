@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './medication_system_form.css';
 import addDrugIcon from "../../../../assets/dashboard/icons-adddrug-blue.png";
+import { API_BASE_URL } from "../../../../config";
 
 const MedicationSystemForm = ({setNewSystemMedicineContainer}) => {
   const [medications, setMedications] = useState([{ category: '', name: '' }]);
@@ -25,37 +26,47 @@ const MedicationSystemForm = ({setNewSystemMedicineContainer}) => {
     setNewSystemMedicineContainer(false)
   };
 
-  const handleSubmit = () => {
-    medications.forEach(function (medication, index) {
-        fetch("http://localhost:8000/api/medicines/", {
-    method: "POST",
-    headers: {
-        'Content-Type': 'application/json'
-      },
-    body: JSON.stringify(
-        {'email': user.email,
-                'type': 'new',
-                'medicine_data': {
-                    "medicine_category": medication.category,
-                    "medicine_name": medication.name
-            }
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-    if ('success' === data['status']) {
-        window.alert("İlaç Sisteme Başarıyla Eklendi!")
-        handleCancel()
-    } else {
-        window.alert("İlaç Sisteme Eklenemedi!")
+  const handleSubmit = async () => {
+    if (medications.length === 0) {
+      window.alert("Eklemek için en az bir ilaç giriniz.");
+      return;
     }
-    })
-    .catch(error => {
-    console.error('Error:', error);
-    window.alert("İlaç Sisteme Eklenemedi!");
-    });
-    })
 
+    const confirmed = window.confirm(
+      "Girilen tüm ilaçları sisteme eklemek istiyor musunuz?"
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await Promise.all(
+        medications.map((medication) =>
+          fetch(`${API_BASE_URL}/medicines/`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: user.email,
+              type: "new",
+              medicine_data: {
+                medicine_category: medication.category,
+                medicine_name: medication.name,
+              },
+            }),
+          }).then((response) => response.json())
+        )
+      );
+
+      window.alert("İlaçlar sisteme başarıyla eklendi.");
+      handleCancel();
+    } catch (error) {
+      console.error("Error:", error);
+      window.alert(
+        "İlaçlar sisteme eklenirken bir hata oluştu. Lütfen tekrar deneyin."
+      );
+    }
   };
 
   return (

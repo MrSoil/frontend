@@ -1,0 +1,205 @@
+.patient-selection-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.patient-selection-modal-content {
+  background-color: #FFFFFF;
+  border-radius: 24px;
+  width: 90%;
+  max-width: 1200px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.patient-selection-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 32px;
+  border-bottom: 1px solid #E0E0E0;
+}
+
+.patient-selection-modal-title {
+  margin: 0;
+  font: 700 24px "RedHatDisplay";
+  color: #003238;
+}
+
+.patient-selection-modal-close {
+  background: none;
+  border: none;
+  font-size: 32px;
+  color: #5F6767;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  line-height: 1;
+}
+
+.patient-selection-modal-close:hover {
+  background-color: #F0F0F0;
+}
+
+.patient-selection-modal-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 32px;
+  gap: 20px;
+}
+
+.patient-selection-search-container {
+  flex: 1;
+  max-width: 400px;
+  height: 48px;
+  border-radius: 24px;
+  background-color: #ECEDEC;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+}
+
+.patient-selection-search-icon {
+  flex-shrink: 0;
+}
+
+.patient-selection-search-input {
+  flex: 1;
+  font: 200 16px "RedHatDisplay";
+  background: transparent;
+  outline: none;
+  border: none;
+  color: #28252F;
+}
+
+.patient-selection-search-input::placeholder {
+  color: rgba(40, 37, 47, 0.5);
+}
+
+.patient-selection-sort-container {
+  border-radius: 24px;
+  border: 1px solid rgba(40, 37, 47, 0.7);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.patient-selection-sort-container:hover {
+  border-color: #28252F;
+}
+
+.patient-selection-sort-label {
+  font: 400 14px "RedHatDisplay";
+  color: rgba(40, 37, 47, 0.7);
+  letter-spacing: 0.24px;
+}
+
+.patient-selection-sort-icon {
+  flex-shrink: 0;
+}
+
+.patient-selection-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding: 24px 32px 32px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+@media (max-width: 1200px) {
+  .patient-selection-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .patient-selection-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.patient-selection-card {
+  justify-content: center;
+  align-items: start;
+  border-radius: 33px;
+  border: 1px solid rgba(40, 37, 47, 0.3);
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.patient-selection-card:hover {
+  border-color: #000000;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.patient-selection-card.selected {
+  background-color: #A695CC;
+  border: 2px solid #A695CC;
+}
+
+.patient-selection-card.selected .patient-selection-card-name,
+.patient-selection-card.selected .patient-selection-card-location {
+  color: #FFFFFF;
+}
+
+.patient-selection-card-info {
+  display: flex;
+  gap: 12px;
+}
+
+.patient-selection-avatar {
+  aspect-ratio: 1;
+  object-position: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.patient-selection-card-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.patient-selection-card-name {
+  color: #28252f;
+  font: 700 18px "RedHatDisplay";
+  margin-bottom: 4px;
+}
+
+.patient-selection-card-location {
+  color: rgba(40, 37, 47, 0.7);
+  letter-spacing: 0.24px;
+  font: 300 16px "RedHatDisplay";
+}
+

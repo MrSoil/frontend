@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './medication_table.css';
 import addDrugIcon from "../../../../assets/dashboard/icons-adddrug-blue.png";
+import { API_BASE_URL } from "../../../../config";
 import PlaylistAddRoundedIcon from '@mui/icons-material/PlaylistAddRounded';
 import PlaylistAddCheckCircleIcon from '@mui/icons-material/PlaylistAddCheckCircle';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
@@ -78,8 +79,10 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
   const user = JSON.parse(localStorage.getItem("user"));
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState([]);
+  const prevPatientRef = useRef(null);
 
   const [sortConfig, setSortConfig] = useState(null);
+  const [activeTab, setActiveTab] = useState('all'); // 'all' | 'morning' | 'noon' | 'evening'
 
   const daysMap = {
     'Paz':"Pazar",
@@ -147,104 +150,118 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
   };
 
 
-  const submitGivenMeds = () => {
-    setIsLoading(true)
-    let fail = false
-    const payload = Array.from(selectedPreparedMeds).map(medicine_id =>
-        ({
-        patient_id: selectedPatient.patient_id,
-        email: user.email,
-        type: "add_prepared_medicine",
-        medicine_id: medicine_id,
-        prepared_dates: getNextDates(),
-        })
-    );
+  const submitGivenMeds = async () => {
+    const payload = Array.from(selectedPreparedMeds).map((medicine_id) => ({
+      patient_id: selectedPatient.patient_id,
+      email: user.email,
+      type: "add_prepared_medicine",
+      medicine_id: medicine_id,
+      prepared_dates: getNextDates(),
+    }));
 
-    for (let i = 0; i < payload.length; i++) {
-        fetch("http://localhost:8000/api/patients/", {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json'},
-          body: JSON.stringify({
-              "patient_id": payload[i]["patient_id"],
-              "email": payload[i]["email"],
-              "type": payload[i]["type"],
-              "medicine_id": payload[i]["medicine_id"],
-              "prepared_dates": payload[i]["prepared_dates"]
-          })
-        })
-        .then(r => r.json())
-        .then(() => {
-          // merge newly given into takenMeds and clear selection
-          setPreparedMeds(prev => new Set([...prev, ...selectedPreparedMeds]));
-          setSelectedPreparedMeds(new Set());
-          window.alert("Hazırlanan İlaçların Bilgisi Başarıyla Kaydedildi!")
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            fail = true
-        });
-
-    }
-    if (fail) {
-        window.alert("Hazırlanan İlaçların Bilgisi Kaydedilemedi!");
-    }
-    else {
-        window.alert("Hazırlanan İlaçların Bilgisi Başarıyla Kaydedildi!")
-        setIsLoading(false)
+    if (payload.length === 0) {
+      return true;
     }
 
+    try {
+      await Promise.all(
+        payload.map((item) =>
+          fetch(`${API_BASE_URL}/patients/`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              patient_id: item.patient_id,
+              email: item.email,
+              type: item.type,
+              medicine_id: item.medicine_id,
+              prepared_dates: item.prepared_dates,
+            }),
+          }).then((r) => r.json())
+        )
+      );
+
+      // merge newly given into takenMeds and clear selection
+      setPreparedMeds((prev) => new Set([...prev, ...selectedPreparedMeds]));
+      setSelectedPreparedMeds(new Set());
+
+      return true;
+    } catch (error) {
+      console.error("Error while saving prepared medicines:", error);
+      return false;
+    }
   };
 
-
-  const submitDeletedMeds = () => {
-    setIsLoading(true)
-    let fail = false
+  const submitDeletedMeds = async () => {
     const payload = {
-        patient_id: selectedPatient.patient_id,
-        email: user.email,
-        type: "delete_medicines",
-        medicine_ids: Array.from(selectedPreparedMedsDelete)
+      patient_id: selectedPatient.patient_id,
+      email: user.email,
+      type: "delete_medicines",
+      medicine_ids: Array.from(selectedPreparedMedsDelete),
     };
 
-    console.log(payload)
+    if (payload.medicine_ids.length === 0) {
+      return true;
+    }
 
-    fetch("http://localhost:8000/api/patients/", {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json'},
-      body: JSON.stringify({
-          "patient_id": payload["patient_id"],
-          "email": payload["email"],
-          "type": payload["type"],
-          "medicine_ids": payload["medicine_ids"]
-      })
-    })
-    .then(r => r.json())
-    .then(() => {
+    try {
+      await fetch(`${API_BASE_URL}/patients/`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          patient_id: payload.patient_id,
+          email: payload.email,
+          type: payload.type,
+          medicine_ids: payload.medicine_ids,
+        }),
+      }).then((r) => r.json());
+
       setSelectedPreparedMedsDelete(new Set());
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        fail = true
-    });
 
-    if (fail) {
-        window.alert("İlaçların Bilgisi Kaldırılamadı!");
+      return true;
+    } catch (error) {
+      console.error("Error while deleting medicines:", error);
+      return false;
     }
-    else {
-        window.alert("İlaçların Bilgisi Başarıyla Kaldırıldı!")
-        setIsLoading(false)
-    }
-
   };
 
-  const submitMeds = () => {
-    submitGivenMeds()
-    submitDeletedMeds()
+  const submitMeds = async () => {
+    if (
+      selectedPreparedMeds.size === 0 &&
+      selectedPreparedMedsDelete.size === 0
+    ) {
+      window.alert("İşlem yapılacak ilaç seçilmedi.");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Seçili ilaçlar için değişiklikleri kaydetmek istiyor musunuz?"
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    const [givenOk, deletedOk] = await Promise.all([
+      submitGivenMeds(),
+      submitDeletedMeds(),
+    ]);
+
+    if (givenOk && deletedOk) {
+      window.alert("Seçili ilaçlar için değişiklikler başarıyla kaydedildi.");
+      // Refresh the patient data to show updated medications
+      updateSelectedPatient(user.email);
+    } else {
+      window.alert(
+        "İşlem sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin."
+      );
+      setIsLoading(false);
+    }
   };
 
   const updateSelectedPatient = (email) => {
     setIsLoading(true)
-    fetch(`http://localhost:8000/api/patients/?email=${email}&patient_id=${selectedPatient.patient_id}`, {
+    fetch(`${API_BASE_URL}/patients/?email=${email}&patient_id=${selectedPatient.patient_id}`, {
       method: "GET",
       headers: {
         'Content-Type': 'application/json'
@@ -308,8 +325,75 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
   };
 
   useEffect(() => {
-      updateSelectedPatient(user.email)
-    }, [user.email]);
+      if (selectedPatient && selectedPatient.patient_id) {
+        // Check if patient data has actually changed
+        const patientChanged = !prevPatientRef.current || 
+          prevPatientRef.current.patient_id !== selectedPatient.patient_id ||
+          JSON.stringify(prevPatientRef.current.patient_medicines) !== JSON.stringify(selectedPatient.patient_medicines);
+        
+        if (patientChanged) {
+          prevPatientRef.current = selectedPatient;
+          updateSelectedPatient(user.email);
+        }
+      }
+    }, [user.email, selectedPatient]);
+
+  const filteredData = data.filter((row) => {
+    if (activeTab === 'all') return true;
+    if (activeTab === 'morning') return row.period === 'Sabah';
+    if (activeTab === 'noon') return row.period === 'Öğlen';
+    if (activeTab === 'evening') return row.period === 'Akşam';
+    return true;
+  });
+
+  const handleExportExcel = () => {
+    if (data.length === 0) {
+      window.alert("Dışa aktarılacak planlı ilaç bulunmuyor.");
+      return;
+    }
+
+    const headers = [
+      "İlaç Adı",
+      "Dozaj",
+      "Kategori",
+      "Zaman",
+      "Günler",
+      "Hazırlandı mı?",
+    ];
+
+    const csvRows = [];
+    csvRows.push(headers.join(","));
+
+    data.forEach((row) => {
+      const daysString = Array.isArray(row.days) ? row.days.join(" - ") : "";
+      const preparedString = row.prepared ? "Evet" : "Hayır";
+      csvRows.push(
+        [
+          row.name,
+          row.dosage,
+          row.category,
+          row.period,
+          daysString,
+          preparedString,
+        ].join(",")
+      );
+    });
+
+    const csvContent = "\uFEFF" + csvRows.join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute(
+      "download",
+      `hasta_${selectedPatient.patient_id}_ilac_takvimi.csv`
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   if (isLoading) {
     return (
@@ -326,41 +410,75 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
 <Typography className="Typography" variant="h5" >Haftalık İlaç Hazırlama</Typography>
 <div className="divider" />
 
-    <Box>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-        <Typography className="Typography" variant="h6" sx={{ flexGrow: 1 }}>
-          Tüm İlaçlar
-        </Typography>
-
-        <Button
-          variant="outlined"
-          color="info"
-          onClick={handleAddMedicinePerson}
-          startIcon={
-            <Box component="img" src={addDrugIcon} alt="addMedicine" sx={{ width: 18, height: 18 }} />
-          }
-          className="blue-medic"
-        >
-          <Box sx={{ alignContent: "center", color: "#16CBE0", font: "700 14px 'RedHatDisplay'" }}>
-            Kişiye İlaç Ekle
-          </Box>
-        </Button>
-
-        <Button
-          variant="outlined"
-          color="info"
-          onClick={handleAddMedicineSystem}
-          startIcon={
-            <Box component="img" src={addDrugIcon} alt="addMedicine" sx={{ width: 18, height: 18 }} />
-          }
-          className="blue-medic"
-        >
-          <Box sx={{ alignContent: "center", color: "#16CBE0", font: "700 14px 'RedHatDisplay'" }}>
-            Sisteme İlaç Ekle
-          </Box>
-        </Button>
-      </Box>
+<Box>
+  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+    <Box className="medication-tabs">
+      <button
+        className={`medication-tab ${activeTab === 'all' ? 'active' : ''}`}
+        onClick={() => setActiveTab('all')}
+      >
+        Tüm İlaçlar
+      </button>
+      <button
+        className={`medication-tab ${activeTab === 'morning' ? 'active' : ''}`}
+        onClick={() => setActiveTab('morning')}
+      >
+        Sabah İlaçları
+      </button>
+      <button
+        className={`medication-tab ${activeTab === 'noon' ? 'active' : ''}`}
+        onClick={() => setActiveTab('noon')}
+      >
+        Öğle İlaçları
+      </button>
+      <button
+        className={`medication-tab ${activeTab === 'evening' ? 'active' : ''}`}
+        onClick={() => setActiveTab('evening')}
+      >
+        Akşam İlaçları
+      </button>
     </Box>
+
+    <Box sx={{ flexGrow: 1 }} />
+
+    <Button
+      variant="outlined"
+      color="info"
+      onClick={handleAddMedicinePerson}
+      startIcon={
+        <Box component="img" src={addDrugIcon} alt="addMedicine" sx={{ width: 18, height: 18 }} />
+      }
+      className="blue-medic"
+    >
+      <Box sx={{ alignContent: "center", color: "#16CBE0", font: "700 14px 'RedHatDisplay'" }}>
+        Kişiye İlaç Ekle
+      </Box>
+    </Button>
+
+    <Button
+      variant="outlined"
+      color="info"
+      onClick={handleAddMedicineSystem}
+      startIcon={
+        <Box component="img" src={addDrugIcon} alt="addMedicine" sx={{ width: 18, height: 18 }} />
+      }
+      className="blue-medic"
+    >
+      <Box sx={{ alignContent: "center", color: "#16CBE0", font: "700 14px 'RedHatDisplay'" }}>
+        Sisteme İlaç Ekle
+      </Box>
+    </Button>
+
+    <Button
+      variant="outlined"
+      color="success"
+      onClick={handleExportExcel}
+      sx={{ width: 18, height: 18 }}
+    >
+      Excel
+    </Button>
+  </Box>
+</Box>
 
     <div className="scroll-table">
       <table>
@@ -399,7 +517,7 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
           </tr>
         </thead>
         <tbody>
-          {data.map((entry, index) => {
+          {filteredData.map((entry, index) => {
             const isPrepared = preparedMeds.has(entry.id);
             const isSelected = selectedPreparedMeds.has(entry.id);
             const isSelectedDelete = selectedPreparedMedsDelete.has(entry.id);

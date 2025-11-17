@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {useAuth} from "../AuthContext";
 import homeImage from '../../assets/home/aiworks 9.png';
+import { API_BASE_URL } from '../../config';
 import { FormControl, InputLabel, TextField, Button } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -95,7 +96,7 @@ const Login = (props) => {
 
     const logIn = () => {
 
-        fetch('http://localhost:8000/api/login/', {
+        fetch(`${API_BASE_URL}/login/`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

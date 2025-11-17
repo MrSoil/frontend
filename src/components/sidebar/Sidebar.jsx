@@ -56,9 +56,10 @@ function Sidebar() {
 
       <div className={"sidebar-content"}>
 
-          <div className={"sidebar-main-contents"}>
-            <img src={sugrIconImage} alt="SugrIcon"/>
-          </div>
+          <button className={"sidebar-main-contents stat-button hover"}
+          onClick={onHomeButtonClick}>
+              <img src={sugrIconImage} alt="SugrIcon"/>
+          </button>
 
           <button className={"sidebar-main-contents stat-button hover"}
           onClick={() => handleHoverChange(0)}>

@@ -2,11 +2,15 @@ import * as React from "react";
 import './hc_form_component.css'
 import CircularProgress from '@mui/material/CircularProgress';
 import { useState, useEffect } from 'react';
+import { API_BASE_URL } from "../../../../config";
 import {
 Icon, Typography, Button, IconButton, Checkbox, FormControlLabel, TextField, FormControl, Select, MenuItem, Box, Accordion, AccordionSummary, AccordionDetails, Dialog, DialogTitle, DialogContent, DialogActions, Tooltip, Chip, Stack,
 } from '@mui/material';
 import Close from '@mui/icons-material/Close';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { ArrowCircleLeftOutlined, ArrowCircleRightOutlined, Delete, Edit } from '@mui/icons-material';
+import PatientSelectionModal from '../PatientSelectionModal';
+import NoteModal from './NoteModal';
 
 import LightModeIcon from '@mui/icons-material/LightMode';
 import NightlightIcon from '@mui/icons-material/Nightlight';
@@ -42,26 +46,59 @@ function reformatDjangoDate(djangoDateString) {
   return `${dd}-${mm}-${yy}`;
 }
 
-function PatientNotes({ note }) {
+function PatientNotes({ note, onEdit, onDelete }) {
     let date = note["note_date"]
     let title = note["note_title"]
     let data = note["note_data"]
   return (
     <article className="note">
-      <time className="note-date" style={{margin: 0}}>{date}</time>
-      <h4>
+      <div className="note-header-row">
+        <time className="note-date" style={{margin: 0}}>{date}</time>
+        <div className="note-actions">
+          <IconButton 
+            size="small" 
+            onClick={() => onEdit(note)}
+            className="note-action-btn"
+            title="Düzenle"
+          >
+            <Edit fontSize="small" />
+          </IconButton>
+          <IconButton 
+            size="small" 
+            onClick={() => onDelete(note)}
+            className="note-action-btn delete"
+            title="Sil"
+          >
+            <Delete fontSize="small" />
+          </IconButton>
+        </div>
+      </div>
+      <div className="note-header-row">
+      <h3 className="note-title">
         {title}
-      </h4>
-      <p className="note-data" style={{margin: 0}}>{data}</p>
+      </h3>
+      </div>
+      <div className="note-header-row">
+           <p className="note-data" style={{margin: 0}}>{data}</p>
+      </div>
+
     </article>
   );
 }
 
-function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate }) {
+function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate, patientsList, currentPatientIndex, setCurrentPatientIndex, navigateToPreviousPatient, navigateToNextPatient }) {
   const user = JSON.parse(localStorage.getItem("user"));
 
   const [bodyCode, setBodyCode] = useState(null);
 
+  const titleOptions = [
+      "Hijyen Gereksinimleri",
+      "Beslenme Takibi",
+      "Pozisyon Takibi",
+      "Pansuman ve Katater Bakımı",
+      "Ödem Takibi",
+      "Misafir Güvenliği"
+  ];
 
   const [expandedCol1, setExpandedCol1] = useState(false); // 'hygiene' | 'meal' | 'posture' | false
   const [expandedCol2, setExpandedCol2] = useState(false); // 'dressing' | 'edema' | 'security' | 'urine' | false
@@ -112,7 +149,8 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
     catheter: "Katater Bakımı Yapıldı mı?"
   }
   let edemaCheckMap = {
-    liquidCheck: "Sıvı takibi yapıldı mı?"
+    liquidCheck: "Sıvı takibi yapıldı mı?",
+    liquidCheckML:  "İdrar Çıkışı (ml):",
   }
   let securityCheckMap = {
     reason1: "Yerde takılacağı kablo vs. herhangi bir şey var mı? Giymiş olduğu terlik ve oda zemini güvenli mi?",
@@ -169,12 +207,13 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
     dailyDressing: false,
     needDressing: false,
     isDressed: false,
-    catheter: false
+    catheter: false,
+    injuredParts: []
   });
 
   const [edemaCheck, setEdemaCheck] = useState({
     liquidCheck: false,
-    injuredParts: []
+    liquidCheckML: 0,
   });
 
   const [securityCheck, setSecurityCheck] = useState({
@@ -196,14 +235,10 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
 
   const [feedingNote, setFeedingNote] = useState('');
   const [selectedNote, setSelectedNote] = useState('');
-
-  const [oldNotes, setOldNotes] = useState([
-    // {
-    //   note_date: "15.09.23",
-    //   note_title: "Test1",
-    //   note_data: "",
-    // }
-    ])
+  const [showPatientSelectionModal, setShowPatientSelectionModal] = useState(false);
+  const [oldNotes, setOldNotes] = useState([]);
+  const [showNoteModal, setShowNoteModal] = useState(false);
+  const [noteToEdit, setNoteToEdit] = useState(null);
 
   const bodyMapping = ["Kafa Bölgesi", "Göğüs Bölgesi", "Sol Kol Bölgesi", "Sol Ayak Bölgesi", "Sol El Bölgesi",
     "Sol Bacak Bölgesi", "Sol Omuz Bölgesi", "Sağ Kol Bölgesi", "Sağ Ayak Bölgesi", "Sağ El Bölgesi",
@@ -211,7 +246,7 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
 
   const addInjuredPart = () => {
     if (bodyCode == null || bodyCode === "") return;
-    setEdemaCheck(prev => {
+    setDressingCheck(prev => {
     const list = Array.isArray(prev.injuredParts) ? prev.injuredParts : [];
     if (list.includes(bodyCode)) return prev; // avoid duplicates
     return { ...prev, injuredParts: [...list, bodyCode] };
@@ -220,14 +255,14 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
   };
 
   const removeInjuredPart = (code) => {
-    setEdemaCheck(prev => ({
+    setDressingCheck(prev => ({
     ...prev,
     injuredParts: (prev.injuredParts || []).filter(c => c !== code)
     }));
   };
 
   const removeLastInjuredPart = () => {
-    setEdemaCheck(prev => {
+    setDressingCheck(prev => {
     const list = prev.injuredParts || [];
     if (!list.length) return prev;
     return { ...prev, injuredParts: list.slice(0, -1) };
@@ -289,7 +324,7 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
     // setTakenMeds(prev => new Set([...prev, ...selectedGivenMeds]));
     // setSelectedGivenMeds(new Set());
 
-    fetch("http://localhost:8000/api/patients/", {
+    fetch(`${API_BASE_URL}/patients/`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json'},
         body: JSON.stringify(payload)
@@ -302,7 +337,7 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
 
   const updateSelectedPatient = (email, hc_type) => {
     setIsLoading(true);
-    fetch(`http://localhost:8000/api/patients/?email=${email}&patient_id=${selectedPatient.patient_id}`, {
+    fetch(`${API_BASE_URL}/patients/?email=${email}&patient_id=${selectedPatient.patient_id}`, {
       method: "GET",
       headers: {
         'Content-Type': 'application/json'
@@ -364,11 +399,12 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
             dailyDressing: false,
             needDressing: false,
             isDressed: false,
-            catheter: false
+            catheter: false,
+            injuredParts: []
           })
           setEdemaCheck({
             liquidCheck: false,
-            injuredParts: []
+            liquidCheckML:  0
           })
           setSecurityCheck({
             reason1: false,
@@ -391,9 +427,132 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
     )
   };
 
+  const fetchNotes = () => {
+    if (!selectedPatient || !selectedPatient.patient_id) return;
+    
+    fetch(`${API_BASE_URL}/patients/?email=${user.email}&patient_id=${selectedPatient.patient_id}`, {
+      method: "GET",
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(r => r.json())
+    .then(resp => {
+      if (resp.status === "success" && resp.data && resp.data.length > 0) {
+        const patientData = resp.data[0];
+        const patientNotes = patientData.patient_notes || {};
+        
+        // Convert notes object to array, sorted by date (newest first)
+        const notesArray = [];
+        Object.keys(patientNotes).forEach(date => {
+          Object.keys(patientNotes[date]).forEach(noteId => {
+            notesArray.push(patientNotes[date][noteId]);
+          });
+        });
+        
+        // Sort by timestamp (newest first)
+        notesArray.sort((a, b) => {
+          const dateA = new Date(a.timestamp || a.note_date);
+          const dateB = new Date(b.timestamp || b.note_date);
+          return dateB - dateA;
+        });
+        
+        setOldNotes(notesArray);
+      } else {
+        setOldNotes([]);
+      }
+    })
+    .catch(error => {
+      console.error("Error fetching notes:", error);
+      setOldNotes([]);
+    });
+  };
+
+  const addNote = () => {
+    if (!selectedNote || selectedNote === "") {
+      alert("Lütfen bir başlık seçiniz.");
+      return;
+    }
+    if (!feedingNote.trim()) {
+      alert("Lütfen not içeriğini giriniz.");
+      return;
+    }
+
+    fetch(`${API_BASE_URL}/patients/`, {
+      method: "PUT",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email: user.email,
+        type: "add_note",
+        patient_id: selectedPatient.patient_id,
+        note_title: selectedNote,
+        note_data: feedingNote,
+        today_date: getTodayForDjango()
+      })
+    })
+    .then(r => r.json())
+    .then(resp => {
+      if (resp.status === "success") {
+        setFeedingNote('');
+        setSelectedNote('');
+        fetchNotes();
+      } else {
+        alert("Not eklenirken bir hata oluştu.");
+      }
+    })
+    .catch(error => {
+      console.error("Error adding note:", error);
+      alert("Not eklenirken bir hata oluştu.");
+    });
+  };
+
+  const handleEditNote = (note) => {
+    setNoteToEdit(note);
+    setShowNoteModal(true);
+  };
+
+  const handleDeleteNote = (note) => {
+    if (!window.confirm("Bu notu silmek istediğinize emin misiniz?")) {
+      return;
+    }
+
+    fetch(`${API_BASE_URL}/patients/`, {
+      method: "DELETE",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email: user.email,
+        type: "delete_note",
+        patient_id: selectedPatient.patient_id,
+        note_id: note.note_id,
+        note_date: note.note_date
+      })
+    })
+    .then(r => r.json())
+    .then(resp => {
+      if (resp.status === "success") {
+        fetchNotes();
+      } else {
+        alert("Not silinirken bir hata oluştu.");
+      }
+    })
+    .catch(error => {
+      console.error("Error deleting note:", error);
+      alert("Not silinirken bir hata oluştu.");
+    });
+  };
+
+  const handleNoteSaved = () => {
+    fetchNotes();
+  };
+
   useEffect(() => {
-      updateSelectedPatient(user.email, hcType)
-    }, [user.email]);
+      updateSelectedPatient(user.email, hcType);
+      fetchNotes();
+    }, [user.email, selectedPatient.patient_id]);
 
   if (isLoading) {
     return (
@@ -442,6 +601,37 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
     </div>
 
     <div className="divider"></div>
+    
+    {/* Patient Navigation Arrows */}
+    <div className="patient-navigation-container">
+        <IconButton 
+            className="nav-arrow" 
+            onClick={navigateToPreviousPatient}
+            disabled={currentPatientIndex === 0}
+            title="Previous Patient"
+        >
+            <ArrowCircleLeftOutlined sx={{ fontSize: 40 }} />
+        </IconButton>
+        <div className="patient-navigation-info">
+            <span className="patient-counter">
+                {currentPatientIndex + 1} / {patientsList.length}
+            </span>
+            <button 
+                className="patient-name-button"
+                onClick={() => setShowPatientSelectionModal(true)}
+            >
+                {selectedPatient?.patient_personal_info?.section_1?.firstname} {selectedPatient?.patient_personal_info?.section_1?.lastname}
+            </button>
+        </div>
+        <IconButton 
+            className="nav-arrow" 
+            onClick={navigateToNextPatient}
+            disabled={currentPatientIndex === patientsList.length - 1}
+            title="Next Patient"
+        >
+            <ArrowCircleRightOutlined sx={{ fontSize: 40 }} />
+        </IconButton>
+    </div>
 
     <div className="content">
       <div className="care-column"> {/* Hijyen Gereksinimleri */}
@@ -541,18 +731,12 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography className="TypographyHC" variant="h6">Pansuman ve Katater Bakımı</Typography>
           </AccordionSummary>
-         <AccordionDetails> <div className="divider-low-margin"></div> {Object.keys(dressingCheck).map((key) => ( <div className="each-point" key={key}> {key === 'stage' ? ( <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}> <Typography className="TypographyHC" variant="body1"> {dressingCheckMap[key]} </Typography> <FormControl size="small" sx={{ minWidth: 140 }}> <InputLabel id="stage-label">Evre</InputLabel> <Select labelId="stage-label" id="stage-select" label="Evre" value={Number(dressingCheck.stage) ?? 1} onChange={(e) => setDressingCheck((prev) => ({ ...prev, stage: Number(e.target.value) })) } > <MenuItem value={1}>Evre I</MenuItem> <MenuItem value={2}>Evre II</MenuItem> <MenuItem value={3}>Evre III</MenuItem> <MenuItem value={4}>Evre IV</MenuItem> </Select> </FormControl> </Box> ) : ( <FormControlLabel control={ <Checkbox style={{ marginLeft: '15px' }} icon={<PlaylistAddRoundedIcon />} checkedIcon={<PlaylistAddCheckCircleIcon />} checked={dressingCheck[key]} onChange={() => toggleList(key, dressingCheck, setDressingCheck)} /> } label={dressingCheckMap[key]} /> )} </div> ))} </AccordionDetails>
-        </Accordion>
-        <Accordion expanded={expandedCol2 === 'edema'} onChange={handleChangeCol2('edema')}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography className="TypographyHC" variant="h6">Ödem Takibi</Typography>
-          </AccordionSummary>
-          <AccordionDetails> <div className="divider-low-margin"></div>
-            {/* Sıvı takibi checkbox (existing) */}
-
-            <div className="each-point"> <FormControlLabel control={ <Checkbox style={{ marginLeft: "15px" }} icon={<PlaylistAddRoundedIcon />} checkedIcon={<PlaylistAddCheckCircleIcon />} checked={!!edemaCheck.liquidCheck} onChange={() => setEdemaCheck(prev => ({ ...prev, liquidCheck: !prev.liquidCheck })) } /> } label={edemaCheckMap.liquidCheck} /> </div>
-            {/* Yeni: Yaralı bölge seçimi + liste */}
-            <Box sx={{ mt: 1 }}>
+         <AccordionDetails>
+           <div className="divider-low-margin"></div> {Object.keys(dressingCheck).map((key) => ( <div className="each-point" key={key}> {key === 'stage' ?
+             ( <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}> <Typography className="TypographyHC" variant="body1"> {dressingCheckMap[key]} </Typography> <FormControl size="small" sx={{ minWidth: 140 }}> <InputLabel id="stage-label">Evre</InputLabel> <Select labelId="stage-label" id="stage-select" label="Evre" value={Number(dressingCheck.stage) ?? 1} onChange={(e) => setDressingCheck((prev) => ({ ...prev, stage: Number(e.target.value) })) } > <MenuItem value={1}>Evre I</MenuItem> <MenuItem value={2}>Evre II</MenuItem> <MenuItem value={3}>Evre III</MenuItem> <MenuItem value={4}>Evre IV</MenuItem> </Select> </FormControl> </Box> ) :
+              key === 'injuredParts' ? null :
+             ( <FormControlLabel control={ <Checkbox style={{ marginLeft: '15px' }} icon={<PlaylistAddRoundedIcon />} checkedIcon={<PlaylistAddCheckCircleIcon />} checked={dressingCheck[key]} onChange={() => toggleList(key, dressingCheck, setDressingCheck)} /> } label={dressingCheckMap[key]} /> )} </div> ))}
+           <Box sx={{ mt: 1 }}>
             <BodyPartInput value={bodyCode} onChange={setBodyCode} />
             <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
               <Button
@@ -586,7 +770,7 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
               }}
             >
               <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-                {(edemaCheck.injuredParts || []).map((code) => (
+                {(dressingCheck.injuredParts || []).map((code) => (
                   <Chip
                     key={code}
                     label={`Bölge: ${bodyMapping[code-1]}`}
@@ -597,27 +781,34 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
               </Stack>
             </Box>
             </Box>
+         </AccordionDetails>
+        </Accordion>
+        <Accordion expanded={expandedCol2 === 'edema'} onChange={handleChangeCol2('edema')}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography className="TypographyHC" variant="h6">Ödem Takibi</Typography>
+          </AccordionSummary>
+          <AccordionDetails> <div className="divider-low-margin"></div>
+            {/* Sıvı takibi checkbox (existing) */}
+
+            <div className="each-point">
+              <FormControlLabel control={ <Checkbox style={{ marginLeft: "15px" }} icon={<PlaylistAddRoundedIcon />} checkedIcon={<PlaylistAddCheckCircleIcon />} checked={!!edemaCheck.liquidCheck} onChange={() => setEdemaCheck(prev => ({ ...prev, liquidCheck: !prev.liquidCheck })) } /> } label={edemaCheckMap.liquidCheck} />
+            </div>
+
+           <div className="each-point">
+            <><InputLabel style={{"alignContent": "center"}} htmlFor="outlined-adornment-liquidCheckML">{edemaCheckMap["liquidCheckML"]}</InputLabel>
+                <OutlinedInput
+                              id="outlined-adornment-liquidCheckML"
+                              type="number" step="0.01"
+                              size="small"
+                              endAdornment={<InputAdornment position="end">ml</InputAdornment>}
+                              value={edemaCheck.liquidCheckML}
+                              onChange={(e) => setEdemaCheck({ ...edemaCheck, liquidCheckML: e.target.value })}
+                            />
+            </>
+          </div>
+            {/* Yeni: Yaralı bölge seçimi + liste */}
+
           </AccordionDetails>
-          {/*<AccordionDetails>*/}
-          {/*  <div className="divider-low-margin"></div>*/}
-          {/*  {Object.keys(edemaCheck).map((key) => (*/}
-          {/*  <div className="each-point" key={key}>*/}
-          {/*  <FormControlLabel*/}
-          {/*  control={*/}
-          {/*  <Checkbox*/}
-          {/*  style={{"marginLeft": "15px"}}*/}
-          {/*  icon={<PlaylistAddRoundedIcon />}*/}
-          {/*  checkedIcon={<PlaylistAddCheckCircleIcon />}*/}
-          {/*  checked={edemaCheck[key]}*/}
-          {/*  onChange={() => toggleList(key, edemaCheck, setEdemaCheck)}*/}
-          {/*  />*/}
-          {/*  }*/}
-          {/*  label={edemaCheckMap[key]}*/}
-          {/*  />*/}
-          {/*  </div>*/}
-          {/*  ))}*/}
-          {/*  <BodyPartInput value={bodyCode} onChange={setBodyCode} />*/}
-          {/*</AccordionDetails>*/}
         </Accordion>
 
         {/* Misafir Güvenliği */}
@@ -680,7 +871,13 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
 
           <div className="care-notes">
             {oldNotes.map((note, index) => (
-              <PatientNotes className="care-note" key={index} note={note} />
+              <PatientNotes 
+                className="care-note" 
+                key={note.note_id || index} 
+                note={note}
+                onEdit={handleEditNote}
+                onDelete={handleDeleteNote}
+              />
             ))}
           </div>
 
@@ -714,7 +911,7 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
             minRows={3}
           />
 
-          <Button className="Button" variant="contained" sx={{ backgroundColor: "#A695CC", ml: 1 }}>
+          <Button className="Button" variant="contained" sx={{ backgroundColor: "#A695CC", ml: 1 }} onClick={addNote}>
               Not Ekle
           </Button>
         </div>
@@ -768,6 +965,31 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
     </div>
   </div>
 </div>
+<PatientSelectionModal
+  isOpen={showPatientSelectionModal}
+  onClose={() => setShowPatientSelectionModal(false)}
+  patientsList={patientsList}
+  selectedPatient={selectedPatient}
+  onSelectPatient={(patient) => {
+    const patientIndex = patientsList.findIndex(p => p.patient_id === patient.patient_id);
+    if (patientIndex !== -1) {
+      setCurrentPatientIndex(patientIndex);
+      setSelectedPatient(patient);
+    }
+  }}
+/>
+<NoteModal
+  isOpen={showNoteModal}
+  onClose={() => {
+    setShowNoteModal(false);
+    setNoteToEdit(null);
+  }}
+  onSave={handleNoteSaved}
+  patientId={selectedPatient?.patient_id}
+  userEmail={user.email}
+  noteToEdit={noteToEdit}
+  titleOptions={titleOptions}
+/>
 </div> )
 }
 

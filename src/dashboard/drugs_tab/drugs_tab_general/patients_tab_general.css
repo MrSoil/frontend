@@ -133,7 +133,7 @@
 }
 
 .search-container input {
-  font-family: "RedHatDisplay";
+  font: 200 18px "RedHatDisplay";
   background: transparent;
   margin-left: 2%;
   width: 100%;
@@ -229,11 +229,12 @@
 
 .patient-name {
   color: #28252f;
-  font: 700 16px "RedHatDisplay";
+  font: 700 18px "RedHatDisplay";
 }
 
 .patient-location {
   color: rgba(40, 37, 47, 0.7);
   letter-spacing: 0.24px;
-  font: 400 12px/160% "RedHatDisplay";
+  font: 300 16px "RedHatDisplay";
 }
+

@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import { API_BASE_URL } from "../../../../config";
 
 const getGenderAge = ( age, gender ) => {
     const today = new Date();
@@ -165,7 +166,7 @@ function PatientProfileComponent({ selectedPatientOuter, setNewRoomContainer, se
         setSelectedPatient(selectedPatientOuter)
     }
     else {
-        fetch(`http://localhost:8000/api/patients/?email=${email}`, {
+        fetch(`${API_BASE_URL}/patients/?email=${email}`, {
       method: "GET",
       headers: {
         'Content-Type': 'application/json'

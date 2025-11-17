@@ -1,5 +1,24 @@
 # Getting Started with Create React App
 
+
+fetch("
+replaced
+fetch("http://localhost:8000
+
+
+fetch("http://localhost:8000
+must be replaced
+fetch("
+
+
+
+
+
+
+
+
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

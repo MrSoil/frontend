@@ -8,8 +8,9 @@ import NotesList from "./info_components/notesComponent";
 import HCList from "./info_components/hcComponent";
 import HC_Form from "./info_components/hcFormComponent";
 import Medicine_Form from "./info_components/medicineFormComponent";
+import PatientSelectionModal from "./PatientSelectionModal";
 
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Visibility, VisibilityOff, ArrowCircleLeftOutlined, ArrowCircleRightOutlined } from "@mui/icons-material";
 import {Box,
         Grid,
         Stack,
@@ -32,12 +33,12 @@ function getTodayForDjango() {
   return today.toString();
 }
 
-function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient }) {
+function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient, patientsList, currentPatientIndex, navigateToPreviousPatient, navigateToNextPatient, setCurrentPatientIndex }) {
     const [newRoomContainer, setNewRoomContainer] = useState(false)
     const [newCareCategoryContainer, setNewCareCategoryContainer] = useState(false)
     const [newMedicineContainer, setNewMedicineContainer] = useState(false)
-    const [newNoteContainer, setNewNoteContainer] = useState(false)
     const [newHCContainer, setNewHCContainer] = useState(false)
+    const [showPatientSelectionModal, setShowPatientSelectionModal] = useState(false)
 
     const [newRoom, setNewRoom] = useState("")
     const [newCareCategory, setNewCareCategory] = useState("")
@@ -62,9 +63,6 @@ function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient
 
     const [newMedicineDesc, setNewMedicineDesc] = useState("")
     const [newMedicineDose, setNewMedicineDose] = useState("")
-
-    const [newNoteName, setNewNoteName] = useState("")
-    const [newNoteDesc, setNewNoteDesc] = useState("")
 
     const [newMedicineNameError, setNewMedicineNameError] = useState("")
     const [newMedicineTimeError, setNewMedicineTimeError] = useState("")
@@ -119,15 +117,10 @@ function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient
         setNewMedicineContainer(false)
     }
 
-    const cancelNewNote = () => {
-        setNewNoteContainer(false)
-    }
-
-
     const addNewMedicine = () => {
 
         const addMedicine = async () => {
-        // fetch("http://localhost:8000/api/patients/", {
+        // fetch("http://localhost:8000http://testserver.local:8000/api/patients/", {
         // method: "POST",
         // headers: {
         //     'Content-Type': 'application/json'
@@ -184,7 +177,7 @@ function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient
             error_occurred = true
         }
 
-        if ([] === newMedicineTimes || newMedicineTimes[-1] === "") {
+        if (newMedicineTimes.length === 0 || newMedicineTimes[newMedicineTimes.length - 1] === "") {
             setNewMedicineTimeError("Please enter a medicine time")
             error_occurred = true
         }
@@ -252,47 +245,58 @@ function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient
             </div>
           </div>
           : newMedicineContainer !== false ?
-          <Medicine_Form selectedPatient={selectedPatient} setSelectedPatient={setSelectedPatient} setNewMedicineContainer={setNewMedicineContainer} medicinesDate={medicinesDate}/>
-          : newNoteContainer !== false ?
-          <div className="blackout-container">
-            <div className="blackout"></div>
-            <div className="blackout-content-container">
-                    <div className={"formContainer"}>
-                        <input
-                            value={newNoteName}
-                            placeholder=" i.e. Majezik"
-                            onChange={ev => setNewNoteName(ev.target.value)}
-                            className={"formBox"} />
-                        <label>Note Name</label>
-                    </div>
-                    <div className={"formContainer"} style={{height: "fit-content"}}>
-                        <textarea rows="5" cols="50"
-                            value={newNoteDesc}
-                            placeholder=""
-                            onChange={ev => setNewNoteDesc(ev.target.value)}
-                            className={"formBox"}></textarea>
-                        <label>Note Description</label>
-                    </div>
-                <div className="exit-container">
-                    <button style={{backgroundColor: "#E77169", float: "left"}} onClick={cancelNewNote} >Cancel</button>
-                    <button style={{backgroundColor: "#A695CC", float: "right"}} >Submit</button>
-                </div>
-            </div>
-          </div>
+          <Medicine_Form selectedPatient={selectedPatient} setSelectedPatient={setSelectedPatient} setNewMedicineContainer={setNewMedicineContainer} medicinesDate={medicinesDate} patientsList={patientsList} currentPatientIndex={currentPatientIndex} setCurrentPatientIndex={setCurrentPatientIndex} navigateToPreviousPatient={navigateToPreviousPatient} navigateToNextPatient={navigateToNextPatient}/>
           : newHCContainer !== false ?
           <HC_Form selectedPatient={selectedPatient}
                    setSelectedPatient={setSelectedPatient}
                     setNewHCContainer={setNewHCContainer}
-                    hcDate={hcDate}/> : null}
-              <Stack style={{'marginLeft': '20px'}} sx={{ width: 1, height: 1 }} spacing={2}>
-              <Grid container spacing={2} sx={{ width: 1, height: 1 }}>
+                    hcDate={hcDate}
+                    patientsList={patientsList}
+                    currentPatientIndex={currentPatientIndex}
+                    setCurrentPatientIndex={setCurrentPatientIndex}
+                    navigateToPreviousPatient={navigateToPreviousPatient}
+                    navigateToNextPatient={navigateToNextPatient}/> : null}
+              
+              {/* Patient Navigation Arrows */}
+              <div className="patient-navigation-container">
+                  <IconButton 
+                      className="nav-arrow"
+                      onClick={navigateToPreviousPatient}
+                      disabled={currentPatientIndex === 0}
+                      title="Previous Patient"
+                  >
+                      <ArrowCircleLeftOutlined sx={{ fontSize: 40 }} />
+                  </IconButton>
+                  <div className="patient-navigation-info">
+                      <span className="patient-counter">
+                          {currentPatientIndex + 1} / {patientsList.length}
+                      </span>
+                      <button 
+                          className="patient-name-button"
+                          onClick={() => setShowPatientSelectionModal(true)}
+                      >
+                          {selectedPatient?.patient_personal_info?.section_1?.firstname} {selectedPatient?.patient_personal_info?.section_1?.lastname}
+                      </button>
+                  </div>
+                  <IconButton 
+                      className="nav-arrow"
+                      onClick={navigateToNextPatient}
+                      disabled={currentPatientIndex === patientsList.length - 1}
+                      title="Next Patient"
+                  >
+                      <ArrowCircleRightOutlined sx={{ fontSize: 40 }} />
+                  </IconButton>
+              </div>
+              
+              <Stack sx={{ width: 1, height: 1 }}>
+              <Grid style={{'justifyContent': 'space-between'}} container spacing={0} sx={{ width: 1, height: 1 }}>
                 <Grid size={6} sx={{ width: 0.25, height: 0.985 }}>
 
                   <PatientProfileComponent selectedPatient={selectedPatient}
                                   setNewRoomContainer={setNewRoomContainer}
                                   setNewCareCategoryContainer={setNewCareCategoryContainer}/>
                 </Grid>
-                <Grid size={6} sx={{ width: 0.70, height: 1 }}>
+                <Grid size={6} sx={{ width: 0.74, height: 1 }}>
                   <Box sx={{ height: 1/2 }}>
                      <MedicineList selectedPatient={selectedPatient}
                                 setNewMedicineContainer={setNewMedicineContainer}
@@ -314,6 +318,19 @@ function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient
          {/*    <NotesList selectedPatient={selectedPatient}*/}
          {/*               setNewNoteContainer={setNewNoteContainer}/>*/}
          {/*</div>*/}
+         <PatientSelectionModal
+           isOpen={showPatientSelectionModal}
+           onClose={() => setShowPatientSelectionModal(false)}
+           patientsList={patientsList}
+           selectedPatient={selectedPatient}
+           onSelectPatient={(patient) => {
+             const patientIndex = patientsList.findIndex(p => p.patient_id === patient.patient_id);
+             if (patientIndex !== -1) {
+               setCurrentPatientIndex(patientIndex);
+               setSelectedPatient(patient);
+             }
+           }}
+         />
       </div>
   );
 }

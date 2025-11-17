@@ -1,10 +1,14 @@
 import * as React from "react";
 import './medicine_form_component.css'
 import {useEffect, useState} from "react";
-import { Tab, Tabs } from '@mui/material';
+import { Tab, Tabs, IconButton } from '@mui/material';
+import { API_BASE_URL } from "../../../../config";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import { ArrowCircleLeftOutlined, ArrowCircleRightOutlined, Delete, Edit } from '@mui/icons-material';
+import PatientSelectionModal from '../PatientSelectionModal';
+import NoteModal from './NoteModal';
 
 
 function getTodayForDjango() {
@@ -68,22 +72,46 @@ const PersonInfo = ({ patientPhoto, name, surname, gender, age, bloodType, heigh
   </div>
 );
 
-function PatientNotes({ note }) {
+function PatientNotes({ note, onEdit, onDelete }) {
     let date = note["note_date"]
     let title = note["note_title"]
     let data = note["note_data"]
   return (
     <article className="note">
-      <time className="note-date" style={{margin: 0}}>{date}</time>
-      <h4>
+      <div className="note-header-row">
+        <time className="note-date" style={{margin: 0}}>{date}</time>
+        <div className="note-actions">
+          <IconButton 
+            size="small" 
+            onClick={() => onEdit(note)}
+            className="note-action-btn"
+            title="Düzenle"
+          >
+            <Edit fontSize="small" />
+          </IconButton>
+          <IconButton 
+            size="small" 
+            onClick={() => onDelete(note)}
+            className="note-action-btn delete"
+            title="Sil"
+          >
+            <Delete fontSize="small" />
+          </IconButton>
+        </div>
+      </div>
+       <div className="note-header-row">
+      <h3 className="note-title">
         {title}
-      </h4>
-      <p className="note-data" style={{margin: 0}}>{data}</p>
+      </h3>
+      </div>
+      <div className="note-header-row">
+           <p className="note-data" style={{margin: 0}}>{data}</p>
+      </div>
     </article>
   );
 }
 
-function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineContainer, medicinesDate }) {
+function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineContainer, medicinesDate, patientsList, currentPatientIndex, setCurrentPatientIndex, navigateToPreviousPatient, navigateToNextPatient }) {
   const user = JSON.parse(localStorage.getItem("user"));
   const theme = createTheme({
     palette: {
@@ -95,6 +123,16 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
       }
     }
   });
+
+  const titleOptions = [
+    "Hijyen Gereksinimleri",
+    "Beslenme Takibi",
+    "Pozisyon Takibi",
+    "Pansuman ve Katater Bakımı",
+    "Ödem Takibi",
+    "Misafir Güvenliği"
+  ];
+
   const dict_key = reformatDjangoDate(medicinesDate)
    // already‐taken medicine IDs
 
@@ -123,13 +161,10 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
   const [feedingNote, setFeedingNote] = useState('');
   const [selectedNoteTitle, setSelectedNoteTitle] = useState('');
 
-  const [oldNotes, setOldNotes] = useState([
-    // {
-    //   note_date: "15.09.23",
-    //   note_title: "Test1",
-    //   note_data: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    // }
-    ])
+  const [showPatientSelectionModal, setShowPatientSelectionModal] = useState(false);
+  const [oldNotes, setOldNotes] = useState([]);
+  const [showNoteModal, setShowNoteModal] = useState(false);
+  const [noteToEdit, setNoteToEdit] = useState(null);
 
   const toggleDailyMedicinesM = (key) => {
     setDailyMedicinesM({
@@ -240,7 +275,7 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
     // setSelectedGivenMeds(new Set());
 
     for (let i = 0; i < payload.length; i++) {
-        fetch("http://localhost:8000/api/patients/", {
+        fetch(`${API_BASE_URL}/patients/`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json'},
           body: JSON.stringify({
@@ -269,7 +304,7 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
 
   const updateSelectedPatient = (email) => {
     setIsLoading(true);
-    fetch(`http://localhost:8000/api/patients/?email=${email}&patient_id=${selectedPatient.patient_id}`, {
+    fetch(`${API_BASE_URL}/patients/?email=${email}&patient_id=${selectedPatient.patient_id}`, {
       method: "GET",
       headers: {
         'Content-Type': 'application/json'
@@ -336,9 +371,132 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
     )
   };
 
+  const fetchNotes = () => {
+    if (!selectedPatient || !selectedPatient.patient_id) return;
+    
+    fetch(`${API_BASE_URL}/patients/?email=${user.email}&patient_id=${selectedPatient.patient_id}`, {
+      method: "GET",
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(r => r.json())
+    .then(resp => {
+      if (resp.status === "success" && resp.data && resp.data.length > 0) {
+        const patientData = resp.data[0];
+        const patientNotes = patientData.patient_notes || {};
+        
+        // Convert notes object to array, sorted by date (newest first)
+        const notesArray = [];
+        Object.keys(patientNotes).forEach(date => {
+          Object.keys(patientNotes[date]).forEach(noteId => {
+            notesArray.push(patientNotes[date][noteId]);
+          });
+        });
+        
+        // Sort by timestamp (newest first)
+        notesArray.sort((a, b) => {
+          const dateA = new Date(a.timestamp || a.note_date);
+          const dateB = new Date(b.timestamp || b.note_date);
+          return dateB - dateA;
+        });
+        
+        setOldNotes(notesArray);
+      } else {
+        setOldNotes([]);
+      }
+    })
+    .catch(error => {
+      console.error("Error fetching notes:", error);
+      setOldNotes([]);
+    });
+  };
+
+  const addNote = () => {
+    if (!selectedNoteTitle || selectedNoteTitle === "Başlık Seçiniz") {
+      alert("Lütfen bir başlık seçiniz.");
+      return;
+    }
+    if (!feedingNote.trim()) {
+      alert("Lütfen not içeriğini giriniz.");
+      return;
+    }
+
+    fetch(`${API_BASE_URL}/patients/`, {
+      method: "PUT",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email: user.email,
+        type: "add_note",
+        patient_id: selectedPatient.patient_id,
+        note_title: selectedNoteTitle,
+        note_data: feedingNote,
+        today_date: getTodayForDjango()
+      })
+    })
+    .then(r => r.json())
+    .then(resp => {
+      if (resp.status === "success") {
+        setFeedingNote('');
+        setSelectedNoteTitle('');
+        fetchNotes();
+      } else {
+        alert("Not eklenirken bir hata oluştu.");
+      }
+    })
+    .catch(error => {
+      console.error("Error adding note:", error);
+      alert("Not eklenirken bir hata oluştu.");
+    });
+  };
+
+  const handleEditNote = (note) => {
+    setNoteToEdit(note);
+    setShowNoteModal(true);
+  };
+
+  const handleDeleteNote = (note) => {
+    if (!window.confirm("Bu notu silmek istediğinize emin misiniz?")) {
+      return;
+    }
+
+    fetch(`${API_BASE_URL}/patients/`, {
+      method: "DELETE",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email: user.email,
+        type: "delete_note",
+        patient_id: selectedPatient.patient_id,
+        note_id: note.note_id,
+        note_date: note.note_date
+      })
+    })
+    .then(r => r.json())
+    .then(resp => {
+      if (resp.status === "success") {
+        fetchNotes();
+      } else {
+        alert("Not silinirken bir hata oluştu.");
+      }
+    })
+    .catch(error => {
+      console.error("Error deleting note:", error);
+      alert("Not silinirken bir hata oluştu.");
+    });
+  };
+
+  const handleNoteSaved = () => {
+    fetchNotes();
+  };
+
   useEffect(() => {
-      updateSelectedPatient(user.email)
-    }, [user.email]);
+      updateSelectedPatient(user.email);
+      fetchNotes();
+    }, [user.email, selectedPatient.patient_id]);
 
   if (isLoading) {
     return (
@@ -363,6 +521,37 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
         </div>
       </div>
           <div className="divider"></div>
+          
+          {/* Patient Navigation Arrows */}
+          <div className="patient-navigation-container">
+              <IconButton 
+                  className="nav-arrow" 
+                  onClick={navigateToPreviousPatient}
+                  disabled={currentPatientIndex === 0}
+                  title="Previous Patient"
+              >
+                  <ArrowCircleLeftOutlined sx={{ fontSize: 40 }} />
+              </IconButton>
+              <div className="patient-navigation-info">
+                  <span className="patient-counter">
+                      {currentPatientIndex + 1} / {patientsList.length}
+                  </span>
+                  <button 
+                      className="patient-name-button"
+                      onClick={() => setShowPatientSelectionModal(true)}
+                  >
+                      {selectedPatient?.patient_personal_info?.section_1?.firstname} {selectedPatient?.patient_personal_info?.section_1?.lastname}
+                  </button>
+              </div>
+              <IconButton 
+                  className="nav-arrow" 
+                  onClick={navigateToNextPatient}
+                  disabled={currentPatientIndex === patientsList.length - 1}
+                  title="Next Patient"
+              >
+                  <ArrowCircleRightOutlined  sx={{ fontSize: 40 }} />
+              </IconButton>
+          </div>
 
 
       <div className="content">
@@ -390,7 +579,12 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
             <div className="divider"></div>
             <div className="medicine-notes">
               {oldNotes.map((note, index) => (
-                <PatientNotes key={index} note={note} />
+                <PatientNotes 
+                  key={note.note_id || index} 
+                  note={note}
+                  onEdit={handleEditNote}
+                  onDelete={handleDeleteNote}
+                />
               ))}
             </div>
             <div className="divider"></div>
@@ -398,12 +592,12 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
             <textarea placeholder="Notunuzu giriniz..." value={feedingNote} onChange={(e) => setFeedingNote(e.target.value)} />
             <h5>Konu Başlığı</h5>
             <div className="half-medicine-note-submit">
-              <select onChange={(e) => setSelectedNoteTitle(e.target.value)}>
+              <select onChange={(e) => setSelectedNoteTitle(e.target.value)} value={selectedNoteTitle}>
                 <option>Başlık Seçiniz</option>
                 <option>Hijyen Gereksinimleri</option>
                 <option>Beslenme Takibi</option>
               </select>
-              <button style={{"backgroundColor": "#A695CC"}}>Not Ekle</button>
+              <button style={{"backgroundColor": "#A695CC"}} onClick={addNote}>Not Ekle</button>
             </div>
           </div>
         </div>
@@ -564,6 +758,31 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
       </div>
     </div>
             </div>
+        <PatientSelectionModal
+            isOpen={showPatientSelectionModal}
+            onClose={() => setShowPatientSelectionModal(false)}
+            patientsList={patientsList}
+            selectedPatient={selectedPatient}
+            onSelectPatient={(patient) => {
+              const patientIndex = patientsList.findIndex(p => p.patient_id === patient.patient_id);
+              if (patientIndex !== -1) {
+                setCurrentPatientIndex(patientIndex);
+                setSelectedPatient(patient);
+              }
+            }}
+          />
+        <NoteModal
+          isOpen={showNoteModal}
+          onClose={() => {
+            setShowNoteModal(false);
+            setNoteToEdit(null);
+          }}
+          onSave={handleNoteSaved}
+          patientId={selectedPatient?.patient_id}
+          userEmail={user.email}
+          noteToEdit={noteToEdit}
+          titleOptions={titleOptions}
+        />
           </div>
   );
 }

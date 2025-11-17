@@ -24,30 +24,94 @@
   border: none;
 }
 .note {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   margin: 0;
-  padding: 10px 0;
+  padding: 16px;
   align-items: start;
   font-weight: 400;
   background-color: #F6F0F6;
+  border-radius: 12px;
+  border: 1px solid #E0E0E0;
+  margin-bottom: 12px;
+  transition: all 0.2s;
 }
+
+.note:hover {
+  background-color: #F0F0F0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
 .note:nth-child(odd) {
   background-color: #FFFFFF;
 }
+
+.note-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: auto;
+}
+
 .note-date {
   color: #717070;
-  margin: 2px 1vw;
   font: 12px "RedHatDisplay";
 }
+
+.note-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.note:hover .note-actions {
+  opacity: 1;
+}
+
+.note-action-btn {
+  padding: 4px !important;
+  color: #5F6767 !important;
+}
+
+.note-action-btn:hover {
+  background-color: rgba(166, 149, 204, 0.1) !important;
+  color: #A695CC !important;
+}
+
+.note-action-btn.delete:hover {
+  background-color: rgba(228, 117, 109, 0.1) !important;
+  color: #E4756D !important;
+}
+
 .note-title {
   color: rgba(52, 55, 56, 1);
-  margin: 2px 1vw;
+  margin: 0;
   font: 600 16px "RedHatDisplay";
 }
+
 .note-data {
   color: rgba(52, 55, 56, 1);
-  margin: 2px 1vw;
+  margin: 0;
   font: 400 16px "RedHatDisplay";
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.notes-list-container {
+  max-height: 400px;
+  min-height: 100px;
+  padding: 0 12px;
+}
+
+.notes-loading,
+.notes-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+  font: 14px "RedHatDisplay";
 }
 .notes-button {
   height: 35px;

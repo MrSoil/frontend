@@ -3,7 +3,7 @@
   border-radius: 24px;
   background-color: #fff;
   flex-direction: column;
-  height: 500px;
+  height: 430px;
   width: 100%;
   gap: 0;
   padding: 10px 20px 10px 20px;
@@ -66,7 +66,7 @@
   width: 100%;
   overflow-y: scroll;
   overflow-x: hidden;
-  max-height: 300px;
+  max-height: 230px;
 }
 
 .medication-table thead {
@@ -94,6 +94,29 @@
   width: 25px;
   height: 25px;
   margin: 0 5px 0 10px;
+}
+
+.medication-tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.medication-tab {
+  border: none;
+  cursor: pointer;
+  padding: 8px 24px;
+  border-radius: 20px 20px 0 0;
+  font-family: 'RedHatDisplay', sans-serif;
+  font-weight: 600;
+  background-color: #ffffff;
+  color: #00555a;
+  box-shadow: 0 -1px 0 0 #ffffff;
+}
+
+.medication-tab.active {
+  background-color: #00555a;
+  color: #ffffff;
 }
 
 .sort-button {

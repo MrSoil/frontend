@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import './patients_tab_general.css'
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import { API_BASE_URL } from "../../../config";
 
 function PatientCard({ patient, setGeneralTab, setFunction }) {
   const patientClickHandle = () => {
@@ -23,7 +24,7 @@ function PatientCard({ patient, setGeneralTab, setFunction }) {
   );
 }
 
-function Patients({ setGeneralTab, setSelectedPatient }) {
+function Patients({ setGeneralTab, setSelectedPatient, setPatientsList }) {
   const [isLoading, setIsLoading] = useState(true);
   const [patients, setPatients] = useState([]);
   const user = JSON.parse(localStorage.getItem("user"));
@@ -36,7 +37,7 @@ function Patients({ setGeneralTab, setSelectedPatient }) {
 
   const getPatients = (email) => {
 
-    fetch(`http://localhost:8000/api/patients/?email=${email}`, {
+    fetch(`${API_BASE_URL}/patients/?email=${email}`, {
       method: "GET",
       headers: {
         'Content-Type': 'application/json'
@@ -47,8 +48,10 @@ function Patients({ setGeneralTab, setSelectedPatient }) {
       // Assuming the backend sends back a JSON response indicating success or failure
       if (resp.status === "success") {
         setPatients(resp.data);
+        setPatientsList(resp.data);
       } else {
         setPatients([]);
+        setPatientsList([]);
       }
       setIsLoading(false);
     }
@@ -56,6 +59,7 @@ function Patients({ setGeneralTab, setSelectedPatient }) {
     .catch(error => {
       setIsLoading(false);
       setPatients([]);
+      setPatientsList([]);
     });
 
   }

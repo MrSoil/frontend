@@ -1,0 +1,170 @@
+.note-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.note-modal-content {
+  background-color: #FFFFFF;
+  border-radius: 24px;
+  width: 90%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.note-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 32px;
+  border-bottom: 1px solid #E0E0E0;
+}
+
+.note-modal-title {
+  margin: 0;
+  font: bold 24px "RedHatDisplay";
+  color: #003238;
+}
+
+.note-modal-close {
+  background: none;
+  border: none;
+  font-size: 32px;
+  color: #5F6767;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  line-height: 1;
+}
+
+.note-modal-close:hover {
+  background-color: #F0F0F0;
+}
+
+.note-modal-body {
+  padding: 24px 32px;
+}
+
+.note-input-group {
+  margin-bottom: 24px;
+}
+
+.note-input-group:last-of-type {
+  margin-bottom: 0;
+}
+
+.note-input-group label {
+  display: block;
+  margin-bottom: 8px;
+  font: 500 14px "RedHatDisplay";
+  color: #343738;
+}
+
+.required {
+  color: #E4756D;
+}
+
+.note-input-group input,
+.note-input-group textarea,
+.note-input-group select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #D2D2D2;
+  border-radius: 8px;
+  font: 14px "RedHatDisplay";
+  color: #343738;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+  font-family: "RedHatDisplay", sans-serif;
+}
+
+.note-input-group input:focus,
+.note-input-group textarea:focus,
+.note-input-group select:focus {
+  outline: none;
+  border-color: #A695CC;
+}
+
+.note-input-group input.error,
+.note-input-group textarea.error,
+.note-input-group select.error {
+  border-color: #E4756D;
+}
+
+.note-input-group textarea {
+  resize: vertical;
+  min-height: 150px;
+  font-family: "RedHatDisplay", sans-serif;
+}
+
+.error-message {
+  display: block;
+  margin-top: 6px;
+  font: 12px "RedHatDisplay";
+  color: #E4756D;
+}
+
+.submit-error {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.note-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 32px;
+  border-top: 1px solid #E0E0E0;
+  background-color: #FAFAFA;
+}
+
+.btn-cancel {
+  height: 40px;
+  border: 1px solid #D2D2D2;
+  border-radius: 24px;
+  padding: 8px 24px;
+  color: #343738;
+  font: 14px "RedHatDisplay";
+  background-color: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+  background-color: #F5F5F5;
+  border-color: #B0B0B0;
+}
+
+.btn-save {
+  height: 40px;
+  border: none;
+  border-radius: 24px;
+  padding: 8px 24px;
+  color: #FFFFFF;
+  font: 14px "RedHatDisplay";
+  background-color: #A695CC;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-save:hover {
+  background-color: #8B7BA8;
+}
+
+
