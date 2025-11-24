@@ -1,5 +1,21 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Box,
+  Stack,
+  Chip,
+  IconButton,
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemSecondaryAction
+} from '@mui/material';
+import { ArrowDropDown, Check, Remove, Close } from '@mui/icons-material';
 import './patient_profile_component.css'
 import { API_BASE_URL } from "../../../../config";
 
@@ -66,10 +82,10 @@ const getStatus = ( title, score ) => {
 
 const getTitle = ( title ) => {
     let titles = {
-        "heart_beat": "Heart Beat",
-        "oxygen": "Oxygen",
-        "sleep": "Sleep",
-        "stress": "Stress",
+        "heart_beat": "Kalp Atış Hızı",
+        "oxygen": "Oksijen",
+        "sleep": "Uyku",
+        "stress": "Stres",
         "vitality": "Vitality"
     }
     return titles[title]
@@ -87,35 +103,91 @@ const getUnitType = ( title ) => {
 };
 
 
-const PersonInfo = ({ patientPhoto, name, surname, gender, age, bloodType, height, weight }) => (
-  <div className="person-info">
-    <div className="person-photo">
-      <img
-        loading="lazy"
-        src={`data:image/*;base64,${patientPhoto}`}
-        alt={`${name} ${surname}`}
-        className="photo"
-      />
-    </div>
-    <div className="info">
-      <h2 className="name">{name}</h2>
-      <h3 className="surname">{surname}</h3>
-      <p className="gender-age">{getGenderAge(age, gender)}</p>
-      <div className="blood-and-physical">
-        <div className="blood-type">
-            <div className="unit">
-                {bloodType}
-            </div>
-        </div>
-        <div className="physical-stats">
-            <div className="unit">{height} cm</div>
-            <p>/</p>
-            <div className="unit">{weight} kg</div>
-        </div>
-      </div>
-    </div>
-  </div>
-);
+const PersonInfo = ({ patientPhoto, name, surname, gender, age, bloodType, height, weight, room }) => {
+  const genderText = gender === 'Erkek' ? 'Erkek' : 'Kadın';
+  const ageText = getGenderAge(age, gender).split(',')[1].trim();
+  
+  return (
+    <Box sx={{ p: 2 }}>
+      <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+        <Box
+          component="img"
+          src={`data:image/*;base64,${patientPhoto}`}
+          alt={`${name} ${surname}`}
+          sx={{
+            width: 60,
+            height: 60,
+            borderRadius: '50%',
+            objectFit: 'cover'
+          }}
+        />
+        <Box sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" sx={{ fontFamily: 'RedHatDisplay', fontWeight: 600, mb: 0.5 }}>
+            {name} {surname}
+          </Typography>
+          <Typography variant="body2" sx={{ fontFamily: 'RedHatDisplay', color: '#717070' }}>
+            {room}
+          </Typography>
+        </Box>
+        <IconButton size="small">
+          <ArrowDropDown />
+        </IconButton>
+      </Stack>
+      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+        <Chip 
+          label={genderText} 
+          size="small" 
+          sx={{ 
+            backgroundColor: '#E3F2FD', 
+            color: '#1976D2',
+            fontFamily: 'RedHatDisplay',
+            fontWeight: 500
+          }} 
+        />
+        <Chip 
+          label={ageText} 
+          size="small" 
+          sx={{ 
+            backgroundColor: '#E3F2FD', 
+            color: '#1976D2',
+            fontFamily: 'RedHatDisplay',
+            fontWeight: 500
+          }} 
+        />
+        <Chip 
+          label={`${weight} kg`} 
+          size="small" 
+          sx={{ 
+            backgroundColor: '#E3F2FD', 
+            color: '#1976D2',
+            fontFamily: 'RedHatDisplay',
+            fontWeight: 500
+          }} 
+        />
+        <Chip 
+          label={`${height} cm`} 
+          size="small" 
+          sx={{ 
+            backgroundColor: '#E3F2FD', 
+            color: '#1976D2',
+            fontFamily: 'RedHatDisplay',
+            fontWeight: 500
+          }} 
+        />
+        <Chip 
+          label={bloodType} 
+          size="small" 
+          sx={{ 
+            backgroundColor: '#E3F2FD', 
+            color: '#1976D2',
+            fontFamily: 'RedHatDisplay',
+            fontWeight: 500
+          }} 
+        />
+      </Stack>
+    </Box>
+  );
+};
 
 
 const VitalScore = ({ title, score, status }) => {
@@ -130,48 +202,83 @@ const VitalScore = ({ title, score, status }) => {
   }
 
   const getStatusLabel = (status) => {
-    if (status === "Good") return `${title === "heart_beat" ? "HR" : title === "oxygen" ? "OX" : title === "stress" ? "ST" : title === "sleep" ? "SP" : "VT"}: Good`;
-    if (status === "Okay") return `${title === "heart_beat" ? "HR" : title === "oxygen" ? "OX" : title === "stress" ? "ST" : title === "sleep" ? "SP" : "VT"}: Okay`;
-    if (status === "Warning") return `${title === "heart_beat" ? "HR" : title === "oxygen" ? "OX" : title === "stress" ? "ST" : title === "sleep" ? "SP" : "VT"}: Warning`;
-    return "";
+    if (status === "Good") return "İyi";
+    if (status === "Okay") return "Ortalama";
+    if (status === "Warning") return "Kötü";
+    return "Veri Yok";
   };
 
+  const getStatusColor = (status) => {
+    if (status === "Good") return { bg: '#40dba3', text: '#40dba3' };
+    if (status === "Okay") return { bg: '#5F6767', text: '#5F6767' };
+    if (status === "Warning") return { bg: '#E4756D', text: '#E4756D' };
+    return { bg: '#5F6767', text: '#5F6767' };
+  };
+
+  const getStatusIcon = (status) => {
+    if (status === "Good") return <Check sx={{ fontSize: 14, color: '#FFFFFF' }} />;
+    if (status === "Okay") return <Remove sx={{ fontSize: 14, color: '#FFFFFF' }} />;
+    if (status === "Warning") return <Close sx={{ fontSize: 14, color: '#FFFFFF' }} />;
+    return <Remove sx={{ fontSize: 14, color: '#FFFFFF' }} />;
+  };
+
+  const statusColor = getStatusColor(status);
+
   return (
-    <section className="vital-score">
-      <div className="vital">
-        <h4 className="title">{getTitle(title)}</h4>
-        <div className="vital-right">
-          {displayValue !== null && (
-            <p className="score">{displayValue} {getUnitType(title)}</p>
-          )}
-          {
-          status === "Good" ?
-            <div className="status-good">
-              <div className="status-good-icon">✓</div>
-              <span>{getStatusLabel(status)}</span>
-            </div>
-              :
-          status === "Okay" ?
-            <div className="status-okay">
-              <div className="status-okay-icon">—</div>
-              <span>{getStatusLabel(status)}</span>
-            </div>
-              :
-          status === "Warning" ?
-            <div className="status-warning">
-              <div className="status-warning-icon">✗</div>
-              <span>{getStatusLabel(status)}</span>
-            </div>
-              :
-              // NONE CASE
-              <div className="status-okay">
-              <div className="status-okay-icon">—</div>
-              <span>No data</span>
-            </div>
+    <ListItem
+      sx={{
+        py: 0,
+        px: 2,
+        backgroundColor: '#FFFFFF'
+      }}
+    >
+      <ListItemText
+        primary={getTitle(title)}
+        secondary={displayValue !== null ? `${displayValue} ${getUnitType(title)}` : 'Veri Yok'}
+        primaryTypographyProps={{
+          fontFamily: 'RedHatDisplay',
+          fontSize: '16px',
+          color: '#343738'
+        }}
+        secondaryTypographyProps={{
+          fontFamily: 'RedHatDisplay',
+          fontSize: '16px',
+          color: '#343738',
+          fontWeight: 500
+        }}
+      />
+      <ListItemSecondaryAction>
+        <Chip
+          icon={
+            <Box
+              sx={{
+                width: 20,
+                height: 20,
+                borderRadius: '50%',
+                backgroundColor: statusColor.bg,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              {getStatusIcon(status)}
+            </Box>
           }
-        </div>
-      </div>
-    </section>
+          label={getStatusLabel(status)}
+          size="small"
+          sx={{
+            backgroundColor: 'transparent',
+            color: statusColor.text,
+            fontFamily: 'RedHatDisplay',
+            fontWeight: 500,
+            border: 'none',
+            '& .MuiChip-icon': {
+              marginLeft: 1
+            }
+          }}
+        />
+      </ListItemSecondaryAction>
+    </ListItem>
   );
 };
 
@@ -348,62 +455,147 @@ function PatientProfileComponent({ selectedPatient, setNewRoomContainer, setNewC
     const vitalTypes = ["heart_beat", "oxygen", "stress", "sleep", "vitality"];
 
     return (
-     <article className="profile-container-general">
-         <div className="profile-container-top">
-            <PersonInfo
-              patientPhoto={selectedPatient.patient_personal_info.section_1.image}
-              name={selectedPatient.patient_personal_info.section_1.firstname}
-              surname={selectedPatient.patient_personal_info.section_1.last_name}
-              gender={selectedPatient.patient_personal_info.section_1.patientGender}
-              age={selectedPatient.patient_personal_info.section_1.dateOfBirth}
-              bloodType={selectedPatient.patient_personal_info.section_1.bloodType.toUpperCase()}
-              height={selectedPatient.patient_personal_info.section_1.patientHeight}
-              weight={selectedPatient.patient_personal_info.section_1.patientWeight}
-            />
-            <hr className="separator" />
-            <div className="room-info">
-                <h3 className="title">Oda</h3>
-                <div className="details">
-                  <p>{selectedPatient.patient_personal_info.section_1.patientRoom}</p>
-                </div>
-            </div>
-            <hr className="separator" />
-            <div className="care-category">
-                <h3 className="title">Bakım Kategorisi</h3>
-                <div className="category">
-                    <p>Aktif Yaşam</p>
-                </div>
-          </div>
-            <hr className="separator" />
-         </div>
-         <div className="profile-container-bottom">
-            <section className="vital-scores">
-            <div className="vitals-title">
-              <h3 className="title">Vital Değerler</h3>
-              <button className="btn-add-vitals" onClick={() => setShowAddVitalsModal(true)}>Ekle</button>
-            </div>
-            <hr className="separator"></hr>
-            {vitalTypes.map(key => {
-              const score = patientVitals[key] || [];
-              return (
-                <VitalScore 
-                  key={key} 
-                  title={key} 
-                  score={score}
-                  status={getStatus(key, score)} 
-                />
-              );
-            })}
-         </section>
-         </div>
-         <AddVitalsModal
-           isOpen={showAddVitalsModal}
-           onClose={() => setShowAddVitalsModal(false)}
-           onSave={handleVitalsSaved}
-           patientId={selectedPatient.patient_id}
-           userEmail={user.email}
-         />
-     </article>
-  );
+      <Card sx={{ height: '100%', borderRadius: '24px', display: 'flex', flexDirection: 'column' }}>
+        <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 0 }}>
+          <PersonInfo
+            patientPhoto={selectedPatient.patient_personal_info.section_1.image}
+            name={selectedPatient.patient_personal_info.section_1.firstname}
+            surname={selectedPatient.patient_personal_info.section_1.last_name}
+            gender={selectedPatient.patient_personal_info.section_1.patientGender}
+            age={selectedPatient.patient_personal_info.section_1.dateOfBirth}
+            bloodType={selectedPatient.patient_personal_info.section_1.bloodType.toUpperCase()}
+            height={selectedPatient.patient_personal_info.section_1.patientHeight}
+            weight={selectedPatient.patient_personal_info.section_1.patientWeight}
+            room={selectedPatient.patient_personal_info.section_1.patientRoom}
+          />
+          
+          <Divider />
+          
+          <Box sx={{ p: 2, pb: 1.5, pt: 1.5 }}>
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0 }}>
+              <Typography variant="h6" sx={{ fontFamily: 'RedHatDisplay', fontWeight: 700, fontSize: '16px' }}>
+                Oda
+              </Typography>
+              <Button
+                size="small"
+                onClick={handleNewRoom}
+                sx={{
+                  color: '#A695CC',
+                  textTransform: 'none',
+                  fontFamily: 'RedHatDisplay',
+                  fontSize: '12px',
+                  minWidth: 'auto',
+                  px: 2
+                }}
+              >
+                Düzenle
+              </Button>
+            </Stack>
+            <Typography variant="body2" sx={{ fontFamily: 'RedHatDisplay', color: '#717070', fontSize: '14px' }}>
+              {selectedPatient.patient_personal_info.section_1.patientRoom}
+            </Typography>
+          </Box>
+
+          <Divider />
+
+          <Box sx={{ p: 2, pb: 1.5, pt: 1.5 }}>
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0 }}>
+              <Typography variant="h6" sx={{ fontFamily: 'RedHatDisplay', fontWeight: 700, fontSize: '16px' }}>
+                Bakım Kategorisi
+              </Typography>
+              <Button
+                size="small"
+                onClick={handleNewCareCategory}
+                sx={{
+                  color: '#A695CC',
+                  textTransform: 'none',
+                  fontFamily: 'RedHatDisplay',
+                  fontSize: '12px',
+                  minWidth: 'auto',
+                  px: 2
+                }}
+              >
+                Düzenle
+              </Button>
+            </Stack>
+            <Typography variant="body2" sx={{ fontFamily: 'RedHatDisplay', color: '#717070', fontSize: '14px' }}>
+              Aktif Yaşam
+            </Typography>
+          </Box>
+
+          <Divider />
+
+          <Box sx={{ p: 2, pb: 1.5, pt: 1.5}}>
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0 }}>
+              <Typography variant="h6" sx={{ fontFamily: 'RedHatDisplay', fontWeight: 700, fontSize: '16px' }}>
+                Kişisel Bilgiler
+              </Typography>
+              <Button
+                size="small"
+                sx={{
+                  color: '#A695CC',
+                  textTransform: 'none',
+                  fontFamily: 'RedHatDisplay',
+                  fontSize: '12px',
+                  minWidth: 'auto',
+                  px: 2
+                }}
+              >
+                Düzenle
+              </Button>
+            </Stack>
+            <Typography variant="body2" sx={{ fontFamily: 'RedHatDisplay', color: '#717070', fontSize: '14px' }}>
+              Tamamlandı
+            </Typography>
+          </Box>
+
+          <Divider />
+
+          <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ p: 2, pb: 1.5, pt: 1.5 }}>
+              <Typography variant="h6" sx={{ fontFamily: 'RedHatDisplay', fontWeight: 700, fontSize: '16px' }}>
+                Vital Değerler
+              </Typography>
+              <Button
+                size="small"
+                onClick={() => setShowAddVitalsModal(true)}
+                sx={{
+                  color: '#A695CC',
+                  textTransform: 'none',
+                  fontFamily: 'RedHatDisplay',
+                  fontSize: '12px',
+                  minWidth: 'auto',
+                  px: 2
+                }}
+              >
+                Düzenle
+              </Button>
+            </Stack>
+            <List sx={{ p: 0, flexGrow: 1 }}>
+              {vitalTypes.map((key, index) => {
+                const score = patientVitals[key] || [];
+                return (
+                  <React.Fragment key={key}>
+                    <VitalScore 
+                      title={key} 
+                      score={score}
+                      status={getStatus(key, score)} 
+                    />
+                    {index < vitalTypes.length - 1 && <Divider />}
+                  </React.Fragment>
+                );
+              })}
+            </List>
+          </Box>
+        </CardContent>
+        <AddVitalsModal
+          isOpen={showAddVitalsModal}
+          onClose={() => setShowAddVitalsModal(false)}
+          onSave={handleVitalsSaved}
+          patientId={selectedPatient.patient_id}
+          userEmail={user.email}
+        />
+      </Card>
+    );
 }
 export default PatientProfileComponent;

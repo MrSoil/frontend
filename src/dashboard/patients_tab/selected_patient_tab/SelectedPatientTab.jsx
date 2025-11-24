@@ -296,14 +296,14 @@ function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient
                                   setNewRoomContainer={setNewRoomContainer}
                                   setNewCareCategoryContainer={setNewCareCategoryContainer}/>
                 </Grid>
-                <Grid size={6} sx={{ width: 0.74, height: 1 }}>
-                  <Box sx={{ height: 1/2 }}>
+                <Grid size={6} sx={{ width: 0.74, height: 1}}>
+                  <Box sx={{ height: '49%', pb: 1 }}>
                      <MedicineList selectedPatient={selectedPatient}
                                 setNewMedicineContainer={setNewMedicineContainer}
                                 medicinesDate={medicinesDate}
                                 setMedicinesDate={setMedicinesDate}/>
                   </Box>
-                  <Box sx={{ height: 1/2 }}>
+                  <Box sx={{ height: '49%', pt: 1 }}>
                      <HCList selectedPatient={selectedPatient}
                             setNewHCContainer={setNewHCContainer}
                             hcDate={hcDate}

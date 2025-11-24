@@ -25,7 +25,8 @@
     "react-select": "^5.8.3",
     "react-tag-input": "^6.10.6",
     "reactjs-human-body": "^0.0.8",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "start": "react-scripts start",
