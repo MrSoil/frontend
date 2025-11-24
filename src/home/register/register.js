@@ -177,10 +177,10 @@ const Register = () => {
   .then((res) => res.json())
   .then((data) => {
   if (data.status === "success") {
-  window.confirm("Register is successful!");
+  window.confirm("Üyelik Başarıyla Oluşturuldu!");
   navigate("/home");
   } else {
-  window.alert("Register failed!");
+  window.alert("Bir Hata Oluştu!");
   }
   })
   .catch((err) => console.error("Error:", err));
@@ -215,7 +215,7 @@ const Register = () => {
                 <Grid size={6}>
                   <TextField
                     fullWidth
-                    label="Name"
+                    label="İsim"
                     value={firstname}
                     onChange={(e) => setFirstname(e.target.value)}
                     error={Boolean(firstnameError)}
@@ -225,7 +225,7 @@ const Register = () => {
                 <Grid size={6} >
                   <TextField
                     fullWidth
-                    label="Surname"
+                    label="Soyisim"
                     value={lastname}
                     onChange={(e) => setLastname(e.target.value)}
                     error={Boolean(lastnameError)}
@@ -244,7 +244,7 @@ const Register = () => {
               />
 
               <TextField
-                label="Password"
+                label="Şifre"
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -267,7 +267,7 @@ const Register = () => {
               />
 
               <TextField
-                label="Confirm Password"
+                label="Şifre Onayı"
                 type={showRepassword ? "text" : "password"}
                 value={repassword}
                 onChange={(e) => setRepassword(e.target.value)}

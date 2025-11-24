@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
    const logout = () => {
-     const confirm = window.confirm("Are you sure you want to logout?");
+     const confirm = window.confirm("Çıkış Yapmak İstediğinize Emin misiniz?");
        if (confirm) {
          localStorage.removeItem('user');
          setIsAuthenticated(false);

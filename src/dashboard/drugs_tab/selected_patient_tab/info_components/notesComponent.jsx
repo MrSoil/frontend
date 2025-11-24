@@ -76,12 +76,10 @@ function NotesList({ selectedPatient }) {
         
         // Convert notes object to array, sorted by date (newest first)
         const notesArray = [];
-        Object.keys(patientNotes).forEach(date => {
-          Object.keys(patientNotes[date]).forEach(noteId => {
-            notesArray.push(patientNotes[date][noteId]);
-          });
+        Object.keys(patientNotes).forEach(noteId => {
+          notesArray.push(patientNotes[noteId]);
         });
-        
+
         // Sort by timestamp (newest first)
         notesArray.sort((a, b) => {
           const dateA = new Date(a.timestamp || a.note_date);

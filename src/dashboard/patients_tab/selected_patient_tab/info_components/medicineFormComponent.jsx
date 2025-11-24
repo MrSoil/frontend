@@ -1,7 +1,7 @@
 import * as React from "react";
 import './medicine_form_component.css'
 import {useEffect, useState} from "react";
-import { Tab, Tabs, IconButton } from '@mui/material';
+import {Tab, Tabs, IconButton, Typography, FormControl, Select, MenuItem, TextField, Button} from '@mui/material';
 import { API_BASE_URL } from "../../../../config";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -388,12 +388,10 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
         
         // Convert notes object to array, sorted by date (newest first)
         const notesArray = [];
-        Object.keys(patientNotes).forEach(date => {
-          Object.keys(patientNotes[date]).forEach(noteId => {
-            notesArray.push(patientNotes[date][noteId]);
-          });
-        });
-        
+      Object.keys(patientNotes).forEach(noteId => {
+        notesArray.push(patientNotes[noteId]);
+      });
+
         // Sort by timestamp (newest first)
         notesArray.sort((a, b) => {
           const dateA = new Date(a.timestamp || a.note_date);
@@ -570,36 +568,60 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
            <div className="room-info" style={{"padding": "10px", "paddingLeft": "20px"}}>
             <h3 className="title">Oda</h3>
             <div className="details">
-              <p style={{"marginTop": "0"}}>{selectedPatient.floor_no}</p>
+              <p>{selectedPatient.patient_personal_info.section_1.patientRoom}</p>
             </div>
         </div>
           </div>
           <div className="half-medicine-column" style={{"height": "480px", "width": "450px"}}>
-            <h3>İlaç Notları</h3>
-            <div className="divider"></div>
-            <div className="medicine-notes">
-              {oldNotes.map((note, index) => (
-                <PatientNotes 
-                  key={note.note_id || index} 
-                  note={note}
-                  onEdit={handleEditNote}
-                  onDelete={handleDeleteNote}
-                />
-              ))}
-            </div>
-            <div className="divider"></div>
-            <h4 style={{marginBottom: "10px"}}>{selectedNoteTitle ? selectedNoteTitle : "Başlık Seçiniz"}</h4>
-            <textarea placeholder="Notunuzu giriniz..." value={feedingNote} onChange={(e) => setFeedingNote(e.target.value)} />
-            <h5>Konu Başlığı</h5>
-            <div className="half-medicine-note-submit">
-              <select onChange={(e) => setSelectedNoteTitle(e.target.value)} value={selectedNoteTitle}>
-                <option>Başlık Seçiniz</option>
-                <option>Hijyen Gereksinimleri</option>
-                <option>Beslenme Takibi</option>
-              </select>
-              <button style={{"backgroundColor": "#A695CC"}} onClick={addNote}>Not Ekle</button>
-            </div>
+          <Typography className="TypographyHC" variant="h6">Bakım Notları</Typography>
+          <div className="divider"></div>
+
+          <div className="care-notes">
+            {oldNotes.map((note, index) => (
+              <PatientNotes
+                className="care-note"
+                key={note.note_id || index}
+                note={note}
+                onEdit={handleEditNote}
+                onDelete={handleDeleteNote}
+              />
+            ))}
           </div>
+
+          <div className="divider"></div>
+          <Typography className="TypographyHC" variant="subtitle1" sx={{ mt: 1 }}>
+            Konu Başlığı
+          </Typography>
+          <Typography className="TypographyHC" variant="subtitle1" sx={{ mb: "10px" }}>
+            <FormControl size="small">
+              <Select
+                className="TypographyHC"
+                value={selectedNoteTitle || ""}
+                onChange={(e) => setSelectedNoteTitle(e.target.value)}
+              >
+                <MenuItem value="Hijyen Gereksinimleri">Hijyen Gereksinimleri</MenuItem>
+                <MenuItem value="Beslenme Takibi">Beslenme Takibi</MenuItem>
+                <MenuItem value="Pozisyon Takibi">Pozisyon Takibi</MenuItem>
+                <MenuItem value="Pansuman ve Katater Bakımı">Pansuman ve Katater Bakımı</MenuItem>
+                <MenuItem value="Ödem Takibi">Ödem Takibi</MenuItem>
+                <MenuItem value="Misafir Güvenliği">Misafir Güvenliği</MenuItem>
+              </Select>
+            </FormControl>
+          </Typography>
+
+          <TextField
+            placeholder="Notunuzu giriniz..."
+            value={feedingNote}
+            onChange={(e) => setFeedingNote(e.target.value)}
+            fullWidth
+            multiline
+            minRows={3}
+          />
+
+          <Button className="Button" variant="contained" sx={{ backgroundColor: "#A695CC", ml: 1 }} onClick={addNote}>
+              Not Ekle
+          </Button>
+        </div>
         </div>
         <div>
           <div className="half-medicine-column" style={{"height": "650px"}}>
@@ -633,7 +655,7 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
                           </th>
                           <th>
                             <button className="sort-button">
-                              Dozaj (miligram)
+                              Dozaj
                             </button>
                           </th>
                           <th>
@@ -657,7 +679,7 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
                       {/*    </th>*/}
                       {/*    <th>*/}
                       {/*      <button onClick={() => requestSort('dosage', setDailyMedicinesM)} className="sort-button">*/}
-                      {/*        Dozaj (miligram)*/}
+                      {/*        Dozaj*/}
                       {/*      </button>*/}
                       {/*    </th>*/}
                       {/*    <th>*/}

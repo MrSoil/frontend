@@ -5,9 +5,12 @@ import Patients from "./patients_tab_general/Patients";
 import PatientAdd from "./patients_tab_add/PatientAdd";
 import PatientRemove from "./patients_tab_remove/PatientRemove";
 import SelectedPatientTab from "./selected_patient_tab/SelectedPatientTab";
+import {useNavigate} from "react-router-dom";
 
  
 function PatientsTab() {
+    const navigate = useNavigate();
+
     const [generalTab, setGeneralTab] = useState(true);
     const [addTab, setAddTab] = useState(false);
     const [removeTab, setRemoveTab] = useState(false);
@@ -47,17 +50,21 @@ function PatientsTab() {
         }
     }
 
+    const onDashboardButtonClick = () => {
+        navigate("/dashboard")
+    }
+
   return (
     <div className="dashboard-content-background">
         <div className="dashboard-content-navigator">
-            <div className="dashboard-logo-design">SUGR.</div>
+            <button className="dashboard-logo-design navigator-button" onClick={onDashboardButtonClick}>SUGR.</button>
             <button className="navigator-button" onClick={getGeneralTab}
-            >/ Müşteri Yönetimi</button>
+            >/ Danışan Yönetimi</button>
             {
             /*First Stage*/
-                addTab ? <button className="navigator-button">/ Müşteri Ekle</button>:
-                removeTab ? <button className="navigator-button">/ Müşteri Sil</button>:
-                selectedPatient ? <button className="navigator-button">/ Müşteri Düzenle</button>: null
+                addTab ? <button className="navigator-button">/ Danışan Ekle</button>:
+                removeTab ? <button className="navigator-button">/ Danışan Sil</button>:
+                selectedPatient ? <button className="navigator-button">/ Danışan Düzenle</button>: null
 
             }
         </div>

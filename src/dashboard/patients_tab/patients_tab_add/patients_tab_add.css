@@ -70,6 +70,7 @@
   margin-top: 2%;
   margin-bottom: 2%;
   width: 145px;
+  height: 285px;
   color: rgba(40, 37, 47, 0.7);
   text-align: center;
 }
@@ -92,7 +93,8 @@
 }
 
 .photograph {
-  width: 36px;
+  width: 92px;
+  height: 92px;
   aspect-ratio: 1;
   object-fit: cover;
   border-radius: 50%;

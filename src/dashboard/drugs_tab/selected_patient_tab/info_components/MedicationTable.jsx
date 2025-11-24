@@ -491,7 +491,7 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
             </th>
             <th>
               <Button onClick={() => requestSort("dosage")} className="sort-button" variant="text">
-                Dozaj (miligram)
+                Dozaj
               </Button>
             </th>
             <th>

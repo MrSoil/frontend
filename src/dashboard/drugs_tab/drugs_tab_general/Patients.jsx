@@ -21,7 +21,11 @@ function PatientCard({ patient, setSelectedPatient }) {
         <img src={`data:image/*;base64,${patient.patient_personal_info.section_1.image}`}  alt={patient.patient_personal_info.section_1.firstname} className="patient-avatar" />
         <div className="patient-details">
           <div className="patient-name">{patient.patient_personal_info.section_1.firstname} {patient.patient_personal_info.section_1.lastname}</div>
-          <div className="patient-location">{patient.patient_personal_info.section_1.patientGender}</div>
+          <div className="patient-location">
+            {patient.patient_personal_info.section_1.patientGender}
+          <br/>
+            {patient.patient_personal_info.section_1.patientRoom}
+          </div>
         </div>
       </div>
     </div>
@@ -80,7 +84,7 @@ function Patients({setSelectedPatient}) {
   return (
     <div className="patients-drug-container">
       <header className="patients-header">
-        <h1 className="patients-title">Danışan Kayıtları</h1>
+        <h1 className="patients-title">Sağlık Kayıtları</h1>
         <div className="search-container">
           <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/73cfc69292ab17af86d8b52564eb88a46395310b083bdbeb1a13a02d459da66b?apiKey=873db62e82664057a5c151e6201a84f6&" alt="Search icon" className="search-icon" />
           <input className="search-text" onChange={handleChange} value={searchInput} placeholder="Danışan Ara"/>
@@ -94,10 +98,11 @@ function Patients({setSelectedPatient}) {
       <div className="patients-grid">
         {patients.filter((patient) =>
         {
-          let full_name = patient.patient_personal_info.section_1.firstname + " " + patient.patient_personal_info.section_1.lastname;
-          return patient.patient_personal_info.section_1.firstname.toLowerCase().includes(searchInput.toLowerCase()) ||
-              patient.patient_personal_info.section_1.lastname.toLowerCase().includes(searchInput.toLowerCase()) ||
-              full_name.toLowerCase().includes(searchInput.toLowerCase());
+          let fullName = patient.patient_personal_info.section_1.firstname + " " + patient.patient_personal_info.section_1.lastname;
+          return (patient.patient_personal_info.section_1.firstname.toLowerCase().startsWith(searchInput.toLowerCase()) ||
+              patient.patient_personal_info.section_1.lastname.toLowerCase().startsWith(searchInput.toLowerCase()) ||
+              fullName.toLowerCase().startsWith(searchInput.toLowerCase()) ||
+              patient.patient_personal_info.section_1.patientRoom.toLowerCase().startsWith(searchInput.toLowerCase()));
         }).map((patient, index) => (
           <PatientCard key={index} patient={patient} value={patient} setSelectedPatient={setSelectedPatient}/>
         ))}

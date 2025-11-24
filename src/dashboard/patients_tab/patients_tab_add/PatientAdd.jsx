@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import {useNavigate} from "react-router-dom";
 import { API_BASE_URL } from "../../../config";
 import {
   Autocomplete,
@@ -17,10 +18,13 @@ import {
   FormGroup,
   Radio,
   RadioGroup,
+  IconButton,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import "./patients_tab_add.css";
 
 function PatientAdd({ setGeneralTab, setAddTab }) {
+  const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   // Options
@@ -134,7 +138,7 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
   const [patientPage, setPatientPage] = useState(0);
 
   // Patient personal info
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState("");
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [citizenID, setCitizenID] = useState("");
@@ -207,6 +211,7 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
     "Bez",
     "Yatak Malzemesi",
   ];
+  const [isThereFallStory, setIsThereFallStory] = useState(""); // "Var" | "Yok"
   const [dengeYurumeBozuklugu, setDengeYurumeBozuklugu] = useState(""); // "Var" | "Yok"
   const [needsPhysicalSupport, setNeedsPhysicalSupport] = useState(""); // "Var" | "Yok"
   const [physicalSupportDetails, setPhysicalSupportDetails] = useState("");
@@ -283,7 +288,7 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
     const file = e.target.files?.[0];
     const newErrors = { ...errors };
     if (!file) {
-      setImage(null);
+      setImage("");
       delete newErrors.image;
       setErrors(newErrors);
       return;
@@ -314,6 +319,25 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
     setErrors(newErrors);
   };
 
+  const handleDeleteImage = () => {
+    setImage("");
+    const newErrors = { ...errors };
+    delete newErrors.image;
+    setErrors(newErrors);
+    // Reset the file input
+    const fileInput = document.getElementById("file-input");
+    if (fileInput) {
+      fileInput.value = "";
+    }
+  };
+
+  const handleDeleteOptionalFile = (setter, key) => () => {
+    setter(null);
+    const newErrors = { ...errors };
+    delete newErrors[key];
+    setErrors(newErrors);
+  };
+
   const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -328,7 +352,6 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
     const newErrors = {};
 
     // Page 0: Patient personal + education/security
-    if (page === 0) {
       if (!firstname.trim()) newErrors.firstname = "Ad zorunludur.";
       else if (!nameRegex.test(firstname.trim()))
         newErrors.firstname = "Ad en az 2 karakter ve yalnızca harf/boşluk/(-) içermelidir.";
@@ -388,12 +411,10 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
         const inc = Number(income);
         if (!Number.isFinite(inc)) newErrors.income = "Geçersiz sayı.";
         else if (inc < 0) newErrors.income = "Gelir negatif olamaz.";
-        else if (inc > 1_000_000_000) newErrors.income = "Gelir çok yüksek görünüyor.";
+        else if (inc > 1_000_000_000) newErrors.income = "Gelir çok yüksek görünüyor. (1.000.000.000+)";
       }
-    }
 
     // Page 1: Contact person (personal + communication)
-    if (page === 1) {
       if (!contactFirstname.trim()) newErrors.contactFirstname = "Ad zorunludur.";
       else if (!nameRegex.test(contactFirstname.trim()))
         newErrors.contactFirstname = "Ad en az 2 karakter ve yalnızca harf/boşluk/(-) içermelidir.";
@@ -446,20 +467,20 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
 
       if (contactEmail && !emailRegex.test(contactEmail)) newErrors.contactEmail = "E-posta formatı geçersiz.";
       // Addresses optional
-    }
 
     // Page 2: Health (mostly optional, but sanity checks)
-    if (page === 2) {
       const longTextLimit = 2000;
       if (system1.length > longTextLimit) newErrors.system1 = "Maksimum 2000 karakter.";
       if (system2.length > longTextLimit) newErrors.system2 = "Maksimum 2000 karakter.";
       if (system3.length > longTextLimit) newErrors.system3 = "Maksimum 2000 karakter.";
       if (system4.length > longTextLimit) newErrors.system4 = "Maksimum 2000 karakter.";
-    }
 
     // Page 3: Care
-    if (page === 3) {
       // If 'Var' -> details required
+      if (isThereFallStory === "Var" && !fallingStory.trim())
+        newErrors.fallingStory = "Lütfen detay belirtiniz.";
+      if (dengeYurumeBozuklugu === "Var" && !balanceState.trim())
+        newErrors.balanceState = "Lütfen detay belirtiniz.";
       if (needsPhysicalSupport === "Var" && !physicalSupportDetails.trim())
         newErrors.physicalSupportDetails = "Lütfen detay belirtiniz.";
       if (nutritionType === "Diğer" && !nutritionOther.trim())
@@ -480,11 +501,9 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
         newErrors.snacksPerDay = "0-10 arasında tam sayı giriniz.";
       if (waterLitersPerDay !== "" && (Number(waterLitersPerDay) < 0 || Number(waterLitersPerDay) > 20))
         newErrors.waterLitersPerDay = "0-20 litre aralığında olmalıdır.";
-    }
 
     // Page 4: Psychological
-    if (page === 4) {
-      // Require selection for yes/no where relevant to avoid missing info
+  // Require selection for yes/no where relevant to avoid missing info
       if (!psychiatricMedUse) newErrors.psychiatricMedUse = "Seçim yapınız.";
       if (psychiatricMedUse === "No" && psychiatricMedNoReason.length > 0 && psychiatricMedNoReason.length > 2000)
         newErrors.psychiatricMedNoReason = "Maksimum 2000 karakter.";
@@ -498,21 +517,20 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
       if (!socialReport) newErrors.socialReport = "Seçim yapınız.";
       if (socialReport === "No" && socialReportNoReason.length > 2000)
         newErrors.socialReportNoReason = "Maksimum 2000 karakter.";
-    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const convertOptionalFile = async (file) => {
-    if (!file) return null;
+    if (!file) return "";
     const base64 = await convertToBase64(file);
     return String(base64).replace(/^data:.*;base64,/, "");
     };
 
   const addPatient = async () => {
     try {
-      const base64Image = image ? await convertToBase64(image) : null;
+      const base64Image = image ? await convertToBase64(image) : "";
       // Optional uploads (psych tab)
       const psychPrescriptionFile64 = await convertOptionalFile(psychiatricMedPrescriptionFile);
       const depressionFile64 = await convertOptionalFile(depressionScaleFile);
@@ -529,8 +547,8 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
                     'patient_personal_info': {
                         "section_1": {
                             "image": base64Image.replace(/^data:image\/(png|jpg|jpeg);base64,/, ""),
-                            "firstname": firstname,
-                            "lastname": lastname,
+                            "firstname": firstname.charAt(0).toUpperCase() + firstname.slice(1).toLowerCase(),
+                            "lastname": lastname.toUpperCase(),
                             "citizenID": citizenID,
                             "motherName": motherName,
                             "fatherName": fatherName,
@@ -546,12 +564,12 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
                             "insurance": insurance,
                             "income": income,
                             "backgroundInfo": backgroundInfo,
-                            "patientRoom": patientRoom,
+                            "patientRoom": "Oda - " + patientRoom,
                             "bloodType": bloodType
                         },
                         "section_2": {
-                            "contactFirstname": contactFirstname,
-                            "contactLastname": contactLastname,
+                            "contactFirstname": contactFirstname.charAt(0).toUpperCase() + contactFirstname.slice(1).toLowerCase(),
+                            "contactLastname": contactLastname.toUpperCase(),
                             "contactCitizenID": contactCitizenID,
                             "contactMotherName": contactMotherName,
                             "contactFatherName": contactFatherName,
@@ -584,6 +602,7 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
                             "fallingStory": fallingStory,
                             "balanceState": balanceState,
                             "selectedDevices": selectedDevices,
+                            "isThereFallStory": isThereFallStory,
                             "dengeYurumeBozuklugu": dengeYurumeBozuklugu,
                             "needsPhysicalSupport": needsPhysicalSupport,
                             "physicalSupportDetails": physicalSupportDetails,
@@ -628,14 +647,14 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
       });
       const data = await resp.json();
       if (data.status === "success") {
-        window.alert("Patient is successfully saved.");
+        window.alert("Danışan Başarıyla Kayıt Edildi");
         onCancelClick();
       } else {
-        window.alert("Patient is NOT saved!");
+        window.alert("Danışan Kaydedilemedi!");
       }
     } catch (error) {
       console.error("Error:", error);
-      window.alert("Patient is NOT saved!");
+      window.alert("Danışan Kaydedilemedi!");
     }
   };
 
@@ -663,8 +682,7 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
   };
 
   const setPatientPageDecr = () => {
-    if (!validatePage(patientPage)) return;
-    if (patientPage === 0) setPatientPage(4);
+    if (patientPage === 0) window.location.reload();
     else setPatientPage(patientPage - 1);
   };
 
@@ -701,7 +719,7 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
         <div className="container-add-patient">
           <h1 className="page-title">Danışan Özlük Bilgileri</h1>
           <h1 className="page-description">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent finibus ipsum ac nibh bibendum, quis sodales orci elementum. Fusce gravida vel quam eleifend ultrices.
+            Tüm bilgileri eksiksiz giriniz, her kısmın doldurulması gerekmektedir.
           </h1>
 
           <div className="information-block">
@@ -717,7 +735,20 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
                     <p>Fotoğraf Ekleyiniz</p>
                   </div>
                 ) : (
-                  <img src={URL.createObjectURL(image)} alt="Uploaded" className="photograph" />
+                  <div style={{ position: "relative", display: "inline-block" }}>
+                    <img src={URL.createObjectURL(image)} alt="Uploaded" className="photograph" />
+                    <IconButton
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleDeleteImage();
+                      }}
+                      size="small"
+                      sx={{ padding: "8px", margin: "8px" }}
+                    >
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  </div>
                 )}
               </label>
               <input id="file-input" type="file" accept="image/*" onChange={handleImageChange} style={{ display: "none" }} />
@@ -1043,7 +1074,7 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
         <div className="container-add-patient">
           <h1 className="page-title">Danışan Kontağının Özlük Bilgileri</h1>
           <h1 className="page-description">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent finibus ipsum ac nibh bibendum, quis sodales orci elementum. Fusce gravida vel quam eleifend ultrices.
+            Tüm bilgileri eksiksiz giriniz, her kısmın doldurulması gerekmektedir.
           </h1>
           <div className="information-block">
             <h2 className="section-title">Özlük Bilgileri</h2>
@@ -1349,7 +1380,7 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
         <div className="container-add-patient">
           <h1 className="page-title">Danışan Sağlık Durumu</h1>
           <h1 className="page-description">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent finibus ipsum ac nibh bibendum, quis sodales orci elementum. Fusce gravida vel quam eleifend ultrices.
+            Tüm bilgileri eksiksiz giriniz, her kısmın doldurulması gerekmektedir.
           </h1>
           <div className="information-block">
             <h2 className="section-title">Hastalıklar & İlaçlar</h2>
@@ -1647,7 +1678,7 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
         <div className="container-add-patient">
           <h1 className="page-title">Danışan Bakım Durumu</h1>
           <h1 className="page-description">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent finibus ipsum ac nibh bibendum, quis sodales orci elementum. Fusce gravida vel quam eleifend ultrices.
+            Tüm bilgileri eksiksiz giriniz, her kısmın doldurulması gerekmektedir.
           </h1>
           <div className="information-block">
             <h2 className="section-title">Hastalıklar & İlaçlar</h2>
@@ -1714,7 +1745,7 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        label="Daha önce Uygulanan fakat şu anda kesilen Bakım"
+                        label="Daha önce uygulanan fakat şu anda kesilen bir bakım uygulaması var mı?"
                         placeholder=" "
                         helperText=" "
                         onPaste={(e) => {
@@ -1783,6 +1814,7 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
 
               {/* Devices checkboxes */}
               <div className="patienceFormContainer">
+                <FormHelperText>Kullanmakta Olduğu Medikal Cihazlar</FormHelperText>
                 <FormControl component="fieldset" fullWidth sx={{ m: 2 }}>
                   <FormGroup row>
                     {careDevices.map((d) => (
@@ -1798,66 +1830,90 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
                       />
                     ))}
                   </FormGroup>
-                  <FormHelperText>Kullanmakta Olduğu Medikal Cihazlar</FormHelperText>
                 </FormControl>
               </div>
 
-              {/* Düşme & Denge/Yürüme */}
+               <div className="patienceFormContainer">
+              <FormHelperText>Düşme Hikayesi Var Mı?</FormHelperText>
+                <FormControl component="fieldset" fullWidth sx={{ m: 1 }} error={!!errors.isThereFallStory}>
+                  <RadioGroup
+                    row
+                    value={isThereFallStory}
+                    onChange={(e) => setIsThereFallStory(e.target.value)}
+                  >
+                    <FormControlLabel value="Hayır" control={<Radio />} label="Hayır" />
+                    <FormControlLabel
+                      value="Evet"
+                      control={<Radio />}
+                      label="Evet (detay yazınız)"
+                    />
+                  </RadioGroup>
+                  {isThereFallStory === "Evet" && (
+                    <TextField
+                      fullWidth sx={{ m: 1 }}
+                      label="Düşme Hikayesi"
+                      placeholder=" "
+                      value={fallingStory}
+                      onChange={(e) => setFallingStory(e.target.value)}
+                      multiline
+                      minRows={3}
+                      error={!!errors.fallingStory}
+                      helperText={errors.fallingStory || " "}
+                    />
+                      )}
+                </FormControl>
+              </div>
+
+
               <div className="patienceFormContainer">
-                <FormControl component="fieldset" fullWidth sx={{ m: 1 }}>
+              <FormHelperText>Denge ve Yürüme Bozukluğu Var Mı?</FormHelperText>
+                <FormControl component="fieldset" fullWidth sx={{ m: 1 }} error={!!errors.dengeYurumeBozuklugu}>
                   <RadioGroup
                     row
                     value={dengeYurumeBozuklugu}
                     onChange={(e) => setDengeYurumeBozuklugu(e.target.value)}
                   >
-                    <FormControlLabel value="Yok" control={<Radio />} label="Denge ve Yürüme Bozukluğu Yok." />
-                    <FormControlLabel value="Var" control={<Radio />} label="Denge ve Yürüme Bozukluğu Var." />
+                    <FormControlLabel value="Hayır" control={<Radio />} label="Hayır" />
+                    <FormControlLabel
+                      value="Evet"
+                      control={<Radio />}
+                      label="Evet (detay yazınız)"
+                    />
                   </RadioGroup>
+                  {dengeYurumeBozuklugu === "Evet" && (
+                    <TextField
+                      fullWidth sx={{ m: 1 }}
+                      label="Denge ve Yürüme Bozukluğu Detayı"
+                      placeholder=" "
+                      value={balanceState}
+                      onChange={(e) => setBalanceState(e.target.value)}
+                      multiline
+                      minRows={3}
+                      error={!!errors.balanceState}
+                      helperText={errors.balanceState || " "}
+                    />
+                  )}
                 </FormControl>
               </div>
 
-              <div className="patienceFormContainer">
-                <TextField
-                  fullWidth sx={{ m: 1 }}
-                  label="Düşme Hikayesi"
-                  placeholder=" "
-                  value={fallingStory}
-                  onChange={(e) => setFallingStory(e.target.value)}
-                  multiline
-                  minRows={3}
-                  helperText="Düşme Hikayesini Anlatınız (Yoksa boş bırakınız)"
-                />
-              </div>
-
-              <div className="patienceFormContainer">
-                <TextField
-                  fullWidth sx={{ m: 1 }}
-                  label="Denge ve Yürüme Bozukluğu Detayı"
-                  placeholder=" "
-                  value={balanceState}
-                  onChange={(e) => setBalanceState(e.target.value)}
-                  multiline
-                  minRows={3}
-                  helperText="Denge ve Yürüme Bozukluklarını Anlatınız (Yoksa boş bırakınız)"
-                />
-              </div>
 
               {/* Physical support */}
               <div className="patienceFormContainer">
+              <FormHelperText>Fiziksel Desteğe İhtiyacı Var Mı?</FormHelperText>
                 <FormControl component="fieldset" fullWidth sx={{ m: 1 }} error={!!errors.physicalSupportDetails}>
                   <RadioGroup
                     row
                     value={needsPhysicalSupport}
                     onChange={(e) => setNeedsPhysicalSupport(e.target.value)}
                   >
-                    <FormControlLabel value="Yok" control={<Radio />} label="Fiziksel Desteğe İhtiyacı Yok." />
+                    <FormControlLabel value="Hayır" control={<Radio />} label="Hayır" />
                     <FormControlLabel
-                      value="Var"
+                      value="Evet"
                       control={<Radio />}
-                      label="Fiziksel Desteğe İhtiyacı Var. (Varsa aşağıda detaylıca anlatınız.)"
+                      label="Evet (detay yazınız)"
                     />
                   </RadioGroup>
-                  {needsPhysicalSupport === "Var" && (
+                  {needsPhysicalSupport === "Evet" && (
                     <TextField
                       sx={{ mt: 1 }}
                       label="Fiziksel Destek Detayı"
@@ -1874,6 +1930,7 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
 
               {/* Nutrition type */}
               <div className="patienceFormContainer">
+              <FormHelperText>Beslenme Şekli Nedir?</FormHelperText>
                 <FormControl component="fieldset" fullWidth sx={{ m: 1 }} error={!!errors.nutritionOther}>
                   <RadioGroup row value={nutritionType} onChange={(e) => setNutritionType(e.target.value)}>
                     <FormControlLabel value="Oral" control={<Radio />} label="Oral Beslenme" />
@@ -1895,13 +1952,14 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
 
               {/* Special diet */}
               <div className="patienceFormContainer">
+              <FormHelperText>Özel Bir Diyet Alması Gerekiyor Mu?</FormHelperText>
                 <FormControl component="fieldset" fullWidth sx={{ m: 1 }} error={!!errors.specialDietDetails}>
                   <RadioGroup row value={specialDiet} onChange={(e) => setSpecialDiet(e.target.value)}>
-                    <FormControlLabel value="Hayır" control={<Radio />} label="Özel Bir Diyet Alması Gerekiyor Mu? Hayır" />
+                    <FormControlLabel value="Hayır" control={<Radio />} label="Hayır" />
                     <FormControlLabel
                       value="Evet"
                       control={<Radio />}
-                      label="Özel Bir Diyet Alması Gerekiyor Mu? Evet (detay yazınız)"
+                      label="Evet (detay yazınız)"
                     />
                   </RadioGroup>
                   {specialDiet === "Evet" && (
@@ -1919,9 +1977,10 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
 
               {/* Oral feeding obstacle */}
               <div className="patienceFormContainer">
+              <FormHelperText>Oral Yol İle Beslenmesine Engel Var Mı?</FormHelperText>
                 <FormControl component="fieldset" fullWidth sx={{ m: 1 }} error={!!errors.oralEngelDetails}>
                   <RadioGroup row value={oralEngel} onChange={(e) => setOralEngel(e.target.value)}>
-                    <FormControlLabel value="Hayır" control={<Radio />} label="Oral Yol İle Beslenmesine Engel Var Mı? Hayır" />
+                    <FormControlLabel value="Hayır" control={<Radio />} label="Hayır" />
                     <FormControlLabel
                       value="Evet"
                       control={<Radio />}
@@ -1943,17 +2002,18 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
 
               {/* Weight loss */}
               <div className="patienceFormContainer">
+              <FormHelperText>Son 6 Ayda İstem Dışı Kilo Kaybı Var Mı?</FormHelperText>
                 <FormControl component="fieldset" fullWidth sx={{ m: 1 }} error={!!errors.kiloKaybiDetails}>
                   <RadioGroup row value={kiloKaybi6Ay} onChange={(e) => setKiloKaybi6Ay(e.target.value)}>
                     <FormControlLabel
                       value="Hayır"
                       control={<Radio />}
-                      label="Son 6 Ayda İstem Dışı Kilo Kaybı Var Mı? Hayır"
+                      label="Hayır"
                     />
                     <FormControlLabel
                       value="Evet"
                       control={<Radio />}
-                      label="Son 6 Ayda İstem Dışı Kilo Kaybı Var Mı? Evet (detay yazınız)"
+                      label="Evet (detay yazınız)"
                     />
                   </RadioGroup>
                   {kiloKaybi6Ay === "Evet" && (
@@ -1971,6 +2031,7 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
 
               {/* Meals with */}
               <div className="patienceFormContainer">
+              <FormHelperText>Kiminle birlikte yaşıyordu?</FormHelperText>
                 <FormControl component="fieldset" fullWidth sx={{ m: 1 }} error={!!errors.mealsWithOther}>
                   <FormGroup row>
                     {mealWithOptions.map((opt) => (
@@ -1998,11 +2059,13 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
                   )}
                 </FormControl>
               </div>
+          <div className="divider">.</div>
 
               {/* Meal counts & water */}
               <div className="patienceFormContainer">
-                <FormControl fullWidth sx={{ m: 1 }} error={!!errors.mainMealsPerDay}>
+                <FormControl error={!!errors.mainMealsPerDay}>
                   <TextField
+                    fullWidth sx={{ m: 1 }}
                     label="Genellikle Günde Kaç Öğün Yemek Yiyor (ana öğün)"
                     type="number"
                     inputProps={{ min: 0, max: 10, step: 1 }}
@@ -2015,8 +2078,9 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
               </div>
 
               <div className="patienceFormContainer">
-                <FormControl fullWidth sx={{ m: 1 }} error={!!errors.snacksPerDay}>
+                <FormControl error={!!errors.snacksPerDay}>
                   <TextField
+                    fullWidth sx={{ m: 1 }}
                     label="Genellikle Günde Kaç Öğün Yemek Yiyor (ara öğün)"
                     type="number"
                     inputProps={{ min: 0, max: 10, step: 1 }}
@@ -2029,8 +2093,9 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
               </div>
 
               <div className="patienceFormContainer">
-                <FormControl fullWidth sx={{ m: 1 }} error={!!errors.waterLitersPerDay}>
+                <FormControl error={!!errors.waterLitersPerDay}>
                   <TextField
+                    fullWidth sx={{ m: 1 }}
                     label="Genellikle Günde Kaç Litre Su İçiyor"
                     type="number"
                     inputProps={{ min: 0, max: 20, step: 0.1 }}
@@ -2041,40 +2106,47 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
                   />
                 </FormControl>
               </div>
+            <div className="divider">.</div>
 
               {/* Food preferences / restrictions */}
               <div className="patienceFormContainer">
-                <TextField
-                  fullWidth sx={{ m: 1 }}
-                  label="Tüketmediği bir besin var mı?"
-                  placeholder=" "
-                  value={doesNotConsume}
-                  onChange={(e) => setDoesNotConsume(e.target.value)}
-                  multiline
-                  minRows={2}
-                />
+                <FormControl>
+                    <TextField
+                      fullWidth sx={{ m: 1 }}
+                      label="Tüketmediği bir besin var mı?"
+                      placeholder=" "
+                      value={doesNotConsume}
+                      onChange={(e) => setDoesNotConsume(e.target.value)}
+                      multiline
+                      minRows={2}
+                    />
+                </FormControl>
               </div>
               <div className="patienceFormContainer">
-                <TextField
-                  fullWidth sx={{ m: 1 }}
-                  label="Alerjisi olduğu bir besin var mı?"
-                  placeholder=" "
-                  value={allergies}
-                  onChange={(e) => setAllergies(e.target.value)}
-                  multiline
-                  minRows={2}
-                />
+                <FormControl>
+                    <TextField
+                      fullWidth sx={{ m: 1 }}
+                      label="Alerjisi olduğu bir besin var mı?"
+                      placeholder=" "
+                      value={allergies}
+                      onChange={(e) => setAllergies(e.target.value)}
+                      multiline
+                      minRows={2}
+                    />
+                </FormControl>
               </div>
               <div className="patienceFormContainer">
-                <TextField
-                  fullWidth sx={{ m: 1 }}
-                  label="Tüketmeyi Sevdiği Besinler Nelerdir?"
-                  placeholder=" "
-                  value={favoriteFoods}
-                  onChange={(e) => setFavoriteFoods(e.target.value)}
-                  multiline
-                  minRows={2}
-                />
+                <FormControl>
+                    <TextField
+                      fullWidth sx={{ m: 1 }}
+                      label="Tüketmeyi Sevdiği Besinler Nelerdir?"
+                      placeholder=" "
+                      value={favoriteFoods}
+                      onChange={(e) => setFavoriteFoods(e.target.value)}
+                      multiline
+                      minRows={2}
+                    />
+                </FormControl>
               </div>
             </div>
           </div>
@@ -2095,7 +2167,7 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
         <div className="container-add-patient">
           <h1 className="page-title">Danışanın Psikolojik Durumu</h1>
           <h1 className="page-description">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent finibus ipsum ac nibh bibendum, quis sodales orci elementum.
+            Tüm bilgileri eksiksiz giriniz, her kısmın doldurulması gerekmektedir.
           </h1>
 
           {/* Genel Psikolojik Durum */}
@@ -2140,10 +2212,11 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
 
                 {/* Psychiatric Meds */}
                 <div className="patienceFormContainer">
+                  <FormHelperText>Psikiyatrik İlaç Kullanıyor Mu?</FormHelperText>
                   <FormControl component="fieldset" fullWidth sx={{ m: 1 }} error={!!errors.psychiatricMedUse}>
                     <RadioGroup row value={psychiatricMedUse} onChange={(e) => setPsychiatricMedUse(e.target.value)}>
-                      <FormControlLabel value="Yes" control={<Radio />} label="Psikiyatrik İlaç Kullanıyor (Yes)" />
-                      <FormControlLabel value="No" control={<Radio />} label="Psikiyatrik İlaç Kullanmıyor (No)" />
+                      <FormControlLabel value="Yes" control={<Radio />} label="Evet" />
+                      <FormControlLabel value="No" control={<Radio />} label="Hayır" />
                     </RadioGroup>
                     {errors.psychiatricMedUse ? <FormHelperText error>{errors.psychiatricMedUse}</FormHelperText> : null}
                     {psychiatricMedUse === "Yes" ? (
@@ -2156,7 +2229,16 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
                           <FormHelperText error>{errors.psychiatricMedPrescriptionFile}</FormHelperText>
                         ) : null}
                         {psychiatricMedPrescriptionFile ? (
-                          <FormHelperText>{psychiatricMedPrescriptionFile.name}</FormHelperText>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "4px" }}>
+                            <FormHelperText>{psychiatricMedPrescriptionFile.name}</FormHelperText>
+                            <IconButton
+                              onClick={handleDeleteOptionalFile(setPsychiatricMedPrescriptionFile, "psychiatricMedPrescriptionFile")}
+                              size="small"
+                              sx={{ padding: "4px" }}
+                            >
+                              <CloseIcon fontSize="small" />
+                            </IconButton>
+                          </div>
                         ) : null}
                       </div>
                     ) : psychiatricMedUse === "No" ? (
@@ -2178,10 +2260,11 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
             <div className="input-group-2">
                 {/* Depression Scale */}
                 <div className="patienceFormContainer">
+                  <FormHelperText>Depresyon Ölçeği Yapıldı Mı?</FormHelperText>
                   <FormControl component="fieldset" fullWidth sx={{ m: 1 }} error={!!errors.depressionScale}>
                     <RadioGroup row value={depressionScale} onChange={(e) => setDepressionScale(e.target.value)}>
-                      <FormControlLabel value="Yes" control={<Radio />} label="Depresyon Ölçeği Yapıldı (Yes)" />
-                      <FormControlLabel value="No" control={<Radio />} label="Depresyon Ölçeği Yapılmadı (No)" />
+                      <FormControlLabel value="Yes" control={<Radio />} label="Evet" />
+                      <FormControlLabel value="No" control={<Radio />} label="Hayır" />
                     </RadioGroup>
                     {errors.depressionScale ? <FormHelperText error>{errors.depressionScale}</FormHelperText> : null}
                     {depressionScale === "Yes" ? (
@@ -2191,7 +2274,18 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
                           <input type="file" hidden onChange={handleOptionalFile(setDepressionScaleFile, "depressionScaleFile")} />
                         </Button>
                         {errors.depressionScaleFile ? <FormHelperText error>{errors.depressionScaleFile}</FormHelperText> : null}
-                        {depressionScaleFile ? <FormHelperText>{depressionScaleFile.name}</FormHelperText> : null}
+                        {depressionScaleFile ? (
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "4px" }}>
+                            <FormHelperText>{depressionScaleFile.name}</FormHelperText>
+                            <IconButton
+                              onClick={handleDeleteOptionalFile(setDepressionScaleFile, "depressionScaleFile")}
+                              size="small"
+                              sx={{ padding: "4px" }}
+                            >
+                              <CloseIcon fontSize="small" />
+                            </IconButton>
+                          </div>
+                        ) : null}
                       </div>
                     ) : depressionScale === "No" ? (
                       <TextField
@@ -2206,10 +2300,11 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
 
                 {/* MOCA */}
                 <div className="patienceFormContainer">
+                  <FormHelperText>Montreal Bilişsel Değerlendirme Ölçeği Yapıldı Mı?</FormHelperText>
                   <FormControl component="fieldset" fullWidth sx={{ m: 1 }} error={!!errors.moca}>
                     <RadioGroup row value={moca} onChange={(e) => setMoca(e.target.value)}>
-                      <FormControlLabel value="Yes" control={<Radio />} label="Montreal Bilişsel Değerlendirme Ölçeği Yapıldı (Yes)" />
-                      <FormControlLabel value="No" control={<Radio />} label="Montreal Bilişsel Değerlendirme Ölçeği Yapılmadı (No)" />
+                      <FormControlLabel value="Yes" control={<Radio />} label="Evet" />
+                      <FormControlLabel value="No" control={<Radio />} label="Hayır" />
                     </RadioGroup>
                     {errors.moca ? <FormHelperText error>{errors.moca}</FormHelperText> : null}
                     {moca === "Yes" ? (
@@ -2219,7 +2314,18 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
                           <input type="file" hidden onChange={handleOptionalFile(setMocaFile, "mocaFile")} />
                         </Button>
                         {errors.mocaFile ? <FormHelperText error>{errors.mocaFile}</FormHelperText> : null}
-                        {mocaFile ? <FormHelperText>{mocaFile.name}</FormHelperText> : null}
+                        {mocaFile ? (
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "4px" }}>
+                            <FormHelperText>{mocaFile.name}</FormHelperText>
+                            <IconButton
+                              onClick={handleDeleteOptionalFile(setMocaFile, "mocaFile")}
+                              size="small"
+                              sx={{ padding: "4px" }}
+                            >
+                              <CloseIcon fontSize="small" />
+                            </IconButton>
+                          </div>
+                        ) : null}
                       </div>
                     ) : moca === "No" ? (
                       <TextField
@@ -2234,10 +2340,11 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
 
                 {/* Mini-Cog */}
                 <div className="patienceFormContainer">
-              <FormControl component="fieldset" fullWidth sx={{ m: 1 }} error={!!errors.miniCog}>
+                  <FormHelperText>Mini-Cog Testi Yapıldı Mı?</FormHelperText>
+                  <FormControl component="fieldset" fullWidth sx={{ m: 1 }} error={!!errors.miniCog}>
                 <RadioGroup row value={miniCog} onChange={(e) => setMiniCog(e.target.value)}>
-                  <FormControlLabel value="Yes" control={<Radio />} label="Mini-Cog Testi Yapıldı (Yes)" />
-                  <FormControlLabel value="No" control={<Radio />} label="Mini-Cog Testi Yapılmadı (No)" />
+                  <FormControlLabel value="Yes" control={<Radio />} label="Evet" />
+                  <FormControlLabel value="No" control={<Radio />} label="Hayır" />
                 </RadioGroup>
                 {errors.miniCog ? <FormHelperText error>{errors.miniCog}</FormHelperText> : null}
                 {miniCog === "Yes" ? (
@@ -2247,7 +2354,18 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
                       <input type="file" hidden onChange={handleOptionalFile(setMiniCogFile, "miniCogFile")} />
                     </Button>
                     {errors.miniCogFile ? <FormHelperText error>{errors.miniCogFile}</FormHelperText> : null}
-                    {miniCogFile ? <FormHelperText>{miniCogFile.name}</FormHelperText> : null}
+                    {miniCogFile ? (
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "4px" }}>
+                        <FormHelperText>{miniCogFile.name}</FormHelperText>
+                        <IconButton
+                          onClick={handleDeleteOptionalFile(setMiniCogFile, "miniCogFile")}
+                          size="small"
+                          sx={{ padding: "4px" }}
+                        >
+                          <CloseIcon fontSize="small" />
+                        </IconButton>
+                      </div>
+                    ) : null}
                   </div>
                 ) : miniCog === "No" ? (
                   <TextField
@@ -2258,7 +2376,7 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
                   />
                 ) : null}
               </FormControl>
-            </div>
+                </div>
             </div>
 
           </div>
@@ -2266,33 +2384,44 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
           <div className="information-block">
             <h2 className="section-title">Sosyal İnceleme Raporu</h2>
             <div className="input-group-2">
-
-                <div className="patienceFormContainer">
-              <FormControl component="fieldset" fullWidth sx={{ m: 1 }} error={!!errors.socialReport}>
-                <RadioGroup row value={socialReport} onChange={(e) => setSocialReport(e.target.value)}>
-                  <FormControlLabel value="Yes" control={<Radio />} label="Sosyal İnceleme Raporu Düzenlendi (Yes)" />
-                  <FormControlLabel value="No" control={<Radio />} label="Sosyal İnceleme Raporu Düzenlenmedi (No)" />
-                </RadioGroup>
-                {errors.socialReport ? <FormHelperText error>{errors.socialReport}</FormHelperText> : null}
-                {socialReport === "Yes" ? (
-                  <div style={{ marginTop: 8 }}>
-                    <Button variant="outlined" component="label">
-                      Rapor Dosyası Yükle (opsiyonel)
-                      <input type="file" hidden onChange={handleOptionalFile(setSocialReportFile, "socialReportFile")} />
-                    </Button>
-                    {errors.socialReportFile ? <FormHelperText error>{errors.socialReportFile}</FormHelperText> : null}
-                    {socialReportFile ? <FormHelperText>{socialReportFile.name}</FormHelperText> : null}
-                  </div>
-                ) : socialReport === "No" ? (
-                  <TextField
-                    sx={{ mt: 1 }}
-                    label="Yapılmama Sebebi (opsiyonel)"
-                    value={socialReportNoReason}
-                    onChange={(e) => setSocialReportNoReason(e.target.value)}
-                  />
-                ) : null}
-              </FormControl>
-            </div>
+              <div className="patienceFormContainer">
+                <FormHelperText>Sosyal İnceleme Raporu Düzenlendi Mi?</FormHelperText>
+                <FormControl component="fieldset" fullWidth sx={{ m: 1 }} error={!!errors.socialReport}>
+                    <RadioGroup row value={socialReport} onChange={(e) => setSocialReport(e.target.value)}>
+                      <FormControlLabel value="Yes" control={<Radio />} label="Evet" />
+                      <FormControlLabel value="No" control={<Radio />} label="Hayır" />
+                    </RadioGroup>
+                    {errors.socialReport ? <FormHelperText error>{errors.socialReport}</FormHelperText> : null}
+                    {socialReport === "Yes" ? (
+                      <div style={{ marginTop: 8 }}>
+                        <Button variant="outlined" component="label">
+                          Rapor Dosyası Yükle (opsiyonel)
+                          <input type="file" hidden onChange={handleOptionalFile(setSocialReportFile, "socialReportFile")} />
+                        </Button>
+                        {errors.socialReportFile ? <FormHelperText error>{errors.socialReportFile}</FormHelperText> : null}
+                        {socialReportFile ? (
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "4px" }}>
+                            <FormHelperText>{socialReportFile.name}</FormHelperText>
+                            <IconButton
+                              onClick={handleDeleteOptionalFile(setSocialReportFile, "socialReportFile")}
+                              size="small"
+                              sx={{ padding: "4px" }}
+                            >
+                              <CloseIcon fontSize="small" />
+                            </IconButton>
+                          </div>
+                        ) : null}
+                      </div>
+                    ) : socialReport === "No" ? (
+                      <TextField
+                        sx={{ mt: 1 }}
+                        label="Yapılmama Sebebi (opsiyonel)"
+                        value={socialReportNoReason}
+                        onChange={(e) => setSocialReportNoReason(e.target.value)}
+                      />
+                    ) : null}
+                  </FormControl>
+              </div>
             </div>
 
           </div>

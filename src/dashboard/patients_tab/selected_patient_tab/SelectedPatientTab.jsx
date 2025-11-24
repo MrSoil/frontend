@@ -221,8 +221,8 @@ function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient
                 <label>New Room</label>
               </div>
                 <div className="exit-container">
-                    <button style={{backgroundColor: "#E77169", float: "left"}} onClick={cancelNewRoom} >Cancel</button>
-                    <button style={{backgroundColor: "#A695CC", float: "right"}} >Submit</button>
+                    <button style={{backgroundColor: "#E77169", float: "left"}} onClick={cancelNewRoom} >Geri</button>
+                    <button style={{backgroundColor: "#A695CC", float: "right"}} >Gönder</button>
                 </div>
             </div>
           </div>
@@ -239,8 +239,8 @@ function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient
                 <label>New Care Category</label>
           </div>
                 <div className="exit-container">
-                <button style={{backgroundColor: "#E77169", float: "left"}} onClick={cancelNewCareCategory} >Cancel</button>
-                <button style={{backgroundColor: "#A695CC", float: "right"}} >Submit</button>
+                <button style={{backgroundColor: "#E77169", float: "left"}} onClick={cancelNewCareCategory} >Geri</button>
+                <button style={{backgroundColor: "#A695CC", float: "right"}} >Gönder</button>
               </div>
             </div>
           </div>

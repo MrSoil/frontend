@@ -55,7 +55,7 @@ function MedicineList({ selectedPatient, setNewMedicineContainer, medicinesDate,
 
   return (
     <article className="medicine-container">
-        <header className="medicine-header">İlaçlar</header>
+        <header className="medicine-header">Sağlık Raporları</header>
         <div className="medicine-divider" />
         <div style={{"overflow": "scroll", "overflowX": "hidden", "height": "200px"}}>
           {medicines.map((medicine, index) => (
@@ -67,7 +67,7 @@ function MedicineList({ selectedPatient, setNewMedicineContainer, medicinesDate,
         </div>
         <div className="medicine-divider" />
         <div style={{alignSelf: "center", marginLeft: "3%"}}>
-            <button className="medicines-button" onClick={() => handleNewMedicine()}>Bugünün İlaçları</button>
+            <button className="medicines-button" onClick={() => handleNewMedicine()}>Bugünün Sağlık Raporu</button>
             <button className="medicines-button" onClick={() => handleEditMedicine()}>İlaçları Düzenle</button>
         </div>
     </article>

@@ -19,11 +19,9 @@
 
 .dashboard-logo-design {
   opacity: 1;
-  font-size: 32px;
+  font-size: 32px !important;
   font-weight: bold;
   background-color: transparent !important;
   color: #000000 !important;
   border: none !important;
-  margin-right: 10px;
-  margin-left: 10px;
 }

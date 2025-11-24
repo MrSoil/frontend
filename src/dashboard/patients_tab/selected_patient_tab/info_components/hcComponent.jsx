@@ -48,7 +48,7 @@ function HCList({ selectedPatient, setNewHCContainer, hcDate, setHcDate }) {
 
   return (
     <article className="hc-container">
-        <header className="hc-header">Sağlık Raporları</header>
+        <header className="hc-header">Bakım Raporları</header>
         <div className="hc-divider" />
         <div style={{"overflow": "scroll", "overflowX": "hidden", "height": "200px"}}>
           {hcs.map((hc, index) => (
@@ -60,7 +60,7 @@ function HCList({ selectedPatient, setNewHCContainer, hcDate, setHcDate }) {
         </div>
         <div className="hc-divider" />
         <div style={{alignSelf: "center", marginLeft: "3%"}}>
-            <button className="hcs-button" onClick={() => handleNewHc()}>Bugünün Sağlık Raporu</button>
+            <button className="hcs-button" onClick={() => handleNewHc()}>Bugünün Bakım Raporu</button>
         </div>
     </article>
   );

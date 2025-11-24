@@ -24,10 +24,17 @@ function Sidebar() {
         navigate("/dashboard/"+hover_index_map[index])
         newSidebarHovers[index] = true;
         setSidebarHovers(newSidebarHovers);
+        if (sidebarHovers[index] === newSidebarHovers[index]) {
+            window.location.reload();
+        }
     };
 
   const onHomeButtonClick = () => {
     navigate("/home")
+  }
+
+  const onDashboardButtonClick = () => {
+    navigate("/dashboard")
   }
 
   const updateSidebar = () => {
@@ -57,7 +64,7 @@ function Sidebar() {
       <div className={"sidebar-content"}>
 
           <button className={"sidebar-main-contents stat-button hover"}
-          onClick={onHomeButtonClick}>
+          onClick={onDashboardButtonClick}>
               <img src={sugrIconImage} alt="SugrIcon"/>
           </button>
 

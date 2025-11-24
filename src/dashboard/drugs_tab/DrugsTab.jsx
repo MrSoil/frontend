@@ -52,12 +52,16 @@ function DrugsTab({setSelectedPatient}) {
         navigate("/dashboard/drugs")
     }
 
+    const onDashboardButtonClick = () => {
+        navigate("/dashboard")
+    }
+
 return (
     <div className="dashboard-content-background">
         <div className="dashboard-content-navigator">
-            <div className="dashboard-logo-design">SUGR.</div>
+            <button className="dashboard-logo-design navigator-button" onClick={onDashboardButtonClick}>SUGR.</button>
             <button className="navigator-button" onClick={getGeneralTab}
-            >/ Müşteri İlaçları</button>
+            >/ Danışan İlaçları</button>
             {
             /*First Stage*/
 

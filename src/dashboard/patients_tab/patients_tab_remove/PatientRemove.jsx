@@ -17,7 +17,11 @@ function PatientCard({ patient, setGeneralTab, setFunction }) {
         <img src={`data:image/*;base64,${patient.patient_personal_info.section_1.image}`}  alt={patient.patient_personal_info.section_1.firstname} className="patient-avatar" />
         <div className="patient-details">
           <div className="patient-name">{patient.patient_personal_info.section_1.firstname} {patient.patient_personal_info.section_1.lastname}</div>
-          <div className="patient-location">{patient.patient_personal_info.section_1.patientGender}</div>
+          <div className="patient-location">
+            {patient.patient_personal_info.section_1.patientGender}
+            <br/>
+            {patient.patient_personal_info.section_1.patientRoom}
+          </div>
         </div>
       </div>
     </div>
@@ -114,10 +118,10 @@ function PatientRemove({ setGeneralTab, setRemoveTab }) {
           <div className="blackout-container">
             <div className="blackout"></div>
             <div className="patient-remove-container">
-              <text>Do you really wish to remove {removePatient.first_name + " " + removePatient.last_name} ?</text>
+              <text>{removePatient.patient_personal_info.section_1.firstname + " " + removePatient.patient_personal_info.section_1.lastname } isimli müşteriyi silmek istediğinize emin misiniz?</text>
               <div className="patient-remove-button-container">
-                <button style={{backgroundColor: "#E77169", float: "left"}} onClick={onCancelRemove}>Cancel</button>
-                <button style={{backgroundColor: "#A695CC", float: "right"}} onClick={onRemoveClick}>Remove</button>
+                <button style={{backgroundColor: "#E77169", float: "left"}} onClick={onCancelRemove}>Geri</button>
+                <button style={{backgroundColor: "#A695CC", float: "right"}} onClick={onRemoveClick}>Sil</button>
               </div>
             </div>
           </div>
@@ -138,10 +142,11 @@ function PatientRemove({ setGeneralTab, setRemoveTab }) {
         <div className="patients-grid">
           {patients.filter((patient) =>
           {
-            let full_name = patient.patient_personal_info.section_1.firstname + " " + patient.patient_personal_info.section_1.lastname;
-            return patient.patient_personal_info.section_1.firstname.toLowerCase().includes(searchInput.toLowerCase()) ||
-              patient.patient_personal_info.section_1.lastname.toLowerCase().includes(searchInput.toLowerCase()) ||
-              full_name.toLowerCase().includes(searchInput.toLowerCase());
+            let fullName = patient.patient_personal_info.section_1.firstname + " " + patient.patient_personal_info.section_1.lastname;
+            return (patient.patient_personal_info.section_1.firstname.toLowerCase().startsWith(searchInput.toLowerCase()) ||
+              patient.patient_personal_info.section_1.lastname.toLowerCase().startsWith(searchInput.toLowerCase()) ||
+              fullName.toLowerCase().startsWith(searchInput.toLowerCase()) ||
+              patient.patient_personal_info.section_1.patientRoom.toLowerCase().startsWith(searchInput.toLowerCase()));
           }).map((patient, index) => (
             <PatientCard key={index} patient={patient} setGeneralTab={setGeneralTab} setFunction={setRemovePatient} value={patient}/>
           ))}

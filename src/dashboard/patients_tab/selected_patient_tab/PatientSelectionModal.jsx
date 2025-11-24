@@ -22,9 +22,10 @@ const PatientSelectionModal = ({ isOpen, onClose, patientsList, selectedPatient,
       filtered = filtered.filter((patient) => {
         const fullName = `${patient.patient_personal_info.section_1.firstname} ${patient.patient_personal_info.section_1.lastname}`;
         return (
-          patient.patient_personal_info.section_1.firstname.toLowerCase().includes(searchInput.toLowerCase()) ||
-          patient.patient_personal_info.section_1.lastname.toLowerCase().includes(searchInput.toLowerCase()) ||
-          fullName.toLowerCase().includes(searchInput.toLowerCase())
+          patient.patient_personal_info.section_1.firstname.toLowerCase().startsWith(searchInput.toLowerCase()) ||
+          patient.patient_personal_info.section_1.lastname.toLowerCase().startsWith(searchInput.toLowerCase()) ||
+          fullName.toLowerCase().startsWith(searchInput.toLowerCase()) ||
+          patient.patient_personal_info.section_1.patientRoom.toLowerCase().startsWith(searchInput.toLowerCase())
         );
       });
     }

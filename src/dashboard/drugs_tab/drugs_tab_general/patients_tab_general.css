@@ -219,7 +219,9 @@
 .patient-avatar {
   aspect-ratio: 1;
   object-position: center;
-  width: 42px;
+  width: 52px;
+  height: 52px;
+  align-self: center
 }
 
 .patient-details {
