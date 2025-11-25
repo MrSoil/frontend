@@ -1,42 +1,79 @@
-import React, {useState} from "react"
-import Sidebar from '../components/sidebar/Sidebar';
-import DrugsTab from './drugs_tab/DrugsTab';
-import './drugs_tab/drugs_tab.css';
-import PatientsTab from "./patients_tab/PatientsTab";
-import {BrowserRouter, Route, Routes} from "react-router-dom";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import './dashboard.css';
 
 const Dashboard = () => {
-    const [sidebarHovers, setSidebarHovers] = useState([ false, true, false, false ]);
+    const navigate = useNavigate();
 
-    const handleHoverChange = (index) => {
-        let newSidebarHovers = [false, false, false, false];
-        newSidebarHovers[index] = true;
-        setSidebarHovers(newSidebarHovers);
+    const handlePatientsNavigation = () => {
+        navigate("/dashboard/patients");
     };
 
+    const handleDrugsNavigation = () => {
+        navigate("/dashboard/drugs");
+    };
+
+    const handleFloorNavigation = (floorNumber) => {
+        navigate(`/dashboard/patients?floor=${floorNumber}`);
+    };
 
     return (
-    <div className="main-container">
-        {/*<BrowserRouter>*/}
-        {/*    <Routes>*/}
-        {/*        <Route path="/dashboard" element={ <Sidebar setHover={handleHoverChange} sidebarHovers={sidebarHovers}></Sidebar>}>*/}
-        {/*            <Route path="/dashboard/patients" element={<DrugsTab/>}/>*/}
-        {/*            <Route path="/dashboard/drugs" element={<PatientsTab/>}/>*/}
-        {/*        </Route>*/}
-        {/*    </Routes>*/}
-        {/*</BrowserRouter>*/}
+        <div className="dashboard-content-background">
+            <div className="dashboard-cards-container">
+                {/* Danışan Yönetimi Card */}
+                <div className="dashboard-card">
+                    <h2 className="dashboard-card-title">Danışan Yönetimi</h2>
+                    <div className="dashboard-card-actions">
+                        <button 
+                            className="dashboard-card-primary-button"
+                            onClick={handlePatientsNavigation}
+                        >
+                            DANIŞAN YÖNETİMİ
+                        </button>
+                    </div>
+                    <div className="dashboard-card-floors">
+                        <button 
+                            className="dashboard-floor-button"
+                            onClick={() => handleFloorNavigation(1)}
+                        >
+                            Kat 1
+                        </button>
+                        <button 
+                            className="dashboard-floor-button"
+                            onClick={() => handleFloorNavigation(2)}
+                        >
+                            Kat 2
+                        </button>
+                        <button 
+                            className="dashboard-floor-button"
+                            onClick={() => handleFloorNavigation(3)}
+                        >
+                            Kat 3
+                        </button>
+                        <button 
+                            className="dashboard-floor-button"
+                            onClick={() => handleFloorNavigation(4)}
+                        >
+                            Kat 4
+                        </button>
+                    </div>
+                </div>
 
-
-        {/*{ sidebarHovers[0] ? <DrugsTab/> : null}*/}
-
-        {/*{ sidebarHovers[1] ? <PatientsTab/> : null}*/}
-
-        { sidebarHovers[2] ? <div className="dashboard-content-background">profile?</div> : null}
-
-        { sidebarHovers[3] ? <div className="dashboard-content-background">sec</div> : null}
-
-    </div>
-);
+                {/* Sağlık Yönetimi Card */}
+                <div className="dashboard-card">
+                    <h2 className="dashboard-card-title">Sağlık Yönetimi</h2>
+                    <div className="dashboard-card-actions">
+                        <button 
+                            className="dashboard-card-primary-button"
+                            onClick={handleDrugsNavigation}
+                        >
+                            İLAÇ YÖNETİMİ
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 }
 
-export default Dashboard
+export default Dashboard;

@@ -30,10 +30,14 @@ function Sidebar() {
     };
 
   const onHomeButtonClick = () => {
+    let newSidebarHovers = [false, false, false, false];
+    setSidebarHovers(newSidebarHovers);
     navigate("/home")
   }
 
   const onDashboardButtonClick = () => {
+    let newSidebarHovers = [false, false, false, false];
+    setSidebarHovers(newSidebarHovers);
     navigate("/dashboard")
   }
 

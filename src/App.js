@@ -31,6 +31,7 @@ function App() {
 
 
                     <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout/></ProtectedRoute>}>
+                        <Route index element={<Dashboard />}/>
                         <Route path="drugs" element={<DrugsTab setSelectedPatient={setSelectedPatient} selectedPatient={selectedPatient}/>}/>
                         <Route path="drugs/patient/:id" element={<SelectedPatientTab selectedPatient={selectedPatient} setSelectedPatient={setSelectedPatient} />}/>
                         <Route path="patients" element={<PatientsTab/>}/>

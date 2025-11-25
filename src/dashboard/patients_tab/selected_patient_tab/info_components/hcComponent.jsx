@@ -456,7 +456,7 @@ function HCList({ selectedPatient, setNewHCContainer, hcDate, setHcDate }) {
     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', borderRadius: '24px' }}>
       <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 2 }}>
         <Typography variant="h5" sx={{ fontWeight: 700, mb: 1, fontFamily: 'RedHatDisplay' }}>
-          Bakım Listesi
+          Bakım Raporları
         </Typography>
         
         <Stack direction="row" spacing={2} sx={{ mb: 1 }}>
