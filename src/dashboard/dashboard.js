@@ -253,12 +253,14 @@ const Dashboard = () => {
                         }
                         
                         if (dateStr && last7DaysSet.has(dateStr) && timestamp) {
+                            const medDosage = medData.medicine_data?.medicine_dosage?.[period] || '';
+                            const dosageText = medDosage ? ` (${medDosage})` : '';
                             history.push({
                                 timestamp: timestamp,
                                 date: dateStr,
                                 patientName: patientName,
                                 type: 'medicine',
-                                message: `${patientName}'in ${periodNames[period]} ilaçları verildi.`,
+                                message: `${patientName}'in ${periodNames[period]} ilacı "${medName}" verildi.`,
                                 fullMessage: `${medName} - ${periodNames[period]}`
                             });
                         }

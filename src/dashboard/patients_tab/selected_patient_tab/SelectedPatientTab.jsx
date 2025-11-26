@@ -9,6 +9,8 @@ import HCList from "./info_components/hcComponent";
 import HC_Form from "./info_components/hcFormComponent";
 import Medicine_Form from "./info_components/medicineFormComponent";
 import PatientSelectionModal from "./PatientSelectionModal";
+import { API_BASE_URL } from "../../../config";
+
 
 import { Visibility, VisibilityOff, ArrowCircleLeftOutlined, ArrowCircleRightOutlined } from "@mui/icons-material";
 import {Box,
@@ -33,12 +35,13 @@ function getTodayForDjango() {
   return today.toString();
 }
 
-function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient, patientsList, currentPatientIndex, navigateToPreviousPatient, navigateToNextPatient, setCurrentPatientIndex }) {
+function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient, patientsList, setPatientsList, currentPatientIndex, navigateToPreviousPatient, navigateToNextPatient, setCurrentPatientIndex }) {
     const [newRoomContainer, setNewRoomContainer] = useState(false)
     const [newCareCategoryContainer, setNewCareCategoryContainer] = useState(false)
     const [newMedicineContainer, setNewMedicineContainer] = useState(false)
     const [newHCContainer, setNewHCContainer] = useState(false)
     const [showPatientSelectionModal, setShowPatientSelectionModal] = useState(false)
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
 
     const [newRoom, setNewRoom] = useState("")
     const [newCareCategory, setNewCareCategory] = useState("")
@@ -206,6 +209,32 @@ function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient
     useEffect(() => {
     }, [newMedicineRemove]);
 
+    const refreshPatientData = () => {
+        if (selectedPatient && selectedPatient.patient_id && user.email) {
+            fetch(`${API_BASE_URL}/patients/?email=${user.email}&patient_id=${selectedPatient.patient_id}`, {
+                method: "GET",
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(r => r.json())
+            .then(resp => {
+                if (resp.status === "success" && resp.data && resp.data.length > 0) {
+                    const updatedPatient = resp.data[0];
+                    setSelectedPatient(updatedPatient);
+                    // Update the patient in the patientsList
+                    const updatedList = patientsList.map(p => 
+                        p.patient_id === updatedPatient.patient_id ? updatedPatient : p
+                    );
+                    setPatientsList(updatedList);
+                }
+            })
+            .catch(error => {
+                console.error("Error refreshing patient data:", error);
+            });
+        }
+    };
+
   return (
       <div className="dashboard-profile-container">
           {newRoomContainer !== false ?
@@ -294,7 +323,8 @@ function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient
 
                   <PatientProfileComponent selectedPatient={selectedPatient}
                                   setNewRoomContainer={setNewRoomContainer}
-                                  setNewCareCategoryContainer={setNewCareCategoryContainer}/>
+                                  setNewCareCategoryContainer={setNewCareCategoryContainer}
+                                  onPatientUpdate={refreshPatientData}/>
                 </Grid>
                 <Grid size={6} sx={{ width: 0.74, height: 1}}>
                   <Box sx={{ height: '49%', pb: 1 }}>

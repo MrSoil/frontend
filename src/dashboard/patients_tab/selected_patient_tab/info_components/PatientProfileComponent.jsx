@@ -18,6 +18,7 @@ import {
 import { ArrowDropDown, Check, Remove, Close } from '@mui/icons-material';
 import './patient_profile_component.css'
 import { API_BASE_URL } from "../../../../config";
+import PatientEditModal from "./PatientEditModal";
 
 
 const getGenderAge = ( age, gender ) => {
@@ -406,8 +407,9 @@ const AddVitalsModal = ({ isOpen, onClose, onSave, patientId, userEmail }) => {
   );
 };
 
-function PatientProfileComponent({ selectedPatient, setNewRoomContainer, setNewCareCategoryContainer }) {
+function PatientProfileComponent({ selectedPatient, setNewRoomContainer, setNewCareCategoryContainer, onPatientUpdate }) {
     const [showAddVitalsModal, setShowAddVitalsModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
     const [patientVitals, setPatientVitals] = useState({});
     const user = JSON.parse(localStorage.getItem("user") || "{}");
 
@@ -476,20 +478,20 @@ function PatientProfileComponent({ selectedPatient, setNewRoomContainer, setNewC
               <Typography variant="h6" sx={{ fontFamily: 'RedHatDisplay', fontWeight: 700, fontSize: '16px' }}>
                 Oda
               </Typography>
-              <Button
-                size="small"
-                onClick={handleNewRoom}
-                sx={{
-                  color: '#A695CC',
-                  textTransform: 'none',
-                  fontFamily: 'RedHatDisplay',
-                  fontSize: '12px',
-                  minWidth: 'auto',
-                  px: 2
-                }}
-              >
-                Düzenle
-              </Button>
+              {/*<Button*/}
+              {/*  size="small"*/}
+              {/*  onClick={handleNewRoom}*/}
+              {/*  sx={{*/}
+              {/*    color: '#A695CC',*/}
+              {/*    textTransform: 'none',*/}
+              {/*    fontFamily: 'RedHatDisplay',*/}
+              {/*    fontSize: '12px',*/}
+              {/*    minWidth: 'auto',*/}
+              {/*    px: 2*/}
+              {/*  }}*/}
+              {/*>*/}
+              {/*  Düzenle*/}
+              {/*</Button>*/}
             </Stack>
             <Typography variant="body2" sx={{ fontFamily: 'RedHatDisplay', color: '#717070', fontSize: '14px' }}>
               {selectedPatient.patient_personal_info.section_1.patientRoom}
@@ -503,20 +505,20 @@ function PatientProfileComponent({ selectedPatient, setNewRoomContainer, setNewC
               <Typography variant="h6" sx={{ fontFamily: 'RedHatDisplay', fontWeight: 700, fontSize: '16px' }}>
                 Bakım Kategorisi
               </Typography>
-              <Button
-                size="small"
-                onClick={handleNewCareCategory}
-                sx={{
-                  color: '#A695CC',
-                  textTransform: 'none',
-                  fontFamily: 'RedHatDisplay',
-                  fontSize: '12px',
-                  minWidth: 'auto',
-                  px: 2
-                }}
-              >
-                Düzenle
-              </Button>
+              {/*<Button*/}
+              {/*  size="small"*/}
+              {/*  onClick={handleNewCareCategory}*/}
+              {/*  sx={{*/}
+              {/*    color: '#A695CC',*/}
+              {/*    textTransform: 'none',*/}
+              {/*    fontFamily: 'RedHatDisplay',*/}
+              {/*    fontSize: '12px',*/}
+              {/*    minWidth: 'auto',*/}
+              {/*    px: 2*/}
+              {/*  }}*/}
+              {/*>*/}
+              {/*  Düzenle*/}
+              {/*</Button>*/}
             </Stack>
             <Typography variant="body2" sx={{ fontFamily: 'RedHatDisplay', color: '#717070', fontSize: '14px' }}>
               Aktif Yaşam
@@ -532,6 +534,7 @@ function PatientProfileComponent({ selectedPatient, setNewRoomContainer, setNewC
               </Typography>
               <Button
                 size="small"
+                onClick={() => setShowEditModal(true)}
                 sx={{
                   color: '#A695CC',
                   textTransform: 'none',
@@ -594,6 +597,17 @@ function PatientProfileComponent({ selectedPatient, setNewRoomContainer, setNewC
           onSave={handleVitalsSaved}
           patientId={selectedPatient.patient_id}
           userEmail={user.email}
+        />
+        <PatientEditModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          selectedPatient={selectedPatient}
+          onSave={() => {
+            handleVitalsSaved();
+            if (onPatientUpdate) {
+              onPatientUpdate();
+            }
+          }}
         />
       </Card>
     );

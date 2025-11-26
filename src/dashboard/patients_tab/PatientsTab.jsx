@@ -81,6 +81,7 @@ function PatientsTab() {
             setSelectedPatient={setSelectedPatient} 
             selectedPatient={selectedPatient}
             patientsList={patientsList}
+            setPatientsList={setPatientsList}
             currentPatientIndex={currentPatientIndex}
             setCurrentPatientIndex={setCurrentPatientIndex}
             navigateToPreviousPatient={navigateToPreviousPatient}

@@ -1,12 +1,14 @@
 import * as React from "react";
 import './medicine_form_component.css'
 import {useEffect, useState} from "react";
-import {Tab, Tabs, IconButton, Typography, FormControl, Select, MenuItem, TextField, Button} from '@mui/material';
+import {Tab, Tabs, IconButton, Typography, FormControl, Select, MenuItem, TextField, Button, Checkbox} from '@mui/material';
 import { API_BASE_URL } from "../../../../config";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import { ArrowCircleLeftOutlined, ArrowCircleRightOutlined, Delete, Edit } from '@mui/icons-material';
+import PlaylistAddRoundedIcon from '@mui/icons-material/PlaylistAddRounded';
+import PlaylistAddCheckCircleIcon from '@mui/icons-material/PlaylistAddCheckCircle';
 import PatientSelectionModal from '../PatientSelectionModal';
 import NoteModal from './NoteModal';
 
@@ -235,7 +237,7 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
     });
   };
 
-  const submitGivenMeds = () => {
+  const submitGivenMeds = async () => {
     const payload_M = Array.from(selectedGivenMeds_M).map(medicine_id => (
         {
             "patient_id": selectedPatient["patient_id"],
@@ -269,36 +271,191 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
         }
     ));
 
-    const payload = payload_M.concat(payload_N).concat(payload_E)
+    const payload = payload_M.concat(payload_N).concat(payload_E);
 
-    // setTakenMeds(prev => new Set([...prev, ...selectedGivenMeds]));
-    // setSelectedGivenMeds(new Set());
+    // Check if there are any medicines to submit
+    if (payload.length === 0) {
+      window.alert("İşaretlenecek ilaç bulunmuyor.");
+      return;
+    }
 
-    for (let i = 0; i < payload.length; i++) {
-        fetch(`${API_BASE_URL}/patients/`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json'},
-          body: JSON.stringify({
-              "patient_id": payload[i]["patient_id"],
-              "email": payload[i]["email"],
-              "type": payload[i]["type"],
-              "medicine_id": payload[i]["medicine_id"],
-              "period": payload[i]["period"],
-              "today_date": payload[i]["today_date"]
-          })
-        })
-        .then(r => r.json())
-        .then(() => {
-          // merge newly given into takenMeds and clear selection
-          setTakenMeds_M(prev => new Set([...prev, ...selectedGivenMeds_M]));
-          setTakenMeds_N(prev => new Set([...prev, ...selectedGivenMeds_N]));
-          setTakenMeds_E(prev => new Set([...prev, ...selectedGivenMeds_E]));
+    // Confirmation dialog
+    const confirmed = window.confirm(
+      `Seçili ilaçlar için imza atmak istediğinize emin misiniz?\n\nSabah: ${selectedGivenMeds_M.size} ilaç\nÖğlen: ${selectedGivenMeds_N.size} ilaç\nAkşam: ${selectedGivenMeds_E.size} ilaç`
+    );
+    if (!confirmed) {
+      return;
+    }
 
-          setSelectedGivenMeds_M(new Set());
-          setSelectedGivenMeds_N(new Set());
-          setSelectedGivenMeds_E(new Set());
-        })
-        .catch(console.error);
+    try {
+      // Send requests sequentially to avoid potential race conditions in backend
+      // Group by period to send morning, noon, then evening
+      const results = [];
+      
+      // Process morning medicines
+      for (const item of payload_M) {
+        try {
+          const response = await fetch(`${API_BASE_URL}/patients/`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              "patient_id": item["patient_id"],
+              "email": item["email"],
+              "type": item["type"],
+              "medicine_id": item["medicine_id"],
+              "period": item["period"],
+              "today_date": item["today_date"]
+            })
+          });
+          
+          const result = await response.json();
+          results.push({
+            success: result.status === "success",
+            period: item["period"],
+            medicine_id: item["medicine_id"],
+            response: result
+          });
+          
+          if (result.status !== "success") {
+            console.error(`Failed to save morning medicine ${item["medicine_id"]}:`, result);
+          }
+        } catch (error) {
+          console.error(`Error sending morning medicine ${item["medicine_id"]}:`, error);
+          results.push({
+            success: false,
+            period: item["period"],
+            medicine_id: item["medicine_id"],
+            error: error.message
+          });
+        }
+      }
+
+      // Process noon medicines
+      for (const item of payload_N) {
+        try {
+          const response = await fetch(`${API_BASE_URL}/patients/`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              "patient_id": item["patient_id"],
+              "email": item["email"],
+              "type": item["type"],
+              "medicine_id": item["medicine_id"],
+              "period": item["period"],
+              "today_date": item["today_date"]
+            })
+          });
+          
+          const result = await response.json();
+          results.push({
+            success: result.status === "success",
+            period: item["period"],
+            medicine_id: item["medicine_id"],
+            response: result
+          });
+          
+          if (result.status !== "success") {
+            console.error(`Failed to save noon medicine ${item["medicine_id"]}:`, result);
+          }
+        } catch (error) {
+          console.error(`Error sending noon medicine ${item["medicine_id"]}:`, error);
+          results.push({
+            success: false,
+            period: item["period"],
+            medicine_id: item["medicine_id"],
+            error: error.message
+          });
+        }
+      }
+
+      // Process evening medicines
+      for (const item of payload_E) {
+        try {
+          const response = await fetch(`${API_BASE_URL}/patients/`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              "patient_id": item["patient_id"],
+              "email": item["email"],
+              "type": item["type"],
+              "medicine_id": item["medicine_id"],
+              "period": item["period"],
+              "today_date": item["today_date"]
+            })
+          });
+          
+          const result = await response.json();
+          results.push({
+            success: result.status === "success",
+            period: item["period"],
+            medicine_id: item["medicine_id"],
+            response: result
+          });
+          
+          if (result.status !== "success") {
+            console.error(`Failed to save evening medicine ${item["medicine_id"]}:`, result);
+          }
+        } catch (error) {
+          console.error(`Error sending evening medicine ${item["medicine_id"]}:`, error);
+          results.push({
+            success: false,
+            period: item["period"],
+            medicine_id: item["medicine_id"],
+            error: error.message
+          });
+        }
+      }
+
+      // Separate results by period
+      const morningResults = results.filter(r => r.period === "morning");
+      const noonResults = results.filter(r => r.period === "noon");
+      const eveningResults = results.filter(r => r.period === "evening");
+
+      const morningSuccess = morningResults.every(r => r.success);
+      const noonSuccess = noonResults.every(r => r.success);
+      const eveningSuccess = eveningResults.every(r => r.success);
+
+      // Log failed requests for debugging
+      const failedRequests = results.filter(r => !r.success);
+      if (failedRequests.length > 0) {
+        console.error("Failed medicine submissions:", failedRequests);
+        failedRequests.forEach(failed => {
+          console.error(`Failed: Period=${failed.period}, Medicine=${failed.medicine_id}, Error=`, failed.error || failed.response);
+        });
+      }
+
+      // Update state only for successful requests
+      if (morningSuccess) {
+        setTakenMeds_M(prev => new Set([...prev, ...selectedGivenMeds_M]));
+        setSelectedGivenMeds_M(new Set());
+      }
+      if (noonSuccess) {
+        setTakenMeds_N(prev => new Set([...prev, ...selectedGivenMeds_N]));
+        setSelectedGivenMeds_N(new Set());
+      }
+      if (eveningSuccess) {
+        setTakenMeds_E(prev => new Set([...prev, ...selectedGivenMeds_E]));
+        setSelectedGivenMeds_E(new Set());
+      }
+
+      // Show appropriate message
+      if (morningSuccess && noonSuccess && eveningSuccess) {
+        window.alert("Tüm ilaçlar başarıyla kaydedildi.");
+      } else {
+        const failedPeriods = [];
+        if (!morningSuccess) failedPeriods.push("Sabah");
+        if (!noonSuccess) failedPeriods.push("Öğlen");
+        if (!eveningSuccess) failedPeriods.push("Akşam");
+        
+        window.alert(
+          `Bazı ilaçlar kaydedilemedi:\n${failedPeriods.join(", ")}\n\n` +
+          `Başarılı: Sabah=${morningSuccess ? "✓" : "✗"}, Öğlen=${noonSuccess ? "✓" : "✗"}, Akşam=${eveningSuccess ? "✓" : "✗"}\n\n` +
+          `Lütfen konsolu kontrol edin ve tekrar deneyin.`
+        );
+      }
+    } catch (error) {
+      console.error("Error submitting medicines:", error);
+      window.alert("İlaçlar kaydedilirken bir hata oluştu. Lütfen tekrar deneyin.");
     }
   };
 
@@ -715,11 +872,13 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
                                 <td>{medicine["category"]}</td>
                                 <td>{medicine["period"]}</td>
                                 <td style={{"borderRight": "None"}}>
-                                  <input
-                                    type="checkbox"
+                                  <Checkbox
                                     disabled={isTaken}
                                     checked={isTaken || isSelected}
                                     onChange={() => handleGivenChange_M(medicine.id)}
+                                    icon={<PlaylistAddRoundedIcon />}
+                                    checkedIcon={<PlaylistAddCheckCircleIcon />}
+                                    color="success"
                                   />
                                 </td>
                               </tr>);
@@ -736,11 +895,13 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
                                 <td>{medicine["category"]}</td>
                                 <td>{medicine["period"]}</td>
                                 <td style={{"borderRight": "None"}}>
-                                  <input
-                                    type="checkbox"
+                                  <Checkbox
                                     disabled={isTaken}
                                     checked={isTaken || isSelected}
                                     onChange={() => handleGivenChange_N(medicine.id)}
+                                    icon={<PlaylistAddRoundedIcon />}
+                                    checkedIcon={<PlaylistAddCheckCircleIcon />}
+                                    color="success"
                                   />
                                 </td>
                               </tr>);
@@ -757,11 +918,13 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
                                 <td>{medicine["category"]}</td>
                                 <td>{medicine["period"]}</td>
                                 <td style={{"borderRight": "None"}}>
-                                  <input
-                                    type="checkbox"
+                                  <Checkbox
                                     disabled={isTaken}
                                     checked={isTaken || isSelected}
                                     onChange={() => handleGivenChange_E(medicine.id)}
+                                    icon={<PlaylistAddRoundedIcon />}
+                                    checkedIcon={<PlaylistAddCheckCircleIcon />}
+                                    color="success"
                                   />
                                 </td>
                               </tr>);
