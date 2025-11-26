@@ -57,15 +57,50 @@ const convertDjangoDateToISO = (djangoDate) => {
 
 // Format date for display
 const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  const options = { day: 'numeric', month: 'long', year: 'numeric' };
-  return date.toLocaleDateString('tr-TR', options);
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      // Try parsing as Django date format
+      if (dateString.includes('-')) {
+        const parts = dateString.split('-');
+        if (parts.length === 3) {
+          const [day, month, year] = parts;
+          const fullYear = year.length === 2 ? '20' + year : year;
+          const dateObj = new Date(`${fullYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`);
+          if (!isNaN(dateObj.getTime())) {
+            const options = { day: 'numeric', month: 'long', year: 'numeric' };
+            return dateObj.toLocaleDateString('tr-TR', options);
+          }
+        }
+      }
+      return dateString; // Return as-is if can't parse
+    }
+    const options = { day: 'numeric', month: 'long', year: 'numeric' };
+    return date.toLocaleDateString('tr-TR', options);
+  } catch (e) {
+    return dateString;
+  }
 };
 
 // Format time for display
 const formatTime = (dateString) => {
-  const date = new Date(dateString);
-  return date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      // Try parsing timestamp format like "Tue Apr 23 2024 01:53:24 GMT+0300"
+      if (dateString.includes('GMT')) {
+        const cleaned = dateString.split(' GMT')[0];
+        const parsed = new Date(cleaned);
+        if (!isNaN(parsed.getTime())) {
+          return parsed.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+        }
+      }
+      return ''; // Return empty if can't parse
+    }
+    return date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+  } catch (e) {
+    return '';
+  }
 };
 
 const Dashboard = () => {
@@ -75,6 +110,12 @@ const Dashboard = () => {
     const [weeklyHistory, setWeeklyHistory] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+    const type_map = {
+        "note": "Not",
+        "hc": "Bakım Raporu",
+        "medicine": "İ̇laç Raporu"
+    }
 
     useEffect(() => {
         if (user.email) {
@@ -184,9 +225,12 @@ const Dashboard = () => {
                     const periodNames = { morning: 'Sabah', noon: 'Öğlen', evening: 'Akşam' };
                     const givenDates = medData.medicine_data?.given_dates?.[period] || {};
                     
-                    Object.keys(givenDates).forEach(dateKey => {
-                        // Check if dateKey is in Django format or ISO format
+                    Object.entries(givenDates).forEach(([dateKey, givenValue]) => {
+                        // Handle both old format (boolean) and new format (object with timestamp)
+                        let timestamp = null;
                         let dateStr = null;
+                        
+                        // Check if dateKey is in Django format or ISO format
                         if (last7DaysDjangoSet.has(dateKey)) {
                             // It's in Django format, convert to ISO
                             dateStr = convertDjangoDateToISO(dateKey);
@@ -194,9 +238,18 @@ const Dashboard = () => {
                             dateStr = dateKey;
                         }
                         
-                        if (dateStr && last7DaysSet.has(dateStr)) {
+                        // Extract timestamp from given value
+                        if (typeof givenValue === 'object' && givenValue !== null && givenValue.timestamp) {
+                            // New format with timestamp
+                            timestamp = givenValue.timestamp;
+                        } else if (givenValue === true || (typeof givenValue === 'object' && givenValue.given)) {
+                            // Old format (boolean) or new format object without timestamp - use date with default time
+                            timestamp = new Date(dateStr + 'T12:00:00').toISOString();
+                        }
+                        
+                        if (dateStr && last7DaysSet.has(dateStr) && timestamp) {
                             history.push({
-                                timestamp: new Date(dateStr + 'T12:00:00').toISOString(),
+                                timestamp: timestamp,
                                 date: dateStr,
                                 patientName: patientName,
                                 type: 'medicine',
@@ -222,15 +275,23 @@ const Dashboard = () => {
                     Object.entries(hcData).forEach(([hcType, hcEntries]) => {
                         if (Array.isArray(hcEntries)) {
                             hcEntries.forEach(entry => {
-                                if (entry.timestamp || entry.note_date) {
-                                    const entryTimestamp = entry.timestamp || entry.note_date;
+                                // HC reports use insert_ts field for timestamp
+                                const entryTimestamp = entry.insert_ts || entry.timestamp || entry.note_date;
+                                if (entryTimestamp) {
+                                    // Map HC type to Turkish name
+                                    const hcTypeNames = {
+                                        'day': 'Gündüz Bakım',
+                                        'night': 'Gece Bakım'
+                                    };
+                                    const hcTypeName = hcTypeNames[hcType] || hcType;
+                                    
                                     history.push({
                                         timestamp: entryTimestamp,
                                         date: dateStr,
                                         patientName: patientName,
                                         type: 'hc',
-                                        message: `${patientName}'in ${hcType} raporu güncellendi.`,
-                                        fullMessage: entry.note_data || ''
+                                        message: `${patientName}'in ${hcTypeName} raporu güncellendi.`,
+                                        fullMessage: entry.signed_hc_data ? JSON.stringify(entry.signed_hc_data) : ''
                                     });
                                 }
                             });
@@ -348,17 +409,23 @@ const Dashboard = () => {
                         ) : weeklyHistory.length === 0 ? (
                             <div className="dashboard-history-empty">Henüz kayıt yok</div>
                         ) : (
-                            weeklyHistory.map((entry, index) => (
-                                <div key={index} className="dashboard-history-item">
-                                    <div className="dashboard-history-header">
-                                        <span className="dashboard-history-name">{entry.patientName}</span>
-                                        <span className="dashboard-history-time">
-                                            {formatTime(entry.timestamp)} - {formatDate(entry.date)}
-                                        </span>
+                            weeklyHistory.map((entry, index) => {
+                                const timestamp = entry.timestamp;
+                                const timeStr = formatTime(timestamp);
+                                const dateStr = formatDate(timestamp);
+                                
+                                return (
+                                    <div key={index} className="dashboard-history-item">
+                                        <div className="dashboard-history-header">
+                                            <span className="dashboard-history-name">{type_map[entry.type]}: {entry.patientName}</span>
+                                            <span className="dashboard-history-time">
+                                                {timeStr && dateStr ? `${timeStr}, ${dateStr}` : dateStr || timestamp}
+                                            </span>
+                                        </div>
+                                        <div className="dashboard-history-message">{entry.message}</div>
                                     </div>
-                                    <div className="dashboard-history-message">{entry.message}</div>
-                                </div>
-                            ))
+                                );
+                            })
                         )}
                     </div>
                 </div>

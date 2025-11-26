@@ -324,9 +324,14 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
 
         for (var key in selectedPatientNew.patient_medicines) {
           var medicine = selectedPatientNew.patient_medicines[key];
-          if (dict_key in medicine["medicine_data"]["given_dates"]["morning"]) values_M.push(medicine["medicine_id"])
-          if (dict_key in medicine["medicine_data"]["given_dates"]["noon"]) values_N.push(medicine["medicine_id"])
-          if (dict_key in medicine["medicine_data"]["given_dates"]["evening"]) values_E.push(medicine["medicine_id"])
+          // Handle both old format (boolean) and new format (object with timestamp)
+          const morningGiven = medicine["medicine_data"]["given_dates"]["morning"][dict_key];
+          const noonGiven = medicine["medicine_data"]["given_dates"]["noon"][dict_key];
+          const eveningGiven = medicine["medicine_data"]["given_dates"]["evening"][dict_key];
+          
+          if (morningGiven && (typeof morningGiven === 'object' ? morningGiven.given : true)) values_M.push(medicine["medicine_id"])
+          if (noonGiven && (typeof noonGiven === 'object' ? noonGiven.given : true)) values_N.push(medicine["medicine_id"])
+          if (eveningGiven && (typeof eveningGiven === 'object' ? eveningGiven.given : true)) values_E.push(medicine["medicine_id"])
         }
         setTakenMeds_M(new Set(values_M))
         setTakenMeds_N(new Set(values_N))
@@ -351,7 +356,10 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
               fullness: record.medicine_data.fullness_options[period],
               days: record.medicine_data.selected_days[period],
               period: periodMap[period],
-              given: getTodayForDjango() in record.medicine_data.given_dates[period],
+              given: (() => {
+                const givenDateValue = record.medicine_data.given_dates[period][getTodayForDjango()];
+                return givenDateValue ? (typeof givenDateValue === 'object' ? givenDateValue.given : true) : false;
+              })(),
           });
 
           if (record.medicine_data.selected_periods.morning && record.medicine_data.selected_days.morning.includes(today)) m.push(buildEntry("morning"));

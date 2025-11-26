@@ -411,7 +411,7 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
 <div className="divider" />
 
 <Box>
-  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+  <Box sx={{ display: "flex", alignItems: "center", gap: 2, p: 1 }}>
     <Box className="medication-tabs">
       <button
         className={`medication-tab ${activeTab === 'all' ? 'active' : ''}`}

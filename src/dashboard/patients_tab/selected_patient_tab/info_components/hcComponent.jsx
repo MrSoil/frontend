@@ -454,7 +454,7 @@ function HCList({ selectedPatient, setNewHCContainer, hcDate, setHcDate }) {
 
   return (
     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', borderRadius: '24px' }}>
-      <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 2 }}>
+      <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 3 }}>
         <Typography variant="h5" sx={{ fontWeight: 700, mb: 1, fontFamily: 'RedHatDisplay' }}>
           Bakım Raporları
         </Typography>
@@ -495,7 +495,7 @@ function HCList({ selectedPatient, setNewHCContainer, hcDate, setHcDate }) {
 
         <Divider sx={{ mb: 1 }} />
 
-        <Box sx={{ flexGrow: 1, overflow: 'auto', height: '180px' }}>
+        <Box sx={{ flexGrow: 1, overflow: 'auto', height: '170px' }}>
           <List sx={{ p: 0 }}>
             {daysInWeek.map((day, index) => (
               <React.Fragment key={index}>
@@ -551,6 +551,7 @@ function HCList({ selectedPatient, setNewHCContainer, hcDate, setHcDate }) {
         <Divider sx={{ my: 0 }} />
 
         <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, pt: 1 }}>
+          <div style={{"minWidth": "124px"}}></div>
           <Button
             variant="outlined"
             onClick={handleExportExcel}

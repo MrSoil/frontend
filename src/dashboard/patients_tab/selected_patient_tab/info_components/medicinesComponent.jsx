@@ -185,9 +185,13 @@ function MedicineList({ selectedPatient, setNewMedicineContainer, medicinesDate,
                   medicineData.selected_days && medicineData.selected_days[period] && 
                   medicineData.selected_days[period].includes(dayName)) {
                 
-                const given = medicineData.given_dates && 
-                             medicineData.given_dates[period] && 
-                             dateKey in medicineData.given_dates[period] ? "Evet" : "Hayır";
+                // Handle both old format (boolean) and new format (object with timestamp)
+                const givenDateValue = medicineData.given_dates && 
+                                      medicineData.given_dates[period] && 
+                                      medicineData.given_dates[period][dateKey];
+                const given = givenDateValue ? 
+                    (typeof givenDateValue === 'object' ? (givenDateValue.given ? "Evet" : "Hayır") : "Evet") : 
+                    "Hayır";
                 
                 dayMedicines.push({
                   "İlaç Adı": medicineData.name || "",
@@ -282,7 +286,7 @@ function MedicineList({ selectedPatient, setNewMedicineContainer, medicinesDate,
 
   return (
     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', borderRadius: '24px' }}>
-      <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 2 }}>
+      <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 3 }}>
         <Typography variant="h5" sx={{ fontWeight: 700, mb: 1, fontFamily: 'RedHatDisplay' }}>
           Sağlık Raporları
         </Typography>
@@ -323,7 +327,7 @@ function MedicineList({ selectedPatient, setNewMedicineContainer, medicinesDate,
 
         <Divider sx={{ mb: 1 }} />
 
-        <Box sx={{ flexGrow: 1, overflow: 'auto', height: '180px' }}>
+        <Box sx={{ flexGrow: 1, overflow: 'auto', height: '170px' }}>
           <List sx={{ p: 0 }}>
             {daysInWeek.map((day, index) => (
               <React.Fragment key={index}>
