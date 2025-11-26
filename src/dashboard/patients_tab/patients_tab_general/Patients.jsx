@@ -122,6 +122,20 @@ function Patients({ setGeneralTab, setSelectedPatient, setPatientsList }) {
     getPatients(user.email);
     }, [user.email]);
 
+  // Calculate unique floors from patients
+  const getFloorsWithPatients = () => {
+    const floorsWithPatients = new Set();
+    patients.forEach(patient => {
+      const room = patient.patient_personal_info?.section_1?.patientRoom;
+      const floor = getFloorFromRoom(room);
+      if (floor) {
+        floorsWithPatients.add(floor);
+      }
+    });
+    return Array.from(floorsWithPatients).sort((a, b) => a - b);
+  };
+
+  const sortedFloors = getFloorsWithPatients();
 
   if (isLoading) {
 
@@ -156,7 +170,7 @@ function Patients({ setGeneralTab, setSelectedPatient, setPatientsList }) {
               >
                 Tümü
               </div>
-              {[1, 2, 3, 4].map((floor) => (
+              {sortedFloors.map((floor) => (
                 <div
                   key={floor}
                   className={`floor-selector-option ${floorFilter && parseInt(floorFilter) === floor ? 'active' : ''}`}

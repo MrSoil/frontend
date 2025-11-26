@@ -155,13 +155,18 @@ const Dashboard = () => {
     };
 
     const processCareTags = (patientsData) => {
-        const tagsByFloor = { 1: {}, 2: {}, 3: {}, 4: {} };
+        const tagsByFloor = {};
         
         patientsData.forEach(patient => {
             const room = patient.patient_personal_info?.section_1?.patientRoom;
             const floor = getFloorFromRoom(room);
             
-            if (floor && floor >= 1 && floor <= 4) {
+            if (floor) {
+                // Initialize floor object if it doesn't exist
+                if (!tagsByFloor[floor]) {
+                    tagsByFloor[floor] = {};
+                }
+                
                 const onGoingCare = patient.patient_personal_info?.section_3?.onGoingCare || [];
                 
                 onGoingCare.forEach(careType => {
@@ -331,10 +336,20 @@ const Dashboard = () => {
         navigate(`/dashboard/patients?floor=${floorNumber}`);
     };
 
-    const handleCareTagClick = (floor, careType) => {
-        // Navigate to patients page with floor filter
-        navigate(`/dashboard/patients?floor=${floor}`);
+    // Calculate unique floors from patients
+    const getFloorsWithPatients = () => {
+        const floorsWithPatients = new Set();
+        patients.forEach(patient => {
+            const room = patient.patient_personal_info?.section_1?.patientRoom;
+            const floor = getFloorFromRoom(room);
+            if (floor) {
+                floorsWithPatients.add(floor);
+            }
+        });
+        return Array.from(floorsWithPatients).sort((a, b) => a - b);
     };
+
+    const sortedFloors = getFloorsWithPatients();
 
     return (
         <div className="dashboard-content-background">
@@ -352,40 +367,30 @@ const Dashboard = () => {
                         </button>
                     </div>
                     <div className="dashboard-card-floors">
-                        {[1, 2, 3, 4].map(floor => (
-                            <button 
-                                key={floor}
-                                className="dashboard-floor-button"
-                                onClick={() => handleFloorNavigation(floor)}
-                            >
-                                Kat {floor}
-                            </button>
-                        ))}
-                    </div>
-                    <div className="dashboard-care-tags-container">
-                        {[1, 2, 3, 4].map(floor => {
+                        {sortedFloors.map(floor => {
                             const floorTags = careTagsByFloor[floor] || {};
                             const tagEntries = Object.entries(floorTags);
                             
-                            if (tagEntries.length === 0) return null;
-                            
                             return (
-                                <div key={floor} className="dashboard-floor-tags-section">
-                                    <div className="dashboard-floor-tags-header">Kat {floor}</div>
-                                    <div className="dashboard-floor-tags">
-                                        {tagEntries.map(([careType, count]) => (
-                                            <button
-                                                key={careType}
-                                                className="dashboard-care-tag"
-                                                onClick={() => handleCareTagClick(floor, careType)}
-                                            >
-                                                {/*<span className="care-tag-prefix">01</span>*/}
-                                                <span className="care-tag-text">{careType}</span>
-                                                <span className="care-tag-count">{count}</span>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
+                                <button 
+                                    key={floor}
+                                    className="dashboard-floor-button"
+                                    onClick={() => handleFloorNavigation(floor)}
+                                >
+                                    <span className="dashboard-floor-button-label">Kat {floor}</span>
+                                    {tagEntries.length > 0 && (
+                                        <div className="dashboard-floor-button-tags">
+                                            {tagEntries.map(([careType, count]) => (
+                                                <span
+                                                    key={careType}
+                                                    className="dashboard-floor-button-tag"
+                                                >
+                                                    {careType} ({count})
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+                                </button>
                             );
                         })}
                     </div>
