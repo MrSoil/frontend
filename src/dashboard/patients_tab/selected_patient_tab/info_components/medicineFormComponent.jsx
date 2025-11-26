@@ -723,7 +723,7 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
             <PersonInfo
               patientPhoto={selectedPatient.patient_personal_info.section_1.image}
               name={selectedPatient.patient_personal_info.section_1.firstname}
-              surname={selectedPatient.patient_personal_info.section_1.last_name}
+              surname={selectedPatient.patient_personal_info.section_1.lastname}
               gender={selectedPatient.patient_personal_info.section_1.patientGender}
               age={selectedPatient.patient_personal_info.section_1.dateOfBirth}
               bloodType={selectedPatient.patient_personal_info.section_1.bloodType.toUpperCase()}
