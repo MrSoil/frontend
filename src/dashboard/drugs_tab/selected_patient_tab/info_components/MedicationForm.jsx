@@ -4,7 +4,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import { API_BASE_URL } from "../../../../config";
 
-const MedicationForm = ({setSelectedPatient, selectedPatient, newMedicineContainer, setNewMedicineContainer}) => {
+const MedicationForm = ({setSelectedPatient, selectedPatient, newMedicineContainer, setNewMedicineContainer, editingMedicine, setEditingMedicine}) => {
   const user = JSON.parse(localStorage.getItem("user"));
   const [isLoading, setIsLoading] = useState(true);
 
@@ -51,6 +51,8 @@ const [fullnessOptions, setFullnessOptions] = useState({
     evening: 0,
   });
 
+  const [endDate, setEndDate] = useState("");
+
   const toggleDay = (period, day) => {
     setSelectedDays((prev) => {
       const days = prev[period];
@@ -85,44 +87,62 @@ const [fullnessOptions, setFullnessOptions] = useState({
   };
 
   const handleSubmit = () => {
+    const medicineData = {
+      "name": selectedMedicineName,
+      "category": selectedMedicineCategory,
+      "selected_periods": selectedPeriod,
+      "selected_days": selectedDays,
+      "fullness_options": fullnessOptions,
+      "medicine_dosage": medicineDosage
+    };
+
+    // Add end_date if provided
+    if (endDate) {
+      medicineData.end_date = endDate;
+    }
+
+    const requestType = editingMedicine ? 'update_scheduled_medicine' : 'add_scheduled_medicine';
+    const requestBody = {
+      'email': user.email,
+      'type': requestType,
+      'patient_id': selectedPatient["patient_id"],
+      'medicine_data': medicineData
+    };
+
+    // Add medicine_id if editing
+    if (editingMedicine) {
+      requestBody.medicine_id = editingMedicine.medicine_id;
+    }
+
     fetch(`${API_BASE_URL}/patients/`, {
-    method: "PUT",
-    headers: {
+      method: "PUT",
+      headers: {
         'Content-Type': 'application/json'
       },
-    body: JSON.stringify(
-        {'email': user.email,
-                'type': 'add_scheduled_medicine',
-                'patient_id': selectedPatient["patient_id"],
-                'medicine_data': {
-                    "name": selectedMedicineName,
-                    "category": selectedMedicineCategory,
-                    "selected_periods": selectedPeriod,
-                    "selected_days": selectedDays,
-                    "fullness_options": fullnessOptions,
-                    "medicine_dosage": medicineDosage
-            }
-        })
+      body: JSON.stringify(requestBody)
     })
     .then(response => response.json())
     .then(data => {
-    if ('success' === data['status']) {
-        window.alert("İlaç Sisteme Başarıyla Eklendi!")
+      if ('success' === data['status']) {
+        window.alert(editingMedicine ? "İlaç Başarıyla Güncellendi!" : "İlaç Sisteme Başarıyla Eklendi!")
         // Update patient data first, then close the form
         updateSelectedPatient(user.email).then(() => {
           handleCancel()
         })
-    } else {
-        window.alert("İlaç Sisteme Eklenemedi!")
-    }
+      } else {
+        window.alert(editingMedicine ? "İlaç Güncellenemedi!" : "İlaç Sisteme Eklenemedi!")
+      }
     })
     .catch(error => {
-    console.error('Error:', error);
-    window.alert("İlaç Sisteme Eklenemedi!");
+      console.error('Error:', error);
+      window.alert(editingMedicine ? "İlaç Güncellenemedi!" : "İlaç Sisteme Eklenemedi!");
     });
   };
 
   const handleCancel = () => {
+    if (setEditingMedicine) {
+      setEditingMedicine(null);
+    }
     setNewMedicineContainer(false)
   };
 
@@ -185,6 +205,68 @@ const [fullnessOptions, setFullnessOptions] = useState({
     getSystemMedicineList(user.email);
     }, [selectedPatient]);
 
+  // Pre-fill form when editing
+  useEffect(() => {
+    if (editingMedicine && editingMedicine.medicine_data) {
+      const medData = editingMedicine.medicine_data;
+      setSelectedMedicineCategory(medData.category || "");
+      setSelectedMedicineName(medData.name || "");
+      
+      // Set periods
+      if (medData.selected_periods) {
+        setSelectedPeriod({
+          morning: medData.selected_periods.morning || false,
+          noon: medData.selected_periods.noon || false,
+          evening: medData.selected_periods.evening || false,
+        });
+      }
+      
+      // Set days, dosage, and fullness for each period
+      if (medData.selected_days) {
+        setSelectedDays({
+          morning: medData.selected_days.morning || [],
+          noon: medData.selected_days.noon || [],
+          evening: medData.selected_days.evening || [],
+        });
+      }
+      
+      if (medData.medicine_dosage) {
+        setMedicineDosage({
+          morning: medData.medicine_dosage.morning || 0,
+          noon: medData.medicine_dosage.noon || 0,
+          evening: medData.medicine_dosage.evening || 0,
+        });
+      }
+      
+      if (medData.fullness_options) {
+        setFullnessOptions({
+          morning: medData.fullness_options.morning || "",
+          noon: medData.fullness_options.noon || "",
+          evening: medData.fullness_options.evening || "",
+        });
+      }
+      
+      // Set end date if exists
+      if (medData.end_date) {
+        setEndDate(medData.end_date);
+      }
+      
+      // Update medicine names when category is set (only if systemMedicines is loaded)
+      if (medData.category && systemMedicines.length > 0) {
+        handleMedicineCategory(medData.category);
+      }
+    } else {
+      // Reset form when not editing
+      setSelectedMedicineCategory("");
+      setSelectedMedicineName("");
+      setSelectedPeriod({ morning: false, noon: false, evening: false });
+      setSelectedDays({ morning: [], noon: [], evening: [] });
+      setMedicineDosage({ morning: 0, noon: 0, evening: 0 });
+      setFullnessOptions({ morning: "", noon: "", evening: "" });
+      setEndDate("");
+    }
+  }, [editingMedicine, systemMedicines]);
+
   if (isLoading) {
    return (
     <Box sx={{ display: 'flex' }}>
@@ -195,7 +277,7 @@ const [fullnessOptions, setFullnessOptions] = useState({
 
   return (
     <div className="medication-form">
-      <h2>Kişiye İlaç Tanımla</h2>
+      <h2>{editingMedicine ? "İlaç Düzenle" : "Kişiye İlaç Tanımla"}</h2>
       <div className="divider" />
 
       <div className="form-group">
@@ -278,10 +360,22 @@ const [fullnessOptions, setFullnessOptions] = useState({
         );
       })}
       </div>
+      <div className="divider" style={{"marginBottom": "15px"}}/>
+      <div className="form-group">
+        <div className="form-ingroup" style={{"paddingRight": "10px"}}>
+          <label>Bitiş Tarihi (Opsiyonel)</label>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            style={{width: "100%", padding: "8px"}}
+          />
+        </div>
+      </div>
       <div className="divider" style={{"marginTop": "20px"}}/>
       <div className="form-actions">
         <button className="cancel-button" onClick={handleCancel}>İptal Et</button>
-        <button className="save-button" onClick={handleSubmit}>Kaydet</button>
+        <button className="save-button" onClick={handleSubmit}>{editingMedicine ? "Güncelle" : "Kaydet"}</button>
       </div>
     </div>
   );

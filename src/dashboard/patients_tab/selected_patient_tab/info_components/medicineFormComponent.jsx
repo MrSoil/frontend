@@ -504,7 +504,20 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
         const today     = daysShort[new Date(medicinesDate).getDay()];
 
         const m = [], n = [], e = [];
+        const todayDate = new Date();
+        todayDate.setHours(0, 0, 0, 0); // Reset time for date comparison
+        
         Object.entries(meds).forEach(([medId, record]) => {
+          // Check if medicine has end_date and if it's in the past
+          if (record.medicine_data.end_date) {
+            const endDate = new Date(record.medicine_data.end_date);
+            endDate.setHours(0, 0, 0, 0);
+            // Skip medicines that have passed their end date
+            if (todayDate > endDate) {
+              return; // Skip this medicine
+            }
+          }
+          
           const buildEntry = (period) => ({
               id: medId,
               name: record.medicine_data.name,

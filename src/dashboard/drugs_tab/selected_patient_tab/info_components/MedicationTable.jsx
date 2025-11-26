@@ -6,6 +6,7 @@ import PlaylistAddRoundedIcon from '@mui/icons-material/PlaylistAddRounded';
 import PlaylistAddCheckCircleIcon from '@mui/icons-material/PlaylistAddCheckCircle';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import CancelIcon from '@mui/icons-material/Cancel';
+import EditIcon from '@mui/icons-material/Edit';
 
 import CircularProgress from '@mui/material/CircularProgress';
 import {
@@ -15,6 +16,7 @@ Box,
 Typography,
 Button,
 Checkbox,
+IconButton,
 } from '@mui/material';
 
 const theme = createTheme({
@@ -75,7 +77,7 @@ function reformatDjangoDate(djangoDateString) {
   return `${dd}-${mm}-${yy}`;
 }
 
-const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedPatient, setNewSystemMedicineContainer}) => {
+const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedPatient, setNewSystemMedicineContainer, setEditingMedicine}) => {
   const user = JSON.parse(localStorage.getItem("user"));
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState([]);
@@ -108,7 +110,15 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
 
   const handleAddMedicineSystem = (index) => {
     setNewSystemMedicineContainer(true)
+  };
 
+  const handleEditMedicine = (medicineId) => {
+    // Find the full medicine object from patient_medicines
+    const medicine = selectedPatient.patient_medicines[medicineId];
+    if (medicine) {
+      setEditingMedicine({...medicine, medicine_id: medicineId});
+      setNewMedicineContainer(true);
+    }
   };
 
    const handlePrepareChange = medId => {
@@ -224,32 +234,51 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
     }
   };
 
-  const submitMeds = async () => {
-    if (
-      selectedPreparedMeds.size === 0 &&
-      selectedPreparedMedsDelete.size === 0
-    ) {
-      window.alert("İşlem yapılacak ilaç seçilmedi.");
+  const submitPreparedMeds = async () => {
+    if (selectedPreparedMeds.size === 0) {
+      window.alert("Hazır olarak işaretlenecek ilaç seçilmedi.");
       return;
     }
 
     const confirmed = window.confirm(
-      "Seçili ilaçlar için değişiklikleri kaydetmek istiyor musunuz?"
+      `Seçili ${selectedPreparedMeds.size} ilaç hazır olarak işaretlenecek. Devam etmek istiyor musunuz?`
     );
     if (!confirmed) {
       return;
     }
 
     setIsLoading(true);
+    const success = await submitGivenMeds();
+    
+    if (success) {
+      window.alert("Seçili ilaçlar hazır olarak işaretlendi.");
+      updateSelectedPatient(user.email);
+    } else {
+      window.alert(
+        "İşlem sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin."
+      );
+      setIsLoading(false);
+    }
+  };
 
-    const [givenOk, deletedOk] = await Promise.all([
-      submitGivenMeds(),
-      submitDeletedMeds(),
-    ]);
+  const submitDeletedMedsHandler = async () => {
+    if (selectedPreparedMedsDelete.size === 0) {
+      window.alert("Silinecek ilaç seçilmedi.");
+      return;
+    }
 
-    if (givenOk && deletedOk) {
-      window.alert("Seçili ilaçlar için değişiklikler başarıyla kaydedildi.");
-      // Refresh the patient data to show updated medications
+    const confirmed = window.confirm(
+      `Seçili ${selectedPreparedMedsDelete.size} ilaç silinecek. Bu işlem geri alınamaz. Devam etmek istiyor musunuz?`
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    setIsLoading(true);
+    const success = await submitDeletedMeds();
+    
+    if (success) {
+      window.alert("Seçili ilaçlar başarıyla silindi.");
       updateSelectedPatient(user.email);
     } else {
       window.alert(
@@ -538,21 +567,31 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
                   ))}
                 </td>
                 <td style={{ borderRight: "None" }}>
+                  <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                    <IconButton
+                      size="small"
+                      onClick={() => handleEditMedicine(entry.id)}
+                      color="primary"
+                      title="Düzenle"
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
                     <Checkbox
-                    disabled={isPrepared}
-                    checked={isPrepared || isSelected}
-                    onChange={() => handlePrepareChange(entry.id)}
-                    color="success"
-                    icon={<PlaylistAddRoundedIcon />}
-                    checkedIcon={<PlaylistAddCheckCircleIcon />}
+                      disabled={isPrepared}
+                      checked={isPrepared || isSelected}
+                      onChange={() => handlePrepareChange(entry.id)}
+                      color="success"
+                      icon={<PlaylistAddRoundedIcon />}
+                      checkedIcon={<PlaylistAddCheckCircleIcon />}
                     />
                     <Checkbox
-                    checked={isSelectedDelete}
-                    onChange={() => handlePrepareDeleteChange(entry.id)}
-                    color="error"
-                    icon={< CancelOutlinedIcon/>}
-                    checkedIcon={<CancelIcon />}
+                      checked={isSelectedDelete}
+                      onChange={() => handlePrepareDeleteChange(entry.id)}
+                      color="error"
+                      icon={<CancelOutlinedIcon/>}
+                      checkedIcon={<CancelIcon />}
                     />
+                  </Box>
                 </td>
               </tr>
             );
@@ -562,9 +601,26 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
     </div>
 
     <div className="divider" />
-    <Button className="Button" variant="contained" color="primary" onClick={submitMeds}>
-      İmza
-    </Button>
+    <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+      <Button 
+        className="Button" 
+        variant="contained" 
+        color="primary" 
+        onClick={submitPreparedMeds}
+        disabled={selectedPreparedMeds.size === 0}
+      >
+        İmza
+      </Button>
+      <Button 
+        className="Button" 
+        variant="contained" 
+        color="error" 
+        onClick={submitDeletedMedsHandler}
+        disabled={selectedPreparedMedsDelete.size === 0}
+      >
+        Sil
+      </Button>
+    </Box>
   </Box>
 </Box>
 </ThemeProvider> )

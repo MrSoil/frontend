@@ -25,6 +25,7 @@ function SelectedPatientTab({ setSelectedPatient, selectedPatient }) {
     const [newSystemMedicineContainer, setNewSystemMedicineContainer] = useState(false)
     const [newMedicineContainer, setNewMedicineContainer] = useState(false)
     const [medicineTabs, setMedicineTabs] = useState([false, false]);
+    const [editingMedicine, setEditingMedicine] = useState(null);
 
     const [newNoteName, setNewNoteName] = useState("")
     const [newNoteDesc, setNewNoteDesc] = useState("")
@@ -164,7 +165,14 @@ function SelectedPatientTab({ setSelectedPatient, selectedPatient }) {
           {/*          className={"formBox"} />*/}
           {/*      <label>New Care Category</label>*/}
           {/*</div>*/}
-                <MedicationForm setSelectedPatient={setSelectedPatient} selectedPatient={selectedPatient} newMedicineContainer={newMedicineContainer} setNewMedicineContainer={setNewMedicineContainer}></MedicationForm>
+                <MedicationForm 
+                  setSelectedPatient={setSelectedPatient} 
+                  selectedPatient={selectedPatient} 
+                  newMedicineContainer={newMedicineContainer} 
+                  setNewMedicineContainer={setNewMedicineContainer}
+                  editingMedicine={editingMedicine}
+                  setEditingMedicine={setEditingMedicine}
+                ></MedicationForm>
             </div>
           </div>
           : newSystemMedicineContainer !== false ?
@@ -221,7 +229,13 @@ function SelectedPatientTab({ setSelectedPatient, selectedPatient }) {
       </div>
         <div className="dashboard-drugs-profile-container">
 
-         <MedicationTable setNewMedicineContainer={setNewMedicineContainer} selectedPatient={selectedPatient} setSelectedPatient={setSelectedPatient} setNewSystemMedicineContainer={setNewSystemMedicineContainer} />
+         <MedicationTable 
+           setNewMedicineContainer={setNewMedicineContainer} 
+           selectedPatient={selectedPatient} 
+           setSelectedPatient={setSelectedPatient} 
+           setNewSystemMedicineContainer={setNewSystemMedicineContainer}
+           setEditingMedicine={setEditingMedicine}
+         />
       </div>
 
     </div>
