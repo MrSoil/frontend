@@ -4,7 +4,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { useState, useEffect } from 'react';
 import { API_BASE_URL } from "../../../../config";
 import {
-Icon, Typography, Button, IconButton, Checkbox, FormControlLabel, TextField, FormControl, Select, MenuItem, Box, Accordion, AccordionSummary, AccordionDetails, Dialog, DialogTitle, DialogContent, DialogActions, Tooltip, Chip, Stack,
+Icon, Typography, Button, IconButton, Checkbox, FormControlLabel, TextField, FormControl, Select, MenuItem, Box, Accordion, AccordionSummary, AccordionDetails, Dialog, DialogTitle, DialogContent, DialogActions, Tooltip, Chip, Stack, Switch,
 } from '@mui/material';
 import Close from '@mui/icons-material/Close';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -568,42 +568,16 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
   <div className="blackout"></div>
   <div className="blackout-care-page-container">
     <div className="care-page">
-      <div className="content">
-        <div className="headerHC">
-          <Typography className="TypographyHC" variant="h5">Bakım - Aktif Yaşam</Typography>
-          <Button className="TypographyHC" onClick={handleToggleHcType} aria-pressed={hcType === "night"} variant="outlined" size="small" >
-            {hcType === "day" ? "Gündüz Raporu" : "Gece Raporu"}
-            {hcType === "day" ? <LightModeIcon style={{"marginLeft": "10px"}}/> : <NightlightIcon style={{"marginLeft": "10px"}}/>}
-          </Button>
-
+      {/* New Top Header Design */}
+      <div className="hc-form-top-header">
+        <div className="hc-form-top-left">
+          <Typography className="hc-form-title-main" variant="h5">Bakım</Typography>
+          <Typography className="hc-form-title-sub" variant="body1">Aktif Yaşam</Typography>
         </div>
-      <div className="headerHC" style={{ justifyContent: "center" }}>
-        <Typography className="TypographyHC" variant="h6">
-          {selectedPatient.patient_personal_info.section_1.firstname.capitalize()}{" "}
-          {selectedPatient.patient_personal_info.section_1.lastname.capitalize()}
-        </Typography>
-      </div>
 
-      <div className="headerHC" style={{ justifyContent: "right" }}>
-        <Typography className="TypographyHC" variant="h5">{mydate.toLocaleString(options)}</Typography>
-        <IconButton
-          className="close-button"
-          aria-label="Close alert"
-          type="button"
-          onClick={onCancelCareClick}
-          sx={{ border: "none", backgroundColor: "inherit", cursor: "pointer", m: 0, ml: 0.5, mt: "-2px" }}
-        >
-          <Close />
-        </IconButton>
-      </div>
-    </div>
-
-    <div className="divider"></div>
-    
-    {/* Patient Navigation Arrows */}
-    <div className="patient-navigation-container">
-        <IconButton 
-            className="nav-arrow" 
+        <div className="patient-navigation-container-inherited">
+          <IconButton
+            className="nav-arrow"
             onClick={navigateToPreviousPatient}
             disabled={currentPatientIndex === 0}
             title="Previous Patient"
@@ -614,22 +588,80 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
             <span className="patient-counter">
                 {currentPatientIndex + 1} / {patientsList.length}
             </span>
-            <button 
+            <button
                 className="patient-name-button"
                 onClick={() => setShowPatientSelectionModal(true)}
             >
                 {selectedPatient?.patient_personal_info?.section_1?.firstname} {selectedPatient?.patient_personal_info?.section_1?.lastname}
             </button>
         </div>
-        <IconButton 
-            className="nav-arrow" 
+        <IconButton
+            className="nav-arrow"
             onClick={navigateToNextPatient}
             disabled={currentPatientIndex === patientsList.length - 1}
             title="Next Patient"
         >
             <ArrowCircleRightOutlined sx={{ fontSize: 40 }} />
         </IconButton>
-    </div>
+
+        </div>
+
+        <div className="hc-form-top-right">
+          <div className="hc-form-shift-toggle">
+            <Typography className="hc-form-shift-label" variant="body2">Sabah Vardiyası</Typography>
+            <Switch
+              checked={hcType === "day"}
+              onChange={() => {
+                if (hcType !== "day") {
+                  handleToggleHcType();
+                }
+              }}
+              sx={{
+                '& .MuiSwitch-switchBase.Mui-checked': {
+                  color: '#1976d2',
+                },
+                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                  backgroundColor: '#1976d2',
+                },
+              }}
+            />
+          </div>
+          <div className="hc-form-shift-toggle">
+            <Typography className="hc-form-shift-label" variant="body2">Gece Vardiyası</Typography>
+            <Switch
+              checked={hcType === "night"}
+              onChange={() => {
+                if (hcType !== "night") {
+                  handleToggleHcType();
+                }
+              }}
+              sx={{
+                '& .MuiSwitch-switchBase.Mui-checked': {
+                  color: '#1976d2',
+                },
+                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                  backgroundColor: '#1976d2',
+                },
+              }}
+            />
+          </div>
+          <IconButton
+            className="hc-form-close-button"
+            aria-label="Close"
+            onClick={onCancelCareClick}
+            sx={{ 
+              border: "none", 
+              backgroundColor: "inherit", 
+              cursor: "pointer",
+              ml: 1
+            }}
+          >
+            <Close />
+          </IconButton>
+        </div>
+      </div>
+
+    <div className="divider"></div>
 
     <div className="content">
       <div className="care-column"> {/* Hijyen Gereksinimleri */}
@@ -933,34 +965,43 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
           <Typography className="TypographyHC" variant="body2">
             Kontrol Eden Hemşire: {user.email}
           </Typography>
-
-          <div
-            style={{
-              display: "inline-flex",
-              width: "100%",
-              justifyContent: "center",
-            }}
-          >
-            <Button
-              className="Button"
-              variant="contained"
-              sx={{ backgroundColor: "#A695CC", mr: 1 }}
-              onClick={submitSignedHC}
-            >
-              İmza
-            </Button>
-            <Button
-              className="Button"
-              variant="contained"
-              sx={{ backgroundColor: "#E77169" }}
-              onClick={onCancelCareClick}
-            >
-              Geri
-            </Button>
-          </div>
         </div>
       </div>
     </div>
+      <div className="divider"></div>
+      {/* Bottom Buttons Container - Outside the cards */}
+      <div className="hc-form-bottom-buttons-container">
+        <Button
+          className="hc-form-cancel-button"
+          variant="outlined"
+          onClick={onCancelCareClick}
+          sx={{
+            borderColor: '#1976d2',
+            color: '#1976d2',
+            backgroundColor: '#FFFFFF',
+            '&:hover': {
+              borderColor: '#1976d2',
+              backgroundColor: '#f5f5f5',
+            },
+          }}
+        >
+          İptal Et
+        </Button>
+        <Button
+          className="hc-form-save-button"
+          variant="contained"
+          onClick={submitSignedHC}
+          sx={{
+            backgroundColor: '#1976d2',
+            color: '#FFFFFF',
+            '&:hover': {
+              backgroundColor: '#1565c0',
+            },
+          }}
+        >
+          Kaydet
+        </Button>
+      </div>
   </div>
 </div>
 <PatientSelectionModal
