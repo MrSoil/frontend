@@ -1,0 +1,79 @@
+.edit-modal-page {
+  padding: 20px 0;
+}
+
+.page-title {
+  font-family: "RedHatDisplay";
+  font-size: 20px;
+  font-weight: 700;
+  color: #343738;
+  margin-bottom: 20px;
+}
+
+.photograph-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.photograph-label {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 150px;
+  border: 2px dashed #D2D2D2;
+  border-radius: 12px;
+  background-color: #F5F5F5;
+  transition: all 0.2s;
+}
+
+.photograph-label:hover {
+  border-color: #A695CC;
+  background-color: #F0F0F0;
+}
+
+.photograph {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.input-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.patienceFormContainer {
+  width: 100%;
+}
+
+/* Dialog content scrollbar styling */
+.MuiDialogContent-root {
+  scrollbar-width: thin;
+  scrollbar-color: #A695CC #F5F5F5;
+}
+
+.MuiDialogContent-root::-webkit-scrollbar {
+  width: 8px;
+}
+
+.MuiDialogContent-root::-webkit-scrollbar-track {
+  background: #F5F5F5;
+  border-radius: 4px;
+}
+
+.MuiDialogContent-root::-webkit-scrollbar-thumb {
+  background: #A695CC;
+  border-radius: 4px;
+}
+
+.MuiDialogContent-root::-webkit-scrollbar-thumb:hover {
+  background: #8B7BA8;
+}
+
