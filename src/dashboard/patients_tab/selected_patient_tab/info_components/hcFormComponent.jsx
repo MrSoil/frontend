@@ -101,7 +101,7 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
   ];
 
   const [expandedCol1, setExpandedCol1] = useState(false); // 'hygiene' | 'meal' | 'posture' | false
-  const [expandedCol2, setExpandedCol2] = useState(false); // 'dressing' | 'edema' | 'security' | 'urine' | false
+  const [expandedCol2, setExpandedCol2] = useState(false); // 'dressing' | 'edema' | 'security' | 'stool' | false
 
   const handleChangeCol1 = (panel) => (event, isExpanded) => {
   setExpandedCol1(isExpanded ? panel : false);
@@ -114,20 +114,20 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
   }
 
   let hygieneCheckDailyMap = {
-    mouthCare: "Ağız Bakımı/Dişlerin Temizliği",
-    handFaceCare: "El-Yüz Temizliği",
-    earNoseCare: "Burun-Kulak Temizliği",
+    mouthCare: "Ağız Bakımı - Dişlerin Temizliği",
+    handFaceCare: "El - Yüz Temizliği",
+    earNoseCare: "Burun - Kulak Temizliği",
     bottomCare: "Alt Bakımı",
-    bodyCare: "Vücut  Muayenesi Kontrolü",
-    rashCare: "Yara/Kızarıklık vb. kontrolü",
+    bodyCare: "Vücut Muayenesi Kontrolü",
+    rashCare: "Yara - Kızarıklık vb. Kontrolü",
     moistureCare: "Cildi Nemlendirme",
   }
   let hygieneCheckWeeklyMap = {
     bathCare: "Banyo Yaptırılması",
     handFootCare: "El ve Ayak Tırnaklarının Kesilmesi",
     bodyHairCare: "İstenmeyen Tüylerin Temizliği",
-    hairCare: "Saç-Sakal Tıraşının Yapılması",
-    bedBathCare: "Yatak Banyosu/Vücut Silme/Yatakta Saç Yıkama",
+    hairCare: "Saç - Sakal Tıraşının Yapılması",
+    bedBathCare: "Yatak Banyosu - Vücut Silme - Yatakta Saç Yıkama",
     bedSheetCare: "Yatak Takımlarının Değiştirilmesi",
   }
   let mealCheckMap = {
@@ -138,19 +138,20 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
     liquidCare: "Su ve Diğer Sıvı Alımı",
   }
   let postureCheckMap = {
-    walkable: "Mobil/Yürüyen Misafir",
+    walkable: "Mobil - Yürüyen Misafir",
   }
   let dressingCheckMap = {
-    isInjured: "Bası Yarası var mı?",
-    stage: "Kaçıncı Evre?",
-    dailyDressing: "Günlük Bası Yarası Pansumanı Yapıldı mı?",
-    needDressing: "Pansuman gerektiren bir durum var mı?",
-    isDressed: "Pansuman Yapıldı mı?",
-    catheter: "Katater Bakımı Yapıldı mı?"
+    isInjured: "Bası Yarası Var Mı?",
+    stage: "Bası Yarası Evresi",
+    dailyDressing: "Günlük Bası Yarası Pansumanı",
+    needDressing: "Pansuman Gerektiren Bir Durum Var Mı?",
+    isDressed: "Pansuman Yapıldı",
+    catheter: "Katater Bakımı Yapıldı"
   }
   let edemaCheckMap = {
-    liquidCheck: "Sıvı takibi yapıldı mı?",
-    liquidCheckML:  "İdrar Çıkışı (ml):",
+    liquidCheck: "Sıvı Takibi Yapıldı Mı?",
+    liquidIntakeML:  "Alınan Sıvı Miktarı:",
+    urineOutput:  "İdrar Çıkışı:",
   }
   let securityCheckMap = {
     reason1: "Yerde takılacağı kablo vs. herhangi bir şey var mı? Giymiş olduğu terlik ve oda zemini güvenli mi?",
@@ -159,8 +160,7 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
     reason4: "Kenarlık koruması gerekli mi?",
     reason5: "Düşme riski oluştu mu?"
   }
-  let urineCheckMap = {
-    urine:  "İdrar Çıkışı (ml):",
+  let stoolCheckMap = {
     stool: "Gaita Çıkışı Var mı?"
   }
 
@@ -195,25 +195,39 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
     midCare: false,
     dinnerCare: false,
     liquidCare: false,
+    breakfastNote: "",
+    lunchNote: "",
+    midNote: "",
+    dinnerNote: "",
+    liquidNote: "",
   });
 
   const [postureCheck, setPostureCheck] = useState({
     walkable: false,
+    positions: [
+      { time: "08:00", position: "Sırt Üstü", checked: false },
+      { time: "10:00", position: "Sağa Dönük", checked: false },
+      { time: "12:00", position: "Sola Dönük", checked: false },
+      { time: "14:00", position: "Sırt Üstü", checked: false },
+      { time: "16:00", position: "Sağa Dönük", checked: false },
+      { time: "18:00", position: "Sola Dönük", checked: false },
+    ]
   });
 
   const [dressingCheck, setDressingCheck] = useState({
-    isInjured: false,
+    isInjured: null, // null = not answered, true = yes, false = no
+    injuredRegion: null,
     stage: 1,
     dailyDressing: false,
-    needDressing: false,
+    needDressing: null, // null = not answered, true = yes, false = no
     isDressed: false,
-    catheter: false,
-    injuredParts: []
+    catheter: false
   });
 
   const [edemaCheck, setEdemaCheck] = useState({
-    liquidCheck: false,
-    liquidCheckML: 0,
+    liquidCheck: null, // null = not answered, true = yes, false = no
+    liquidIntakeML: 0,
+    urineOutput: 0,
   });
 
   const [securityCheck, setSecurityCheck] = useState({
@@ -221,12 +235,16 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
     reason2: false,
     reason3: false,
     reason4: false,
-    reason5: false
+    reason5: false,
+    reason1Note: "",
+    reason2Note: "",
+    reason3Note: "",
+    reason4Note: "",
+    reason5Note: "",
   });
 
-  const [urineCheck, setUrineCheck] = useState({
-    urine: 0,
-    stool: false
+  const [stoolCheck, setStoolCheck] = useState({
+    stool: false,
   });
 
   const [roomChecks, setRoomChecks] = useState(
@@ -243,31 +261,6 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
   const bodyMapping = ["Kafa Bölgesi", "Göğüs Bölgesi", "Sol Kol Bölgesi", "Sol Ayak Bölgesi", "Sol El Bölgesi",
     "Sol Bacak Bölgesi", "Sol Omuz Bölgesi", "Sağ Kol Bölgesi", "Sağ Ayak Bölgesi", "Sağ El Bölgesi",
     "Sağ Bacak Bölgesi", "Sağ Omuz Bölgesi", "Karın Bölgesi"]
-
-  const addInjuredPart = () => {
-    if (bodyCode == null || bodyCode === "") return;
-    setDressingCheck(prev => {
-    const list = Array.isArray(prev.injuredParts) ? prev.injuredParts : [];
-    if (list.includes(bodyCode)) return prev; // avoid duplicates
-    return { ...prev, injuredParts: [...list, bodyCode] };
-    });
-    setBodyCode(null);
-  };
-
-  const removeInjuredPart = (code) => {
-    setDressingCheck(prev => ({
-    ...prev,
-    injuredParts: (prev.injuredParts || []).filter(c => c !== code)
-    }));
-  };
-
-  const removeLastInjuredPart = () => {
-    setDressingCheck(prev => {
-    const list = prev.injuredParts || [];
-    if (!list.length) return prev;
-    return { ...prev, injuredParts: list.slice(0, -1) };
-    });
-  };
 
   const toggleList = (key, key_list, key_function) => {
     key_function({
@@ -318,7 +311,7 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
       "dressingCheck": dressingCheck,
       "edemaCheck": edemaCheck,
       "securityCheck": securityCheck,
-      "urineCheck": urineCheck,
+      "stoolCheck": stoolCheck,
       "roomChecks": roomChecks
     }
     // setTakenMeds(prev => new Set([...prev, ...selectedGivenMeds]));
@@ -355,15 +348,64 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
 
         if (dict_key in hcs && hc_type in hcs[dict_key]) {
            let hc = hcs[dict_key][hc_type].at(-1)["signed_hc_data"];
-           setHygieneCheckDaily(hc["hygieneCheckDaily"])
-           setHygieneCheckWeekly(hc["hygieneCheckWeekly"])
-           setMealCheck(hc["mealCheck"])
-           setPostureCheck(hc["postureCheck"])
-           setDressingCheck(hc["dressingCheck"])
-           setEdemaCheck(hc["edemaCheck"])
-           setSecurityCheck(hc["securityCheck"])
-           setUrineCheck(hc["urineCheck"])
-           setRoomChecks(hc["roomChecks"])
+           setHygieneCheckDaily(hc["hygieneCheckDaily"] || {})
+           setHygieneCheckWeekly(hc["hygieneCheckWeekly"] || {})
+           setMealCheck({
+             breakfastCare: false,
+             lunchCare: false,
+             midCare: false,
+             dinnerCare: false,
+             liquidCare: false,
+             breakfastNote: "",
+             lunchNote: "",
+             midNote: "",
+             dinnerNote: "",
+             liquidNote: "",
+             ...hc["mealCheck"]
+           })
+           setPostureCheck({
+             walkable: false,
+             positions: [
+               { time: "08:00", position: "Sırt Üstü", checked: false },
+               { time: "10:00", position: "Sağa Dönük", checked: false },
+               { time: "12:00", position: "Sola Dönük", checked: false },
+               { time: "14:00", position: "Sırt Üstü", checked: false },
+               { time: "16:00", position: "Sağa Dönük", checked: false },
+               { time: "18:00", position: "Sola Dönük", checked: false },
+             ],
+             ...hc["postureCheck"]
+           })
+           setDressingCheck({
+             isInjured: null,
+             injuredRegion: null,
+             stage: 1,
+             dailyDressing: false,
+             needDressing: null,
+             isDressed: false,
+             catheter: false,
+             ...hc["dressingCheck"]
+           })
+           setEdemaCheck({
+             liquidCheck: null,
+             liquidIntakeML: 0,
+             urineOutput: 0,
+             ...hc["edemaCheck"]
+           })
+           setSecurityCheck({
+             reason1: false,
+             reason2: false,
+             reason3: false,
+             reason4: false,
+             reason5: false,
+             reason1Note: "",
+             reason2Note: "",
+             reason3Note: "",
+             reason4Note: "",
+             reason5Note: "",
+             ...hc["securityCheck"]
+           })
+           setStoolCheck(hc["stoolCheck"] || { stool: false })
+           setRoomChecks(hc["roomChecks"] || [])
         }
         else {
           setHygieneCheckDaily({
@@ -389,32 +431,50 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
             midCare: false,
             dinnerCare: false,
             liquidCare: false,
+            breakfastNote: "",
+            lunchNote: "",
+            midNote: "",
+            dinnerNote: "",
+            liquidNote: "",
           })
           setPostureCheck({
             walkable: false,
+            positions: [
+              { time: "08:00", position: "Sırt Üstü", checked: false },
+              { time: "10:00", position: "Sağa Dönük", checked: false },
+              { time: "12:00", position: "Sola Dönük", checked: false },
+              { time: "14:00", position: "Sırt Üstü", checked: false },
+              { time: "16:00", position: "Sağa Dönük", checked: false },
+              { time: "18:00", position: "Sola Dönük", checked: false },
+            ]
           })
           setDressingCheck({
-            isInjured: false,
+            isInjured: null,
+            injuredRegion: null,
             stage: 1,
             dailyDressing: false,
-            needDressing: false,
+            needDressing: null,
             isDressed: false,
-            catheter: false,
-            injuredParts: []
+            catheter: false
           })
           setEdemaCheck({
-            liquidCheck: false,
-            liquidCheckML:  0
+            liquidCheck: null,
+            liquidIntakeML: 0,
+            urineOutput: 0,
           })
           setSecurityCheck({
             reason1: false,
             reason2: false,
             reason3: false,
             reason4: false,
-            reason5: false
+            reason5: false,
+            reason1Note: "",
+            reason2Note: "",
+            reason3Note: "",
+            reason4Note: "",
+            reason5Note: "",
           })
-          setUrineCheck({
-            urine: 0,
+          setStoolCheck({
             stool: false
           })
           setRoomChecks(
@@ -504,6 +564,11 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
       console.error("Error adding note:", error);
       alert("Not eklenirken bir hata oluştu.");
     });
+  };
+
+  const handleNewNote = () => {
+    setNoteToEdit(null);
+    setShowNoteModal(true);
   };
 
   const handleEditNote = (note) => {
@@ -710,10 +775,11 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography className="TypographyHC" variant="h6">Beslenme Takibi</Typography>
         </AccordionSummary>
-        <AccordionDetails>
+        <AccordionDetails className="AccordionDetails">
         <div className="divider-low-margin"></div>
-        {Object.keys(mealCheck).map((key) => (
-        <div className="each-point" key={key}>
+        {Object.keys(mealCheck).filter(key => !key.endsWith('Note')).map((key) => (
+        <div key={key}>
+        <div className="each-point">
         <FormControlLabel
         control={
         <Checkbox
@@ -727,6 +793,18 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
         label={mealCheckMap[key]}
         />
         </div>
+        {mealCheck[key] && (
+          <Box sx={{ ml: 1, mr: 1, mb: 1 }}>
+            <TextField
+              fullWidth
+              size="small"
+              placeholder={`${mealCheckMap[key]} detayı giriniz...`}
+              value={mealCheck[`${key}Note`] || ""}
+              onChange={(e) => setMealCheck(prev => ({ ...prev, [`${key}Note`]: e.target.value }))}
+            />
+          </Box>
+        )}
+        </div>
         ))}
         </AccordionDetails>
         </Accordion>
@@ -736,7 +814,7 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
         </AccordionSummary>
         <AccordionDetails>
         <div className="divider-low-margin"></div>
-        {Object.keys(postureCheck).map((key) => (
+        {Object.keys(postureCheck).filter(key => key !== 'positions').map((key) => (
         <div className="each-point" key={key}>
         <FormControlLabel
         control={
@@ -752,6 +830,30 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
         />
         </div>
         ))}
+        <Box sx={{ mt: 2 }}>
+          <Typography className="TypographyHC" variant="subtitle1" sx={{ mb: 1 }}>Pozisyon Değişimleri</Typography>
+          <div className="divider-low-margin"></div>
+          {postureCheck.positions?.map((pos, index) => (
+            <div className="each-point" key={index}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    style={{"marginLeft": "15px"}}
+                    icon={<PlaylistAddRoundedIcon />}
+                    checkedIcon={<PlaylistAddCheckCircleIcon />}
+                    checked={pos.checked}
+                    onChange={() => {
+                      const newPositions = [...postureCheck.positions];
+                      newPositions[index].checked = !newPositions[index].checked;
+                      setPostureCheck(prev => ({ ...prev, positions: newPositions }));
+                    }}
+                  />
+                }
+                label={`${pos.position} Pozisyon (${pos.time})`}
+              />
+            </div>
+          ))}
+        </Box>
         </AccordionDetails>
         </Accordion>
       </div>
@@ -762,81 +864,212 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
             <Typography className="TypographyHC" variant="h6">Pansuman ve Katater Bakımı</Typography>
           </AccordionSummary>
          <AccordionDetails>
-           <div className="divider-low-margin"></div> {Object.keys(dressingCheck).map((key) => ( <div className="each-point" key={key}> {key === 'stage' ?
-             ( <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}> <Typography className="TypographyHC" variant="body1"> {dressingCheckMap[key]} </Typography> <FormControl size="small" sx={{ minWidth: 140 }}> <InputLabel id="stage-label">Evre</InputLabel> <Select labelId="stage-label" id="stage-select" label="Evre" value={Number(dressingCheck.stage) ?? 1} onChange={(e) => setDressingCheck((prev) => ({ ...prev, stage: Number(e.target.value) })) } > <MenuItem value={1}>Evre I</MenuItem> <MenuItem value={2}>Evre II</MenuItem> <MenuItem value={3}>Evre III</MenuItem> <MenuItem value={4}>Evre IV</MenuItem> </Select> </FormControl> </Box> ) :
-              key === 'injuredParts' ? null :
-             ( <FormControlLabel control={ <Checkbox style={{ marginLeft: '15px' }} icon={<PlaylistAddRoundedIcon />} checkedIcon={<PlaylistAddCheckCircleIcon />} checked={dressingCheck[key]} onChange={() => toggleList(key, dressingCheck, setDressingCheck)} /> } label={dressingCheckMap[key]} /> )} </div> ))}
-           <Box sx={{ mt: 1 }}>
-            <BodyPartInput value={bodyCode} onChange={setBodyCode} />
-            <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={addInjuredPart}
-                disabled={bodyCode == null}
-              >
-                Ekle
-              </Button>
-              <Button
-                variant="text"
-                size="small"
-                color="error"
-                onClick={removeLastInjuredPart}
-                disabled={!edemaCheck.injuredParts || edemaCheck.injuredParts.length === 0}
-              >
-                Sonuncuyu Sil
-              </Button>
-            </Stack>
+           <div className="divider-low-margin"></div>
+           {/* Bası yarası var mı? */}
+           <div className="each-point">
+             <Typography className="TypographyHC" variant="body1" sx={{ mb: 0 }}>{dressingCheckMap.isInjured}</Typography>
+             <Box sx={{ display: 'flex', gap: 2, ml: 2 }}>
+               <FormControlLabel
+                 control={
+                   <Checkbox
+                     checked={dressingCheck.isInjured === true}
+                     onChange={() => setDressingCheck(prev => ({ ...prev, isInjured: prev.isInjured === true ? null : true }))}
+                   />
+                 }
+                 label="Evet"
+               />
+               <FormControlLabel
+                 control={
+                   <Checkbox
+                     checked={dressingCheck.isInjured === false}
+                     onChange={() => setDressingCheck(prev => ({ ...prev, isInjured: prev.isInjured === false ? null : false }))}
+                   />
+                 }
+                 label="Hayır"
+               />
+             </Box>
+           </div>
+           
+           {/* Bası yarasının bölgesi - shown when Evet is selected */}
+           {dressingCheck.isInjured === true && (
+             <Box sx={{ ml: 2, mb: 0 }}>
+               <Typography className="TypographyHC" variant="body1" sx={{ mb: 1 }}>Bası yarasının bölgesi</Typography>
+               <BodyPartInput value={dressingCheck.injuredRegion} onChange={(val) => setDressingCheck(prev => ({ ...prev, injuredRegion: val }))} />
+             </Box>
+           )}
+           
+           {/* Evre - shown when Evet is selected */}
+           {dressingCheck.isInjured === true && (
+             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, ml: 2, mb: 2 }}>
+               <Typography className="TypographyHC" variant="body1">{dressingCheckMap.stage}</Typography>
+               <FormControl size="small" sx={{ minWidth: 140 }}>
+                 <InputLabel id="stage-label">Evre</InputLabel>
+                 <Select
+                   labelId="stage-label"
+                   id="stage-select"
+                   label="Evre"
+                   value={Number(dressingCheck.stage) ?? 1}
+                   onChange={(e) => setDressingCheck((prev) => ({ ...prev, stage: Number(e.target.value) }))}
+                 >
+                   <MenuItem value={1}>Evre I</MenuItem>
+                   <MenuItem value={2}>Evre II</MenuItem>
+                   <MenuItem value={3}>Evre III</MenuItem>
+                   <MenuItem value={4}>Evre IV</MenuItem>
+                 </Select>
+               </FormControl>
+             </Box>
+           )}
+           
+           {/* Günlük Bası Yarası Pansumanı - shown when Evet is selected */}
+           {dressingCheck.isInjured === true && (
+             <div className="each-point">
+               <FormControlLabel
+                 control={
+                   <Checkbox
+                     style={{ marginLeft: '15px' }}
+                     icon={<PlaylistAddRoundedIcon />}
+                     checkedIcon={<PlaylistAddCheckCircleIcon />}
+                     checked={dressingCheck.dailyDressing}
+                     onChange={() => toggleList('dailyDressing', dressingCheck, setDressingCheck)}
+                   />
+                 }
+                 label={dressingCheckMap.dailyDressing}
+               />
+             </div>
+           )}
+           
+           {/* Pansuman gerektiren durum var mı? */}
+           <div className="each-point">
+             <Typography className="TypographyHC" variant="body1" sx={{ mb: 0 }}>{dressingCheckMap.needDressing}</Typography>
+             <Box sx={{ display: 'flex', gap: 2, ml: 2 }}>
+               <FormControlLabel
+                 control={
+                   <Checkbox
+                     checked={dressingCheck.needDressing === true}
+                     onChange={() => setDressingCheck(prev => ({ ...prev, needDressing: prev.needDressing === true ? null : true }))}
+                   />
+                 }
+                 label="Evet"
+               />
+               <FormControlLabel
+                 control={
+                   <Checkbox
+                     checked={dressingCheck.needDressing === false}
+                     onChange={() => setDressingCheck(prev => ({ ...prev, needDressing: prev.needDressing === false ? null : false }))}
+                   />
+                 }
+                 label="Hayır"
+               />
+             </Box>
+           </div>
+           
+           {/* Pansuman Yapıldı mı? - shown when needDressing is Evet */}
+           {dressingCheck.needDressing === true && (
+             <div className="each-point">
+               <FormControlLabel
+                 control={
+                   <Checkbox
+                     style={{ marginLeft: '15px' }}
+                     icon={<PlaylistAddRoundedIcon />}
+                     checkedIcon={<PlaylistAddCheckCircleIcon />}
+                     checked={dressingCheck.isDressed}
+                     onChange={() => toggleList('isDressed', dressingCheck, setDressingCheck)}
+                   />
+                 }
+                 label={dressingCheckMap.isDressed}
+               />
+             </div>
+           )}
+           
+           {/* Katater Bakımı */}
+           <div className="each-point">
+             <FormControlLabel
+               control={
+                 <Checkbox
+                   style={{ marginLeft: '15px' }}
+                   icon={<PlaylistAddRoundedIcon />}
+                   checkedIcon={<PlaylistAddCheckCircleIcon />}
+                   checked={dressingCheck.catheter}
+                   onChange={() => toggleList('catheter', dressingCheck, setDressingCheck)}
+                 />
+               }
+               label={dressingCheckMap.catheter}
+             />
+           </div>
 
-            {/* Mini container: scrollable list of selected parts */}
-            <Box
-              sx={{
-                mt: 1,
-                maxHeight: 120,
-                overflowY: "auto",
-                border: "1px solid #eee",
-                borderRadius: 1,
-                p: 1,
-              }}
-            >
-              <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-                {(dressingCheck.injuredParts || []).map((code) => (
-                  <Chip
-                    key={code}
-                    label={`Bölge: ${bodyMapping[code-1]}`}
-                    onDelete={() => removeInjuredPart(code)}
-                    size="small"
-                  />
-                ))}
-              </Stack>
-            </Box>
-            </Box>
          </AccordionDetails>
         </Accordion>
         <Accordion expanded={expandedCol2 === 'edema'} onChange={handleChangeCol2('edema')}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography className="TypographyHC" variant="h6">Ödem Takibi</Typography>
           </AccordionSummary>
-          <AccordionDetails> <div className="divider-low-margin"></div>
-            {/* Sıvı takibi checkbox (existing) */}
-
+          <AccordionDetails>
+            <div className="divider-low-margin"></div>
+            
+            {/* Sıvı takibi Yapıldı mı? */}
             <div className="each-point">
-              <FormControlLabel control={ <Checkbox style={{ marginLeft: "15px" }} icon={<PlaylistAddRoundedIcon />} checkedIcon={<PlaylistAddCheckCircleIcon />} checked={!!edemaCheck.liquidCheck} onChange={() => setEdemaCheck(prev => ({ ...prev, liquidCheck: !prev.liquidCheck })) } /> } label={edemaCheckMap.liquidCheck} />
+              <Typography className="TypographyHC" variant="body1" sx={{ mb: 0 }}>{edemaCheckMap.liquidCheck}</Typography>
+              <Box sx={{ display: 'flex', gap: 2, ml: 2 }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={edemaCheck.liquidCheck === true}
+                      onChange={() => setEdemaCheck(prev => ({ ...prev, liquidCheck: prev.liquidCheck === true ? null : true }))}
+                    />
+                  }
+                  label="Evet"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={edemaCheck.liquidCheck === false}
+                      onChange={() => setEdemaCheck(prev => ({ ...prev, liquidCheck: prev.liquidCheck === false ? null : false }))}
+                    />
+                  }
+                  label="Hayır"
+                />
+              </Box>
             </div>
-
-           <div className="each-point">
-            <><InputLabel style={{"alignContent": "center"}} htmlFor="outlined-adornment-liquidCheckML">{edemaCheckMap["liquidCheckML"]}</InputLabel>
+            
+            {/* Kaç ml sıvı alındı? - shown when Evet is selected */}
+            {edemaCheck.liquidCheck === true && (
+              <div className="each-point">
+                <InputLabel style={{"alignContent": "center"}} htmlFor="outlined-adornment-liquidIntakeML">{edemaCheckMap.liquidIntakeML}</InputLabel>
                 <OutlinedInput
-                              id="outlined-adornment-liquidCheckML"
-                              type="number" step="0.01"
-                              size="small"
-                              endAdornment={<InputAdornment position="end">ml</InputAdornment>}
-                              value={edemaCheck.liquidCheckML}
-                              onChange={(e) => setEdemaCheck({ ...edemaCheck, liquidCheckML: e.target.value })}
-                            />
-            </>
-          </div>
-            {/* Yeni: Yaralı bölge seçimi + liste */}
+                  style={{"alignContent": "center", "width": "150px"}}
+                  id="outlined-adornment-liquidIntakeML"
+                  type="number"
+                  step="0.01"
+                  size="small"
+                  endAdornment={<InputAdornment position="end">ml</InputAdornment>}
+                  value={edemaCheck.liquidIntakeML}
+                  onChange={(e) => {
+                    const value = parseFloat(e.target.value) || 0;
+                    setEdemaCheck(prev => ({ ...prev, liquidIntakeML: value }))
+                  }}
+                />
+              </div>
+            )}
+            
+            {/* İdrar Çıkışı - shown when Evet is selected */}
+            {edemaCheck.liquidCheck === true && (
+              <div className="each-point">
+                <InputLabel style={{"alignContent": "center"}} htmlFor="outlined-adornment-urineOutput">{edemaCheckMap.urineOutput}</InputLabel>
+                <OutlinedInput
+                  style={{"alignContent": "center", "width": "150px"}}
+                  id="outlined-adornment-urineOutput"
+                  type="number"
+                  step="0.01"
+                  size="small"
+                  endAdornment={<InputAdornment position="end">ml</InputAdornment>}
+                  value={edemaCheck.urineOutput}
+                  onChange={(e) => {
+                    const value = parseFloat(e.target.value) || 0;
+                    setEdemaCheck(prev => ({ ...prev, urineOutput: value }))
+                  }}
+                />
+              </div>
+            )}
 
           </AccordionDetails>
         </Accordion>
@@ -846,10 +1079,11 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography className="TypographyHC" variant="h6">Misafir Güvenliği</Typography>
         </AccordionSummary>
-        <AccordionDetails>
+        <AccordionDetails className="AccordionDetails">
         <div className="divider-low-margin"></div>
-        {Object.keys(securityCheck).map((key) => (
-        <div className="each-point" key={key}>
+        {Object.keys(securityCheck).filter(key => !key.endsWith('Note')).map((key) => (
+        <div key={key}>
+        <div className="each-point">
         <FormControlLabel
         control={
         <Checkbox
@@ -863,32 +1097,34 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
         label={securityCheckMap[key]}
         />
         </div>
+        {securityCheck[key] && (
+          <Box sx={{ ml: 1, mr: 1, mb: 1 }}>
+            <TextField
+              fullWidth
+              size="small"
+              placeholder={`Detayı giriniz...`}
+              value={securityCheck[`${key}Note`] || ""}
+              onChange={(e) => setSecurityCheck(prev => ({ ...prev, [`${key}Note`]: e.target.value }))}
+            />
+          </Box>
+        )}
+        </div>
         ))}
         </AccordionDetails>
         </Accordion>
 
-        {/* İdrar ve Gaita Takibi */}
-        <Accordion expanded={expandedCol2 === 'urine'} onChange={handleChangeCol2('urine')}>
+        {/* Gaita Takibi */}
+        <Accordion expanded={expandedCol2 === 'stool'} onChange={handleChangeCol2('stool')}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Typography className="TypographyHC" variant="h6">İdrar ve Gaita Takibi</Typography>
+        <Typography className="TypographyHC" variant="h6">Gaita Takibi</Typography>
         </AccordionSummary>
         <AccordionDetails>
         <div className="divider-low-margin"></div>
-        {Object.keys(urineCheck).map((key) => (
+        {Object.keys(stoolCheck).map((key) => (
 
-<div className="each-point" key={key}> {key === 'urine' ? (
-    <><InputLabel style={{"alignContent": "center"}} htmlFor="outlined-adornment-idrar">{urineCheckMap[key]}</InputLabel>
-    <OutlinedInput
-                  id="outlined-adornment-idrar"
-                  type="number" step="0.01"
-                  size="small"
-                  endAdornment={<InputAdornment position="end">ml</InputAdornment>}
-                  value={urineCheck.urine}
-                  onChange={(e) => setUrineCheck({ ...urineCheck, urine: e.target.value })}
-                /></> )
-    : ( <FormControlLabel control={ <Checkbox style={{"marginLeft": "15px"}}
+<div className="each-point" key={key}> {<FormControlLabel control={ <Checkbox style={{"marginLeft": "15px"}}
                     icon={<PlaylistAddRoundedIcon />}
-                    checkedIcon={<PlaylistAddCheckCircleIcon />} checked={urineCheck[key]} onChange={() => setUrineCheck({ ...urineCheck, [key]: !urineCheck[key] }) } /> } label={urineCheckMap[key]} /> )} </div> ))}
+                    checkedIcon={<PlaylistAddCheckCircleIcon />} checked={stoolCheck[key]} onChange={() => setStoolCheck({ ...stoolCheck, [key]: !stoolCheck[key] }) } /> } label={stoolCheckMap[key]} /> } </div> ))}
         </AccordionDetails>
         </Accordion>
 
@@ -910,38 +1146,7 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
               />
             ))}
           </div>
-
-          <div className="divider"></div>
-          <Typography className="TypographyHC" variant="subtitle1" sx={{ mt: 1 }}>
-            Konu Başlığı
-          </Typography>
-          <Typography className="TypographyHC" variant="subtitle1" sx={{ mb: "10px" }}>
-            <FormControl size="small">
-              <Select
-                className="TypographyHC"
-                value={selectedNote || ""}
-                onChange={(e) => setSelectedNote(e.target.value)}
-              >
-                <MenuItem value="Hijyen Gereksinimleri">Hijyen Gereksinimleri</MenuItem>
-                <MenuItem value="Beslenme Takibi">Beslenme Takibi</MenuItem>
-                <MenuItem value="Pozisyon Takibi">Pozisyon Takibi</MenuItem>
-                <MenuItem value="Pansuman ve Katater Bakımı">Pansuman ve Katater Bakımı</MenuItem>
-                <MenuItem value="Ödem Takibi">Ödem Takibi</MenuItem>
-                <MenuItem value="Misafir Güvenliği">Misafir Güvenliği</MenuItem>
-              </Select>
-            </FormControl>
-          </Typography>
-
-          <TextField
-            placeholder="Notunuzu giriniz..."
-            value={feedingNote}
-            onChange={(e) => setFeedingNote(e.target.value)}
-            fullWidth
-            multiline
-            minRows={3}
-          />
-
-          <Button className="Button" variant="contained" sx={{ backgroundColor: "#A695CC", ml: 1 }} onClick={addNote}>
+          <Button className="Button" variant="contained" sx={{ backgroundColor: "#A695CC", ml: 1 }} onClick={handleNewNote}>
               Not Ekle
           </Button>
         </div>

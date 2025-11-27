@@ -104,32 +104,6 @@ helperText={tempRawName ? `Seçili: ${ZONE_LABEL[tempRawName]}` : " "}
   <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md" fullWidth>
     <DialogTitle>Vücut Bölgesi Seç</DialogTitle>
     <DialogContent dividers>
-      <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-        <ToggleButtonGroup
-          value={sex}
-          exclusive
-          onChange={(_, v) => v && setSex(v)}
-          size="small"
-        >
-          <ToggleButton value="male">Erkek</ToggleButton>
-          <ToggleButton value="female">Kadın</ToggleButton>
-        </ToggleButtonGroup>
-
-        <ToggleButtonGroup
-          value={view}
-          exclusive
-          onChange={(_, v) => v && setView(v)}
-          size="small"
-        >
-          <ToggleButton value="front">Ön</ToggleButton>
-          <ToggleButton value="back">Arka</ToggleButton>
-        </ToggleButtonGroup>
-
-        <Typography variant="body2" sx={{ ml: "auto" }}>
-          Seçili: {selectedLabel ? selectedLabel : "—"}
-        </Typography>
-      </Stack>
-
       <BodyComponent
             // onChange={onChange}
             onClick={(x) => setTempRawName(x)}

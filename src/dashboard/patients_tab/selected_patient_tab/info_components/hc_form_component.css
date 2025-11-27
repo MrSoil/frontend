@@ -33,7 +33,7 @@ h5 {
 
 
 .AccordionDetails {
-  max-height: 500px;
+  max-height: 400px;
   overflow-y: auto;
 }
 
@@ -50,6 +50,41 @@ h5 {
   background-color: #EEF7F44D;
   border-radius: 12px;
   border: 1px solid #D2D2D2;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.care-column .MuiAccordion-root {
+  overflow: hidden;
+}
+
+.care-column .MuiAccordionSummary-root {
+  overflow: hidden;
+  min-height: 48px;
+}
+
+.care-column .MuiAccordionSummary-content {
+  overflow: hidden;
+  min-width: 0;
+}
+
+.care-column .MuiAccordionSummary .MuiTypography-root {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.care-column .MuiAccordionDetails .MuiTypography-root {
+  white-space: normal;
+  word-wrap: break-word;
+  overflow: visible;
+}
+
+.care-column .MuiAccordionDetails .MuiFormControlLabel-label {
+  white-space: normal;
+  word-wrap: break-word;
+  overflow: visible;
 }
 
 
@@ -93,7 +128,7 @@ h5 {
 
 
 .care-notes {
-  height: 100px;
+  height: 350px;
   overflow-y: scroll;
 }
 
@@ -204,6 +239,18 @@ h5 {
   display: flex;
   justify-content: space-between;
   margin: 5px;
+  align-items: center;
+}
+
+.each-point .MuiFormControlLabel-root {
+  flex: 1;
+  min-width: 0;
+}
+
+.each-point .MuiFormControlLabel-label {
+  white-space: normal;
+  word-wrap: break-word;
+  overflow: visible;
 }
 
 .each-point:nth-child(odd) {

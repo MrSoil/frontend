@@ -631,6 +631,11 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
     });
   };
 
+  const handleNewNote = () => {
+    setNoteToEdit(null);
+    setShowNoteModal(true);
+  };
+
   const handleEditNote = (note) => {
     setNoteToEdit(note);
     setShowNoteModal(true);
@@ -768,38 +773,7 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
               />
             ))}
           </div>
-
-          <div className="divider"></div>
-          <Typography className="TypographyHC" variant="subtitle1" sx={{ mt: 1 }}>
-            Konu Başlığı
-          </Typography>
-          <Typography className="TypographyHC" variant="subtitle1" sx={{ mb: "10px" }}>
-            <FormControl size="small">
-              <Select
-                className="TypographyHC"
-                value={selectedNoteTitle || ""}
-                onChange={(e) => setSelectedNoteTitle(e.target.value)}
-              >
-                <MenuItem value="Hijyen Gereksinimleri">Hijyen Gereksinimleri</MenuItem>
-                <MenuItem value="Beslenme Takibi">Beslenme Takibi</MenuItem>
-                <MenuItem value="Pozisyon Takibi">Pozisyon Takibi</MenuItem>
-                <MenuItem value="Pansuman ve Katater Bakımı">Pansuman ve Katater Bakımı</MenuItem>
-                <MenuItem value="Ödem Takibi">Ödem Takibi</MenuItem>
-                <MenuItem value="Misafir Güvenliği">Misafir Güvenliği</MenuItem>
-              </Select>
-            </FormControl>
-          </Typography>
-
-          <TextField
-            placeholder="Notunuzu giriniz..."
-            value={feedingNote}
-            onChange={(e) => setFeedingNote(e.target.value)}
-            fullWidth
-            multiline
-            minRows={3}
-          />
-
-          <Button className="Button" variant="contained" sx={{ backgroundColor: "#A695CC", ml: 1 }} onClick={addNote}>
+          <Button className="Button" variant="contained" sx={{ backgroundColor: "#A695CC", ml: 1 }} onClick={handleNewNote}>
               Not Ekle
           </Button>
         </div>
