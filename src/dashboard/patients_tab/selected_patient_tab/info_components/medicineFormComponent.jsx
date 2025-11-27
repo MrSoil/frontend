@@ -504,16 +504,19 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
         const today     = daysShort[new Date(medicinesDate).getDay()];
 
         const m = [], n = [], e = [];
-        const todayDate = new Date();
-        todayDate.setHours(0, 0, 0, 0); // Reset time for date comparison
+        // Get the date being viewed (medicinesDate) for comparison
+        const viewedDate = new Date(medicinesDate);
+        viewedDate.setHours(0, 0, 0, 0); // Reset time for date comparison
         
         Object.entries(meds).forEach(([medId, record]) => {
-          // Check if medicine has end_date and if it's in the past
+          // Check if medicine has end_date and if the viewed date is after the end_date
           if (record.medicine_data.end_date) {
             const endDate = new Date(record.medicine_data.end_date);
             endDate.setHours(0, 0, 0, 0);
-            // Skip medicines that have passed their end date
-            if (todayDate > endDate) {
+            // Skip medicines if the viewed date is after the end_date
+            // This way, medicines with passed end_date won't show for current/future dates
+            // but will still show for dates older than the end_date (historical viewing)
+            if (viewedDate > endDate) {
               return; // Skip this medicine
             }
           }

@@ -322,6 +322,8 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
 
         const today     = daysShort[new Date().getDay()];
         const all = [];
+        const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0);
 
         Object.entries(meds).forEach(([medId, record]) => {
           const buildEntry = (period) => ({
@@ -335,10 +337,54 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
               period: periodMap[period]
           });
 
+          // Check if medicine has an end_date and if it has passed
+          const hasEndDate = record.medicine_data.end_date;
+          let isEndDatePassed = false;
+          if (hasEndDate) {
+            const endDate = new Date(record.medicine_data.end_date);
+            endDate.setHours(0, 0, 0, 0);
+            isEndDatePassed = endDate < currentDate;
+          }
 
-          if (record.medicine_data.selected_periods.morning && record.medicine_data.selected_days.morning.includes(today)) all.push(buildEntry("morning"));
-          if (record.medicine_data.selected_periods.noon    && record.medicine_data.selected_days.noon.includes(today))    all.push(buildEntry("noon"));
-          if (record.medicine_data.selected_periods.evening && record.medicine_data.selected_days.evening.includes(today)) all.push(buildEntry("evening"));
+          // Track which periods have been added to avoid duplicates
+          const addedPeriods = new Set();
+
+          // Show medicine if:
+          // 1. It's scheduled for today (normal case), OR
+          // 2. It has an end_date that has passed (for historical viewing - always show for all originally scheduled days)
+          const isScheduledForToday = (record.medicine_data.selected_periods.morning && record.medicine_data.selected_days.morning.includes(today)) ||
+                                      (record.medicine_data.selected_periods.noon && record.medicine_data.selected_days.noon.includes(today)) ||
+                                      (record.medicine_data.selected_periods.evening && record.medicine_data.selected_days.evening.includes(today));
+
+          if (isScheduledForToday) {
+            // Normal case: show medicines scheduled for today
+            if (record.medicine_data.selected_periods.morning && record.medicine_data.selected_days.morning.includes(today)) {
+              all.push(buildEntry("morning"));
+              addedPeriods.add("morning");
+            }
+            if (record.medicine_data.selected_periods.noon && record.medicine_data.selected_days.noon.includes(today)) {
+              all.push(buildEntry("noon"));
+              addedPeriods.add("noon");
+            }
+            if (record.medicine_data.selected_periods.evening && record.medicine_data.selected_days.evening.includes(today)) {
+              all.push(buildEntry("evening"));
+              addedPeriods.add("evening");
+            }
+          }
+          
+          // Always show medicines with passed end_date for all their originally scheduled days
+          // This allows viewing them for dates older than the end_date (historical viewing)
+          if (isEndDatePassed) {
+            if (record.medicine_data.selected_periods.morning && record.medicine_data.selected_days.morning.length > 0 && !addedPeriods.has("morning")) {
+              all.push(buildEntry("morning"));
+            }
+            if (record.medicine_data.selected_periods.noon && record.medicine_data.selected_days.noon.length > 0 && !addedPeriods.has("noon")) {
+              all.push(buildEntry("noon"));
+            }
+            if (record.medicine_data.selected_periods.evening && record.medicine_data.selected_days.evening.length > 0 && !addedPeriods.has("evening")) {
+              all.push(buildEntry("evening"));
+            }
+          }
 
         });
 
