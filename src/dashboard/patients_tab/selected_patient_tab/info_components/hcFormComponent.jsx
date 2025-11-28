@@ -216,7 +216,7 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
 
   const [dressingCheck, setDressingCheck] = useState({
     isInjured: null, // null = not answered, true = yes, false = no
-    injuredRegion: null,
+    injuredRegion: null, // null or array of body part codes
     stage: 1,
     dailyDressing: false,
     needDressing: null, // null = not answered, true = yes, false = no
@@ -226,8 +226,8 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
 
   const [edemaCheck, setEdemaCheck] = useState({
     liquidCheck: null, // null = not answered, true = yes, false = no
-    liquidIntakeML: 0,
-    urineOutput: 0,
+    liquidIntakeML: null,
+    urineOutput: null,
   });
 
   const [securityCheck, setSecurityCheck] = useState({
@@ -282,6 +282,14 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
     updateSelectedPatient(user.email, nextMode)
   };
   const submitSignedHC = () => {
+    // Show confirmation alert
+    const confirmed = window.confirm(
+      "Bakım formu kaydedilecek. Bu işlemi onaylıyor musunuz?"
+    );
+    if (!confirmed) {
+      return;
+    }
+
     const hcs = selectedPatient["patient_signed_hc"];
     let payload = {}
     if (dict_key in hcs && hcType in hcs[dict_key]) {
@@ -323,9 +331,18 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
         body: JSON.stringify(payload)
       })
       .then(r => r.json())
-      .then(() => {
+      .then((response) => {
+        if (response.status === "success") {
+          window.alert("Bakım formu başarıyla kaydedildi.");
+          updateSelectedPatient(user.email, hcType);
+        } else {
+          window.alert("Bakım formu kaydedilirken bir hata oluştu. Lütfen tekrar deneyin.");
+        }
       })
-      .catch(console.error);
+      .catch((error) => {
+        console.error(error);
+        window.alert("Bakım formu kaydedilirken bir hata oluştu. Lütfen tekrar deneyin.");
+      });
   };
 
   const updateSelectedPatient = (email, hc_type) => {
@@ -375,20 +392,26 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
              ],
              ...hc["postureCheck"]
            })
+           const loadedDressingCheck = hc["dressingCheck"] || {};
+           // Handle migration: convert single value to array if needed
+           let injuredRegion = loadedDressingCheck.injuredRegion;
+           if (injuredRegion !== null && injuredRegion !== undefined && !Array.isArray(injuredRegion)) {
+             injuredRegion = [injuredRegion];
+           }
            setDressingCheck({
              isInjured: null,
-             injuredRegion: null,
              stage: 1,
              dailyDressing: false,
              needDressing: null,
              isDressed: false,
              catheter: false,
-             ...hc["dressingCheck"]
+             ...loadedDressingCheck,
+             injuredRegion: injuredRegion
            })
            setEdemaCheck({
              liquidCheck: null,
-             liquidIntakeML: 0,
-             urineOutput: 0,
+             liquidIntakeML: null,
+             urineOutput: null,
              ...hc["edemaCheck"]
            })
            setSecurityCheck({
@@ -673,7 +696,7 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
 
         <div className="hc-form-top-right">
           <div className="hc-form-shift-toggle">
-            <Typography className="hc-form-shift-label" variant="body2">Sabah Vardiyası</Typography>
+            <Typography className="hc-form-shift-label" variant="body2">Gündüz Vardiyası</Typography>
             <Switch
               checked={hcType === "day"}
               onChange={() => {
@@ -863,7 +886,7 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography className="TypographyHC" variant="h6">Pansuman ve Katater Bakımı</Typography>
           </AccordionSummary>
-         <AccordionDetails>
+         <AccordionDetails className="AccordionDetails">
            <div className="divider-low-margin"></div>
            {/* Bası yarası var mı? */}
            <div className="each-point">
@@ -902,7 +925,7 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
            {dressingCheck.isInjured === true && (
              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, ml: 2, mb: 2 }}>
                <Typography className="TypographyHC" variant="body1">{dressingCheckMap.stage}</Typography>
-               <FormControl size="small" sx={{ minWidth: 140 }}>
+               <FormControl size="small" sx={{ minWidth: 140, mt: 2  }}>
                  <InputLabel id="stage-label">Evre</InputLabel>
                  <Select
                    labelId="stage-label"
@@ -1042,9 +1065,9 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
                   step="0.01"
                   size="small"
                   endAdornment={<InputAdornment position="end">ml</InputAdornment>}
-                  value={edemaCheck.liquidIntakeML}
+                  value={edemaCheck.liquidIntakeML ?? ""}
                   onChange={(e) => {
-                    const value = parseFloat(e.target.value) || 0;
+                    const value = e.target.value === "" ? null : (parseFloat(e.target.value) || null);
                     setEdemaCheck(prev => ({ ...prev, liquidIntakeML: value }))
                   }}
                 />
@@ -1062,9 +1085,9 @@ function HCForm({ selectedPatient, setSelectedPatient, setNewHCContainer, hcDate
                   step="0.01"
                   size="small"
                   endAdornment={<InputAdornment position="end">ml</InputAdornment>}
-                  value={edemaCheck.urineOutput}
+                  value={edemaCheck.urineOutput ?? ""}
                   onChange={(e) => {
-                    const value = parseFloat(e.target.value) || 0;
+                    const value = e.target.value === "" ? null : (parseFloat(e.target.value) || null);
                     setEdemaCheck(prev => ({ ...prev, urineOutput: value }))
                   }}
                 />

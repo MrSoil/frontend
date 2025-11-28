@@ -211,6 +211,17 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
 
 
   const handleGivenChange_M = medId => {
+    // Prevent marking medications as given on future dates
+    const viewedDate = new Date(medicinesDate);
+    viewedDate.setHours(0, 0, 0, 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (viewedDate > today) {
+      window.alert("Gelecek tarihler için ilaç işaretlenemez.");
+      return;
+    }
+    
     setSelectedGivenMeds_M(prev => {
       const next = new Set(prev);
       if (next.has(medId)) next.delete(medId);
@@ -220,6 +231,17 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
   };
 
     const handleGivenChange_N = medId => {
+    // Prevent marking medications as given on future dates
+    const viewedDate = new Date(medicinesDate);
+    viewedDate.setHours(0, 0, 0, 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (viewedDate > today) {
+      window.alert("Gelecek tarihler için ilaç işaretlenemez.");
+      return;
+    }
+    
     setSelectedGivenMeds_N(prev => {
       const next = new Set(prev);
       if (next.has(medId)) next.delete(medId);
@@ -229,6 +251,17 @@ function MedicineForm({ selectedPatient, setSelectedPatient, setNewMedicineConta
   };
 
       const handleGivenChange_E = medId => {
+    // Prevent marking medications as given on future dates
+    const viewedDate = new Date(medicinesDate);
+    viewedDate.setHours(0, 0, 0, 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (viewedDate > today) {
+      window.alert("Gelecek tarihler için ilaç işaretlenemez.");
+      return;
+    }
+    
     setSelectedGivenMeds_E(prev => {
       const next = new Set(prev);
       if (next.has(medId)) next.delete(medId);

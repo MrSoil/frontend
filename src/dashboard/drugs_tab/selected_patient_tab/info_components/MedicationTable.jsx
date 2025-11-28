@@ -320,7 +320,6 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
           "evening": "Akşam"
         };
 
-        const today     = daysShort[new Date().getDay()];
         const all = [];
         const currentDate = new Date();
         currentDate.setHours(0, 0, 0, 0);
@@ -346,42 +345,17 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
             isEndDatePassed = endDate < currentDate;
           }
 
-          // Track which periods have been added to avoid duplicates
-          const addedPeriods = new Set();
-
-          // Show medicine if:
-          // 1. It's scheduled for today (normal case), OR
-          // 2. It has an end_date that has passed (for historical viewing - always show for all originally scheduled days)
-          const isScheduledForToday = (record.medicine_data.selected_periods.morning && record.medicine_data.selected_days.morning.includes(today)) ||
-                                      (record.medicine_data.selected_periods.noon && record.medicine_data.selected_days.noon.includes(today)) ||
-                                      (record.medicine_data.selected_periods.evening && record.medicine_data.selected_days.evening.includes(today));
-
-          if (isScheduledForToday) {
-            // Normal case: show medicines scheduled for today
-            if (record.medicine_data.selected_periods.morning && record.medicine_data.selected_days.morning.includes(today)) {
-              all.push(buildEntry("morning"));
-              addedPeriods.add("morning");
-            }
-            if (record.medicine_data.selected_periods.noon && record.medicine_data.selected_days.noon.includes(today)) {
-              all.push(buildEntry("noon"));
-              addedPeriods.add("noon");
-            }
-            if (record.medicine_data.selected_periods.evening && record.medicine_data.selected_days.evening.includes(today)) {
-              all.push(buildEntry("evening"));
-              addedPeriods.add("evening");
-            }
-          }
-          
-          // Always show medicines with passed end_date for all their originally scheduled days
-          // This allows viewing them for dates older than the end_date (historical viewing)
-          if (isEndDatePassed) {
-            if (record.medicine_data.selected_periods.morning && record.medicine_data.selected_days.morning.length > 0 && !addedPeriods.has("morning")) {
+          // Show all medications regardless of day - show all periods that are configured
+          // Only skip if the medicine has an end_date that has passed (for historical viewing)
+          if (!isEndDatePassed) {
+            // Show all periods that are configured, regardless of which days they're scheduled for
+            if (record.medicine_data.selected_periods.morning && record.medicine_data.selected_days.morning.length > 0) {
               all.push(buildEntry("morning"));
             }
-            if (record.medicine_data.selected_periods.noon && record.medicine_data.selected_days.noon.length > 0 && !addedPeriods.has("noon")) {
+            if (record.medicine_data.selected_periods.noon && record.medicine_data.selected_days.noon.length > 0) {
               all.push(buildEntry("noon"));
             }
-            if (record.medicine_data.selected_periods.evening && record.medicine_data.selected_days.evening.length > 0 && !addedPeriods.has("evening")) {
+            if (record.medicine_data.selected_periods.evening && record.medicine_data.selected_days.evening.length > 0) {
               all.push(buildEntry("evening"));
             }
           }
@@ -421,53 +395,61 @@ const MedicationTable = ({setNewMedicineContainer, selectedPatient, setSelectedP
     return true;
   });
 
-  const handleExportExcel = () => {
+  const handleExportExcel = async () => {
     if (data.length === 0) {
       window.alert("Dışa aktarılacak planlı ilaç bulunmuyor.");
       return;
     }
 
-    const headers = [
-      "İlaç Adı",
-      "Dozaj",
-      "Kategori",
-      "Zaman",
-      "Günler",
-      "Hazırlandı mı?",
-    ];
+    try {
+      // Dynamically import XLSX library
+      const XLSX = await import('xlsx');
 
-    const csvRows = [];
-    csvRows.push(headers.join(","));
+      // Create a new workbook
+      const workbook = XLSX.utils.book_new();
 
-    data.forEach((row) => {
-      const daysString = Array.isArray(row.days) ? row.days.join(" - ") : "";
-      const preparedString = row.prepared ? "Evet" : "Hayır";
-      csvRows.push(
-        [
-          row.name,
-          row.dosage,
-          row.category,
-          row.period,
-          daysString,
-          preparedString,
-        ].join(",")
-      );
-    });
+      // Prepare data for Excel
+      const excelData = [
+        ["İlaç Adı", "Dozaj", "Kategori", "Zaman", "Günler", "Hazırlandı mı?"],
+        ...data.map((row) => {
+          const daysString = Array.isArray(row.days) ? row.days.join(" - ") : "";
+          const preparedString = row.prepared ? "Evet" : "Hayır";
+          return [
+            row.name,
+            row.dosage,
+            row.category,
+            row.period,
+            daysString,
+            preparedString,
+          ];
+        })
+      ];
 
-    const csvContent = "\uFEFF" + csvRows.join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
+      // Create worksheet
+      const worksheet = XLSX.utils.aoa_to_sheet(excelData);
+      
+      // Set column widths
+      worksheet['!cols'] = [
+        { wch: 25 }, // İlaç Adı
+        { wch: 15 }, // Dozaj
+        { wch: 20 }, // Kategori
+        { wch: 12 }, // Zaman
+        { wch: 30 }, // Günler
+        { wch: 15 }  // Hazırlandı mı?
+      ];
 
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute(
-      "download",
-      `hasta_${selectedPatient.patient_id}_ilac_takvimi.csv`
-    );
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+      // Add worksheet to workbook
+      XLSX.utils.book_append_sheet(workbook, worksheet, "İlaç Takvimi");
+
+      // Generate Excel file
+      const fileName = `hasta_${selectedPatient.patient_id}_ilac_takvimi.xlsx`;
+      XLSX.writeFile(workbook, fileName);
+
+      window.alert("Excel dosyası başarıyla oluşturuldu.");
+    } catch (error) {
+      console.error("Excel export error:", error);
+      window.alert("Excel dosyası oluşturulurken bir hata oluştu.");
+    }
   };
 
   if (isLoading) {

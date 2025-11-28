@@ -21,7 +21,12 @@ function Sidebar() {
 
     const handleHoverChange = (index) => {
         let newSidebarHovers = [false, false, false, false];
-        navigate("/dashboard/"+hover_index_map[index])
+        if (index > 1) {
+            navigate("/")
+        }
+        else {
+            navigate("/dashboard/"+hover_index_map[index])
+        }
         newSidebarHovers[index] = true;
         setSidebarHovers(newSidebarHovers);
         if (sidebarHovers[index] === newSidebarHovers[index]) {

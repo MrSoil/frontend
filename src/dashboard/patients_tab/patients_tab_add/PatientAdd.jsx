@@ -176,6 +176,8 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
   const [contactRelation, setContactRelation] = useState("");
   const [contactEducation, setContactEducation] = useState("");
   const [contactWorkStatus, setContactWorkStatus] = useState("");
+  const [contactInsurance, setContactInsurance] = useState("");
+  const [contactIncome, setContactIncome] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [contactAddress, setContactAddress] = useState("");
   const [contactWorkAddress, setContactWorkAddress] = useState("");
@@ -352,171 +354,177 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
     const newErrors = {};
 
     // Page 0: Patient personal + education/security
-      if (!firstname.trim()) newErrors.firstname = "Ad zorunludur.";
-      else if (!nameRegex.test(firstname.trim()))
-        newErrors.firstname = "Ad en az 2 karakter ve yalnızca harf/boşluk/(-) içermelidir.";
+    if (page >= 0) {
+          if (!firstname.trim()) newErrors.firstname = "Ad zorunludur.";
+          else if (!nameRegex.test(firstname.trim()))
+              newErrors.firstname = "Ad en az 2 karakter ve yalnızca harf/boşluk/(-) içermelidir.";
 
-      if (!lastname.trim()) newErrors.lastname = "Soyad zorunludur.";
-      else if (!nameRegex.test(lastname.trim()))
-        newErrors.lastname = "Soyad en az 2 karakter ve yalnızca harf/boşluk/(-) içermelidir.";
+          if (!lastname.trim()) newErrors.lastname = "Soyad zorunludur.";
+          else if (!nameRegex.test(lastname.trim()))
+              newErrors.lastname = "Soyad en az 2 karakter ve yalnızca harf/boşluk/(-) içermelidir.";
 
-      if (!citizenID.trim()) newErrors.citizenID = "TC Kimlik Numarası zorunludur.";
-      else if (!/^\d{11}$/.test(citizenID)) newErrors.citizenID = "TC Kimlik No 11 haneli olmalıdır.";
-      else if (!validateTCKN(citizenID)) newErrors.citizenID = "TC Kimlik No geçersiz.";
+          if (!citizenID.trim()) newErrors.citizenID = "TC Kimlik Numarası zorunludur.";
+          else if (!/^\d{11}$/.test(citizenID)) newErrors.citizenID = "TC Kimlik No 11 haneli olmalıdır.";
+          else if (!validateTCKN(citizenID)) newErrors.citizenID = "TC Kimlik No geçersiz.";
 
-      if (fatherName.trim() && !nameRegex.test(fatherName.trim()))
-        newErrors.fatherName = "Baba adı yalnızca harf/boşluk/(-) içermelidir (min 2).";
-      if (motherName.trim() && !nameRegex.test(motherName.trim()))
-        newErrors.motherName = "Anne adı yalnızca harf/boşluk/(-) içermelidir (min 2).";
+          if (fatherName.trim() && !nameRegex.test(fatherName.trim()))
+              newErrors.fatherName = "Baba adı yalnızca harf/boşluk/(-) içermelidir (min 2).";
+          if (motherName.trim() && !nameRegex.test(motherName.trim()))
+              newErrors.motherName = "Anne adı yalnızca harf/boşluk/(-) içermelidir (min 2).";
 
-      if (!dateOfBirth) newErrors.dateOfBirth = "Doğum tarihi zorunludur.";
-      else if (!isPastDate(dateOfBirth)) newErrors.dateOfBirth = "Doğum tarihi geçmişte olmalıdır (1900 sonrası).";
-      else {
-        const birth = new Date(dateOfBirth + "T00:00:00");
-        const age = (Date.now() - birth.getTime()) / (365.25 * 24 * 3600 * 1000);
-        if (age <= 0 || age > 120) newErrors.dateOfBirth = "Yaş 0-120 aralığında olmalıdır.";
-      }
+          if (!dateOfBirth) newErrors.dateOfBirth = "Doğum tarihi zorunludur.";
+          else if (!isPastDate(dateOfBirth)) newErrors.dateOfBirth = "Doğum tarihi geçmişte olmalıdır (1900 sonrası).";
+          else {
+              const birth = new Date(dateOfBirth + "T00:00:00");
+              const age = (Date.now() - birth.getTime()) / (365.25 * 24 * 3600 * 1000);
+              if (age <= 0 || age > 120) newErrors.dateOfBirth = "Yaş 0-120 aralığında olmalıdır.";
+          }
 
-      if (!birthPlace) newErrors.birthPlace = "Doğum yeri zorunludur.";
-      else if (!provinces.includes(birthPlace)) newErrors.birthPlace = "Geçersiz doğum yeri.";
+          if (!birthPlace) newErrors.birthPlace = "Doğum yeri zorunludur.";
+          else if (!provinces.includes(birthPlace)) newErrors.birthPlace = "Geçersiz doğum yeri.";
 
-      if (!patientGender) newErrors.patientGender = "Cinsiyet zorunludur.";
-      else if (!genders.includes(patientGender)) newErrors.patientGender = "Geçersiz cinsiyet.";
+          if (!patientGender) newErrors.patientGender = "Cinsiyet zorunludur.";
+          else if (!genders.includes(patientGender)) newErrors.patientGender = "Geçersiz cinsiyet.";
 
-      if (!currentRelation) newErrors.currentRelation = "Medeni durum zorunludur.";
-      else if (!maritalStatuses.includes(currentRelation)) newErrors.currentRelation = "Geçersiz medeni durum.";
+          if (!currentRelation) newErrors.currentRelation = "Medeni durum zorunludur.";
+          else if (!maritalStatuses.includes(currentRelation)) newErrors.currentRelation = "Geçersiz medeni durum.";
 
-      if (!education) newErrors.education = "Öğrenim durumu zorunludur.";
-      else if (!educationStatuses.includes(education)) newErrors.education = "Geçersiz öğrenim durumu.";
+          if (!education) newErrors.education = "Öğrenim durumu zorunludur.";
+          else if (!educationStatuses.includes(education)) newErrors.education = "Geçersiz öğrenim durumu.";
 
-      if (!workStatus) newErrors.workStatus = "Çalışma durumu zorunludur.";
-      else if (!workStatuses.includes(workStatus)) newErrors.workStatus = "Geçersiz çalışma durumu.";
+          if (!workStatus) newErrors.workStatus = "Çalışma durumu zorunludur.";
+          else if (!workStatuses.includes(workStatus)) newErrors.workStatus = "Geçersiz çalışma durumu.";
 
-      if (!insurance) newErrors.insurance = "Sosyal güvence zorunludur.";
-      else if (!insurances.includes(insurance)) newErrors.insurance = "Geçersiz sosyal güvence.";
+          if (!insurance) newErrors.insurance = "Sosyal güvence zorunludur.";
+          else if (!insurances.includes(insurance)) newErrors.insurance = "Geçersiz sosyal güvence.";
 
-      if (patientHeight !== "" && patientHeight !== null) {
-        const h = Number(patientHeight);
-        if (!Number.isFinite(h)) newErrors.patientHeight = "Geçersiz sayı.";
-        else if (h < 50 || h > 250) newErrors.patientHeight = "Boy 50-250 cm aralığında olmalıdır.";
-      }
-      if (patientWeight !== "" && patientWeight !== null) {
-        const w = Number(patientWeight);
-        if (!Number.isFinite(w)) newErrors.patientWeight = "Geçersiz sayı.";
-        else if (w < 2 || w > 300) newErrors.patientWeight = "Kilo 2-300 kg aralığında olmalıdır.";
-      }
-      if (bloodType && !bloodTypes.includes(bloodType)) newErrors.bloodType = "Geçersiz kan grubu.";
+          if (patientHeight !== "" && patientHeight !== null) {
+              const h = Number(patientHeight);
+              if (!Number.isFinite(h)) newErrors.patientHeight = "Geçersiz sayı.";
+              else if (h < 50 || h > 250) newErrors.patientHeight = "Boy 50-250 cm aralığında olmalıdır.";
+          }
+          if (patientWeight !== "" && patientWeight !== null) {
+              const w = Number(patientWeight);
+              if (!Number.isFinite(w)) newErrors.patientWeight = "Geçersiz sayı.";
+              else if (w < 2 || w > 300) newErrors.patientWeight = "Kilo 2-300 kg aralığında olmalıdır.";
+          }
+          if (bloodType && !bloodTypes.includes(bloodType)) newErrors.bloodType = "Geçersiz kan grubu.";
 
-      if (income !== "" && income !== null) {
-        const inc = Number(income);
-        if (!Number.isFinite(inc)) newErrors.income = "Geçersiz sayı.";
-        else if (inc < 0) newErrors.income = "Gelir negatif olamaz.";
-        else if (inc > 1_000_000_000) newErrors.income = "Gelir çok yüksek görünüyor. (1.000.000.000+)";
+          if (income !== "" && income !== null) {
+              const inc = Number(income);
+              if (!Number.isFinite(inc)) newErrors.income = "Geçersiz sayı.";
+              else if (inc < 0) newErrors.income = "Gelir negatif olamaz.";
+              else if (inc > 1_000_000_000) newErrors.income = "Gelir çok yüksek görünüyor. (1.000.000.000+)";
+          }
       }
 
     // Page 1: Contact person (personal + communication)
-      if (!contactFirstname.trim()) newErrors.contactFirstname = "Ad zorunludur.";
-      else if (!nameRegex.test(contactFirstname.trim()))
-        newErrors.contactFirstname = "Ad en az 2 karakter ve yalnızca harf/boşluk/(-) içermelidir.";
+       if (page >= 1) {
+          if (!contactFirstname.trim()) newErrors.contactFirstname = "Ad zorunludur.";
+          else if (!nameRegex.test(contactFirstname.trim()))
+              newErrors.contactFirstname = "Ad en az 2 karakter ve yalnızca harf/boşluk/(-) içermelidir.";
 
-      if (!contactLastname.trim()) newErrors.contactLastname = "Soyad zorunludur.";
-      else if (!nameRegex.test(contactLastname.trim()))
-        newErrors.contactLastname = "Soyad en az 2 karakter ve yalnızca harf/boşluk/(-) içermelidir.";
+          if (!contactLastname.trim()) newErrors.contactLastname = "Soyad zorunludur.";
+          else if (!nameRegex.test(contactLastname.trim()))
+              newErrors.contactLastname = "Soyad en az 2 karakter ve yalnızca harf/boşluk/(-) içermelidir.";
 
-      if (!contactCitizenID.trim()) newErrors.contactCitizenID = "TC Kimlik Numarası zorunludur.";
-      else if (!/^\d{11}$/.test(contactCitizenID))
-        newErrors.contactCitizenID = "TC Kimlik No 11 haneli olmalıdır.";
-      else if (!validateTCKN(contactCitizenID))
-        newErrors.contactCitizenID = "TC Kimlik No geçersiz.";
+          if (!contactCitizenID.trim()) newErrors.contactCitizenID = "TC Kimlik Numarası zorunludur.";
+          else if (!/^\d{11}$/.test(contactCitizenID))
+              newErrors.contactCitizenID = "TC Kimlik No 11 haneli olmalıdır.";
+          else if (!validateTCKN(contactCitizenID))
+              newErrors.contactCitizenID = "TC Kimlik No geçersiz.";
 
-      if (contactFatherName.trim() && !nameRegex.test(contactFatherName.trim()))
-        newErrors.contactFatherName = "Baba adı yalnızca harf/boşluk/(-) içermelidir (min 2).";
-      if (contactMotherName.trim() && !nameRegex.test(contactMotherName.trim()))
-        newErrors.contactMotherName = "Anne adı yalnızca harf/boşluk/(-) içermelidir (min 2).";
+          if (contactFatherName.trim() && !nameRegex.test(contactFatherName.trim()))
+              newErrors.contactFatherName = "Baba adı yalnızca harf/boşluk/(-) içermelidir (min 2).";
+          if (contactMotherName.trim() && !nameRegex.test(contactMotherName.trim()))
+              newErrors.contactMotherName = "Anne adı yalnızca harf/boşluk/(-) içermelidir (min 2).";
 
-      if (!contactDateOfBirth) newErrors.contactDateOfBirth = "Doğum tarihi zorunludur.";
-      else if (!isPastDate(contactDateOfBirth))
-        newErrors.contactDateOfBirth = "Doğum tarihi geçmişte olmalıdır (1900 sonrası).";
+          if (!contactDateOfBirth) newErrors.contactDateOfBirth = "Doğum tarihi zorunludur.";
+          else if (!isPastDate(contactDateOfBirth))
+              newErrors.contactDateOfBirth = "Doğum tarihi geçmişte olmalıdır (1900 sonrası).";
 
-      if (!contactBirthPlace) newErrors.contactBirthPlace = "Doğum yeri zorunludur.";
-      else if (!provinces.includes(contactBirthPlace))
-        newErrors.contactBirthPlace = "Geçersiz doğum yeri.";
+          if (!contactBirthPlace) newErrors.contactBirthPlace = "Doğum yeri zorunludur.";
+          else if (!provinces.includes(contactBirthPlace))
+              newErrors.contactBirthPlace = "Geçersiz doğum yeri.";
 
-      if (!contactPatientGender) newErrors.contactPatientGender = "Cinsiyet zorunludur.";
-      else if (!genders.includes(contactPatientGender))
-        newErrors.contactPatientGender = "Geçersiz cinsiyet.";
+          if (!contactPatientGender) newErrors.contactPatientGender = "Cinsiyet zorunludur.";
+          else if (!genders.includes(contactPatientGender))
+              newErrors.contactPatientGender = "Geçersiz cinsiyet.";
 
-      if (!contactCurrentRelationship) {
-        newErrors.contactCurrentRelationship = "Medeni durum zorunludur.";
-      } else if (!maritalStatuses.includes(contactCurrentRelationship)) {
-        newErrors.contactCurrentRelationship = "Geçersiz medeni durum.";
+          if (!contactCurrentRelationship) {
+              newErrors.contactCurrentRelationship = "Medeni durum zorunludur.";
+          } else if (!maritalStatuses.includes(contactCurrentRelationship)) {
+              newErrors.contactCurrentRelationship = "Geçersiz medeni durum.";
+          }
+
+          if (!contactRelation) newErrors.contactRelation = "Yakınlık derecesi zorunludur.";
+          else if (!relationDegrees.includes(contactRelation))
+              newErrors.contactRelation = "Geçersiz yakınlık derecesi.";
+
+          if (!contactEducation) newErrors.contactEducation = "Öğrenim durumu zorunludur.";
+          else if (!educationStatuses.includes(contactEducation))
+              newErrors.contactEducation = "Geçersiz öğrenim durumu.";
+
+          // Work status (free text) optional
+
+          // Phone: exactly 9 digits (as requested)
+          if (!/^\d{9}$/.test(contactPhone)) newErrors.contactPhone = "Telefon 9 haneli olmalıdır.";
+
+          if (contactEmail && !emailRegex.test(contactEmail)) newErrors.contactEmail = "E-posta formatı geçersiz.";
       }
-
-      if (!contactRelation) newErrors.contactRelation = "Yakınlık derecesi zorunludur.";
-      else if (!relationDegrees.includes(contactRelation))
-        newErrors.contactRelation = "Geçersiz yakınlık derecesi.";
-
-      if (!contactEducation) newErrors.contactEducation = "Öğrenim durumu zorunludur.";
-      else if (!educationStatuses.includes(contactEducation))
-        newErrors.contactEducation = "Geçersiz öğrenim durumu.";
-
-      // Work status (free text) optional
-
-      // Phone: exactly 9 digits (as requested)
-      if (!/^\d{9}$/.test(contactPhone)) newErrors.contactPhone = "Telefon 9 haneli olmalıdır.";
-
-      if (contactEmail && !emailRegex.test(contactEmail)) newErrors.contactEmail = "E-posta formatı geçersiz.";
       // Addresses optional
+      // Page 2: Health (mostly optional, but sanity checks)
+      if (page >= 2) {
+          const longTextLimit = 2000;
+          if (system1.length > longTextLimit) newErrors.system1 = "Maksimum 2000 karakter.";
+          if (system2.length > longTextLimit) newErrors.system2 = "Maksimum 2000 karakter.";
+          if (system3.length > longTextLimit) newErrors.system3 = "Maksimum 2000 karakter.";
+          if (system4.length > longTextLimit) newErrors.system4 = "Maksimum 2000 karakter.";
 
-    // Page 2: Health (mostly optional, but sanity checks)
-      const longTextLimit = 2000;
-      if (system1.length > longTextLimit) newErrors.system1 = "Maksimum 2000 karakter.";
-      if (system2.length > longTextLimit) newErrors.system2 = "Maksimum 2000 karakter.";
-      if (system3.length > longTextLimit) newErrors.system3 = "Maksimum 2000 karakter.";
-      if (system4.length > longTextLimit) newErrors.system4 = "Maksimum 2000 karakter.";
+          // Page 3: Care
+          // If 'Var' -> details required
+          if (isThereFallStory === "Var" && !fallingStory.trim())
+              newErrors.fallingStory = "Lütfen detay belirtiniz.";
+          if (dengeYurumeBozuklugu === "Var" && !balanceState.trim())
+              newErrors.balanceState = "Lütfen detay belirtiniz.";
+          if (needsPhysicalSupport === "Var" && !physicalSupportDetails.trim())
+              newErrors.physicalSupportDetails = "Lütfen detay belirtiniz.";
+          if (nutritionType === "Diğer" && !nutritionOther.trim())
+              newErrors.nutritionOther = "Beslenme şeklini belirtiniz.";
+          if (specialDiet === "Evet" && !specialDietDetails.trim())
+              newErrors.specialDietDetails = "Diyet detayını belirtiniz.";
+          if (oralEngel === "Evet" && !oralEngelDetails.trim())
+              newErrors.oralEngelDetails = "Engel detayını belirtiniz.";
+          if (kiloKaybi6Ay === "Evet" && !kiloKaybiDetails.trim())
+              newErrors.kiloKaybiDetails = "Detay belirtiniz.";
+          if (mealsWith.includes("Diğer") && !mealsWithOther.trim())
+              newErrors.mealsWithOther = "Diğer alanını belirtiniz.";
 
-    // Page 3: Care
-      // If 'Var' -> details required
-      if (isThereFallStory === "Var" && !fallingStory.trim())
-        newErrors.fallingStory = "Lütfen detay belirtiniz.";
-      if (dengeYurumeBozuklugu === "Var" && !balanceState.trim())
-        newErrors.balanceState = "Lütfen detay belirtiniz.";
-      if (needsPhysicalSupport === "Var" && !physicalSupportDetails.trim())
-        newErrors.physicalSupportDetails = "Lütfen detay belirtiniz.";
-      if (nutritionType === "Diğer" && !nutritionOther.trim())
-        newErrors.nutritionOther = "Beslenme şeklini belirtiniz.";
-      if (specialDiet === "Evet" && !specialDietDetails.trim())
-        newErrors.specialDietDetails = "Diyet detayını belirtiniz.";
-      if (oralEngel === "Evet" && !oralEngelDetails.trim())
-        newErrors.oralEngelDetails = "Engel detayını belirtiniz.";
-      if (kiloKaybi6Ay === "Evet" && !kiloKaybiDetails.trim())
-        newErrors.kiloKaybiDetails = "Detay belirtiniz.";
-      if (mealsWith.includes("Diğer") && !mealsWithOther.trim())
-        newErrors.mealsWithOther = "Diğer alanını belirtiniz.";
-
-      // Numbers sanity
-      if (mainMealsPerDay !== "" && (!Number.isInteger(Number(mainMealsPerDay)) || Number(mainMealsPerDay) < 0 || Number(mainMealsPerDay) > 10))
-        newErrors.mainMealsPerDay = "0-10 arasında tam sayı giriniz.";
-      if (snacksPerDay !== "" && (!Number.isInteger(Number(snacksPerDay)) || Number(snacksPerDay) < 0 || Number(snacksPerDay) > 10))
-        newErrors.snacksPerDay = "0-10 arasında tam sayı giriniz.";
-      if (waterLitersPerDay !== "" && (Number(waterLitersPerDay) < 0 || Number(waterLitersPerDay) > 20))
-        newErrors.waterLitersPerDay = "0-20 litre aralığında olmalıdır.";
-
+          // Numbers sanity
+          if (mainMealsPerDay !== "" && (!Number.isInteger(Number(mainMealsPerDay)) || Number(mainMealsPerDay) < 0 || Number(mainMealsPerDay) > 10))
+              newErrors.mainMealsPerDay = "0-10 arasında tam sayı giriniz.";
+          if (snacksPerDay !== "" && (!Number.isInteger(Number(snacksPerDay)) || Number(snacksPerDay) < 0 || Number(snacksPerDay) > 10))
+              newErrors.snacksPerDay = "0-10 arasında tam sayı giriniz.";
+          if (waterLitersPerDay !== "" && (Number(waterLitersPerDay) < 0 || Number(waterLitersPerDay) > 20))
+              newErrors.waterLitersPerDay = "0-20 litre aralığında olmalıdır.";
+      }
+      if (page >= 3) {
     // Page 4: Psychological
   // Require selection for yes/no where relevant to avoid missing info
-      if (!psychiatricMedUse) newErrors.psychiatricMedUse = "Seçim yapınız.";
-      if (psychiatricMedUse === "No" && psychiatricMedNoReason.length > 0 && psychiatricMedNoReason.length > 2000)
-        newErrors.psychiatricMedNoReason = "Maksimum 2000 karakter.";
-      if (!depressionScale) newErrors.depressionScale = "Seçim yapınız.";
-      if (depressionScale === "No" && depressionScaleNoReason.length > 2000)
-        newErrors.depressionScaleNoReason = "Maksimum 2000 karakter.";
-      if (!moca) newErrors.moca = "Seçim yapınız.";
-      if (moca === "No" && mocaNoReason.length > 2000) newErrors.mocaNoReason = "Maksimum 2000 karakter.";
-      if (!miniCog) newErrors.miniCog = "Seçim yapınız.";
-      if (miniCog === "No" && miniCogNoReason.length > 2000) newErrors.miniCogNoReason = "Maksimum 2000 karakter.";
-      if (!socialReport) newErrors.socialReport = "Seçim yapınız.";
-      if (socialReport === "No" && socialReportNoReason.length > 2000)
-        newErrors.socialReportNoReason = "Maksimum 2000 karakter.";
+          if (!psychiatricMedUse) newErrors.psychiatricMedUse = "Seçim yapınız.";
+          if (psychiatricMedUse === "No" && psychiatricMedNoReason.length > 0 && psychiatricMedNoReason.length > 2000)
+              newErrors.psychiatricMedNoReason = "Maksimum 2000 karakter.";
+          if (!depressionScale) newErrors.depressionScale = "Seçim yapınız.";
+          if (depressionScale === "No" && depressionScaleNoReason.length > 2000)
+              newErrors.depressionScaleNoReason = "Maksimum 2000 karakter.";
+          if (!moca) newErrors.moca = "Seçim yapınız.";
+          if (moca === "No" && mocaNoReason.length > 2000) newErrors.mocaNoReason = "Maksimum 2000 karakter.";
+          if (!miniCog) newErrors.miniCog = "Seçim yapınız.";
+          if (miniCog === "No" && miniCogNoReason.length > 2000) newErrors.miniCogNoReason = "Maksimum 2000 karakter.";
+          if (!socialReport) newErrors.socialReport = "Seçim yapınız.";
+          if (socialReport === "No" && socialReportNoReason.length > 2000)
+              newErrors.socialReportNoReason = "Maksimum 2000 karakter.";
+      }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -546,7 +554,7 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
                     'type': 'new',
                     'patient_personal_info': {
                         "section_1": {
-                            "image": base64Image.replace(/^data:image\/(png|jpg|jpeg);base64,/, ""),
+                            "image": base64Image ? base64Image.replace(/^data:image\/(png|jpg|jpeg);base64,/, "") : "",
                             "firstname": firstname.charAt(0).toUpperCase() + firstname.slice(1).toLowerCase(),
                             "lastname": lastname.toUpperCase(),
                             "citizenID": citizenID,
@@ -580,6 +588,8 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
                             "contactRelation": contactRelation,
                             "contactEducation": contactEducation,
                             "contactWorkStatus": contactWorkStatus,
+                            "contactInsurance": contactInsurance,
+                            "contactIncome": contactIncome,
                             "contactPhone": contactPhone,
                             "contactAddress": contactAddress,
                             "contactWorkAddress": contactWorkAddress,
@@ -650,11 +660,13 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
         window.alert("Danışan Başarıyla Kayıt Edildi");
         onCancelClick();
       } else {
-        window.alert("Danışan Kaydedilemedi!");
+        // Show error reason if available
+        const errorMessage = data.data ? (typeof data.data === 'string' ? data.data : JSON.stringify(data.data)) : (data.message || "Bilinmeyen bir hata oluştu.");
+        window.alert(`Danışan Kaydedilemedi!\n\nHata: ${errorMessage}`);
       }
     } catch (error) {
       console.error("Error:", error);
-      window.alert("Danışan Kaydedilemedi!");
+      window.alert(`Danışan Kaydedilemedi!\n\nHata: ${error.message || "Bilinmeyen bir hata oluştu."}`);
     }
   };
 
@@ -676,7 +688,16 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
   const setPatientPage4 = () => setPatientPage(4);
 
   const setPatientPageInc = () => {
-    if (!validatePage(patientPage)) return;
+    if (!validatePage(patientPage)) {
+      // Show validation errors to user
+      const errorMessages = Object.values(errors).filter(msg => msg).join('\n');
+      if (errorMessages) {
+        window.alert(`Lütfen aşağıdaki hataları düzeltin:\n\n${errorMessages}`);
+      } else {
+        window.alert("Lütfen tüm zorunlu alanları doldurun.");
+      }
+      return;
+    }
     if (patientPage === 4) setPatientPage(0);
     else setPatientPage(patientPage + 1);
   };
@@ -1278,13 +1299,55 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
 
               <div className="patienceFormContainer">
                 <FormControl fullWidth sx={{ m: 1 }}>
-                  <InputLabel htmlFor="outlined-adornment-contactWorkStatus">İşi</InputLabel>
-                  <OutlinedInput
+                  <InputLabel id="contactWorkStatus-label">Çalışma Durumu</InputLabel>
+                  <Select
+                    labelId="contactWorkStatus-label"
                     id="outlined-adornment-contactWorkStatus"
-                    type="text"
+                    label="Çalışma Durumu"
                     value={contactWorkStatus}
-                    label="İşi"
                     onChange={(e) => setContactWorkStatus(e.target.value)}
+                  >
+                    {workStatuses.map((ws) => (
+                      <MenuItem key={ws} value={ws}>
+                        {ws}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </div>
+
+              <div className="patienceFormContainer">
+                <FormControl fullWidth sx={{ m: 1 }}>
+                  <InputLabel id="contactInsurance-label">Sosyal Güvence</InputLabel>
+                  <Select
+                    labelId="contactInsurance-label"
+                    id="outlined-adornment-contactInsurance"
+                    label="Sosyal Güvence"
+                    value={contactInsurance}
+                    onChange={(e) => setContactInsurance(e.target.value)}
+                  >
+                    {insurances.map((ins) => (
+                      <MenuItem key={ins} value={ins}>
+                        {ins}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </div>
+
+              <div className="patienceFormContainer">
+                <FormControl fullWidth sx={{ m: 1 }}>
+                  <InputLabel htmlFor="outlined-adornment-contactIncome">Aylık Gelir</InputLabel>
+                  <OutlinedInput
+                    id="outlined-adornment-contactIncome"
+                    type="text"
+                    inputMode="numeric"
+                    label="Aylık Gelir"
+                    value={contactIncome}
+                    onChange={(e) => {
+                      const digits = e.target.value.replace(/\D/g, "");
+                      setContactIncome(digits);
+                    }}
                   />
                 </FormControl>
               </div>

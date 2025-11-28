@@ -51,11 +51,16 @@ function PatientRemove({ setGeneralTab, setRemoveTab }) {
   }
 
   const onRemoveClick = () => {
-    fetch(`${API_BASE_URL}/patients/?email=${user.email}&type=delete_patient&patient_id=${removePatient.patient_id}`, {
+    fetch(`${API_BASE_URL}/patients/`, {
       method: "DELETE",
       headers: {
         'Content-Type': 'application/json'
-      }
+      },
+      body: JSON.stringify({
+        email: user.email,
+        type: "delete_patient",
+        patient_id: removePatient.patient_id
+      })
     })
     .then(r => r.json())
     .then(resp => {
@@ -63,11 +68,15 @@ function PatientRemove({ setGeneralTab, setRemoveTab }) {
       if (resp.status === "success") {
         getPatients(user.email);
         setRemovePatient(null)
+      } else {
+        window.alert(`Hasta silinirken bir hata oluştu: ${resp.error || resp.message || "Bilinmeyen hata"}`);
+        setIsLoading(false);
       }
     }
     )
     .catch(error => {
       console.log(error)
+      window.alert("Hasta silinirken bir hata oluştu. Lütfen tekrar deneyin.");
       setIsLoading(false);
     });
 

@@ -56,7 +56,7 @@ h5 {
 }
 
 .care-column .MuiAccordion-root {
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 .care-column .MuiAccordionSummary-root {
@@ -128,7 +128,7 @@ h5 {
 
 
 .care-notes {
-  height: 350px;
+  height: 320px;
   overflow-y: scroll;
 }
 
