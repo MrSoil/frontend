@@ -63,6 +63,7 @@ const PatientEditModal = ({ isOpen, onClose, selectedPatient, onSave }) => {
   const bloodTypes = ["A RH+", "B RH+", "AB RH+", "0 RH+", "A RH-", "B RH-", "AB RH-", "0 RH-"];
   const relationDegrees = ["1. Derece Akraba", "2. Derece Akraba", "3. Derece Akraba", "4. Derece Akraba", "Akraba Değil"];
   const mealWithOptions = ["Tek Başına", "Eşiyle", "Ailesiyle", "Bakıcısıyla", "Diğer"];
+  const onGoingCareOptions = ["Aktif Yaşam", "Destekli Yaşam", "Hafıza Bakımı", "Palyatif Bakım"];
   const careDevices = [
     "Oksijen Cihazı", "Mama Cihazı", "Walker/Baston", "Tekerlekli Sandalye",
     "Protez/Ortez", "İşitme cihazı", "Bez", "Yatak Malzemesi",
@@ -1216,14 +1217,10 @@ const PatientEditModal = ({ isOpen, onClose, selectedPatient, onSave }) => {
             <FormControl fullWidth sx={{ m: 1 }}>
               <Autocomplete
                 multiple
-                freeSolo
-                options={[]}
+                options={onGoingCareOptions}
                 value={formData.onGoingCare || []}
                 onChange={(e, newValue) => {
-                  const cleaned = Array.from(
-                    new Set((newValue || []).map((v) => (typeof v === "string" ? v.trim() : "")).filter(Boolean))
-                  ).slice(0, 30);
-                  handleChange("onGoingCare", cleaned);
+                  handleChange("onGoingCare", newValue || []);
                 }}
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => <Chip variant="outlined" label={option} {...getTagProps({ index })} key={index} />)
@@ -1647,7 +1644,7 @@ const PatientEditModal = ({ isOpen, onClose, selectedPatient, onSave }) => {
                   onClick={() => handleFileDownload(formData.psychiatricMedPrescriptionFile, "psychiatric_prescription.pdf")}
                   sx={{ fontFamily: "RedHatDisplay", textTransform: "none" }}
                 >
-                  Mevcut Dosyayı İndir
+                  Mevcut Dosya
                 </Button>
               )}
               <Button
@@ -1691,7 +1688,7 @@ const PatientEditModal = ({ isOpen, onClose, selectedPatient, onSave }) => {
                   onClick={() => handleFileDownload(formData.depressionScaleFile, "depression_scale.pdf")}
                   sx={{ fontFamily: "RedHatDisplay", textTransform: "none" }}
                 >
-                  Mevcut Dosyayı İndir
+                  Mevcut Dosya
                 </Button>
               )}
               <Button
@@ -1735,7 +1732,7 @@ const PatientEditModal = ({ isOpen, onClose, selectedPatient, onSave }) => {
                   onClick={() => handleFileDownload(formData.mocaFile, "moca.pdf")}
                   sx={{ fontFamily: "RedHatDisplay", textTransform: "none" }}
                 >
-                  Mevcut Dosyayı İndir
+                  Mevcut Dosya
                 </Button>
               )}
               <Button
@@ -1779,7 +1776,7 @@ const PatientEditModal = ({ isOpen, onClose, selectedPatient, onSave }) => {
                   onClick={() => handleFileDownload(formData.miniCogFile, "mini_cog.pdf")}
                   sx={{ fontFamily: "RedHatDisplay", textTransform: "none" }}
                 >
-                  Mevcut Dosyayı İndir
+                  Mevcut Dosya
                 </Button>
               )}
               <Button
@@ -1823,7 +1820,7 @@ const PatientEditModal = ({ isOpen, onClose, selectedPatient, onSave }) => {
                   onClick={() => handleFileDownload(formData.socialReportFile, "social_report.pdf")}
                   sx={{ fontFamily: "RedHatDisplay", textTransform: "none" }}
                 >
-                  Mevcut Dosyayı İndir
+                  Mevcut Dosya
                 </Button>
               )}
               <Button

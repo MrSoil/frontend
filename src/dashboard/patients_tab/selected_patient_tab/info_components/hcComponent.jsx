@@ -429,6 +429,15 @@ function HCList({ selectedPatient, setNewHCContainer, hcDate, setHcDate }) {
     setNewHCContainer(true)
   }
 
+  const handleYearChange = (event) => {
+    const newYear = event.target.value;
+    setSelectedYear(newYear);
+    // Reset month to first month of new year
+    setSelectedMonth(0);
+    // Reset week to first week
+    setSelectedWeekIndex(0);
+  };
+
   const handleMonthChange = (event) => {
     const newMonth = event.target.value;
     setSelectedMonth(newMonth);
@@ -439,6 +448,12 @@ function HCList({ selectedPatient, setNewHCContainer, hcDate, setHcDate }) {
   const handleWeekChange = (event) => {
     setSelectedWeekIndex(event.target.value);
   };
+
+  // Generate year options for current year and previous year
+  const yearOptions = [];
+  for (let year = currentDate.getFullYear() - 1; year <= currentDate.getFullYear(); year++) {
+    yearOptions.push(year);
+  }
 
   // Generate month options for current year and previous year
   const monthOptions = [];
@@ -460,6 +475,21 @@ function HCList({ selectedPatient, setNewHCContainer, hcDate, setHcDate }) {
         </Typography>
         
         <Stack direction="row" spacing={2} sx={{ mb: 1 }}>
+          <FormControl size="small" sx={{ minWidth: 120 }}>
+            <InputLabel style={{'zIndex': 0}}>Yıl</InputLabel>
+            <Select
+              value={selectedYear}
+              label="Yıl"
+              onChange={handleYearChange}
+            >
+              {yearOptions.map((year) => (
+                <MenuItem key={year} value={year}>
+                  {year}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          
           <FormControl size="small" sx={{ minWidth: 150 }}>
             <InputLabel style={{'zIndex': 0}}>Ay</InputLabel>
             <Select

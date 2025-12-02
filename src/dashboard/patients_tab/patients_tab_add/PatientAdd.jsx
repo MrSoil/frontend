@@ -132,6 +132,7 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
   const bloodTypes = ["A RH+", "B RH+", "AB RH+", "0 RH+", "A RH-", "B RH-", "AB RH-", "0 RH-"];
   const relationDegrees = ["1. Derece Akraba", "2. Derece Akraba", "3. Derece Akraba", "4. Derece Akraba", "Akraba Değil"];
   const mealWithOptions = ["Tek Başına", "Eşiyle", "Ailesiyle", "Bakıcısıyla", "Diğer"];
+  const onGoingCareOptions = ["Aktif Yaşam", "Destekli Yaşam", "Hafıza Bakımı", "Palyatif Bakım"];
 
   // UI State
   const [errors, setErrors] = useState({});
@@ -1750,14 +1751,10 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
                 <FormControl fullWidth sx={{ m: 1 }}>
                   <Autocomplete
                     multiple
-                    freeSolo
-                    options={[]}
+                    options={onGoingCareOptions}
                     value={onGoingCare}
                     onChange={(e, newValue) => {
-                      const cleaned = Array.from(
-                        new Set((newValue || []).map((v) => (typeof v === "string" ? v.trim() : "")).filter(Boolean))
-                      ).slice(0, 30);
-                      setOnGoingCare(cleaned);
+                      setOnGoingCare(newValue || []);
                     }}
                     renderTags={(value, getTagProps) =>
                       value.map((option, index) => <Chip variant="outlined" label={option} {...getTagProps({ index })} />)
@@ -1768,18 +1765,6 @@ function PatientAdd({ setGeneralTab, setAddTab }) {
                         label="Devam Eden Bakım Durumu"
                         placeholder=" "
                         helperText=" "
-                        onPaste={(e) => {
-                          const parts = e.clipboardData
-                            .getData("text")
-                            .split(/[,\n;]+/)
-                            .map((s) => s.trim())
-                            .filter(Boolean);
-                          if (parts.length) {
-                            e.preventDefault();
-                            const next = Array.from(new Set([...(onGoingCare || []), ...parts])).slice(0, 30);
-                            setOnGoingCare(next);
-                          }
-                        }}
                       />
                     )}
                     onKeyDown={(e) => {
