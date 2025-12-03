@@ -132,7 +132,7 @@ function SelectedPatientTab({ setGeneralTab, setSelectedPatient, selectedPatient
               </div>
               
               <Stack sx={{ width: 1, height: 1 }}>
-              <Grid style={{'justifyContent': 'space-between'}} container spacing={0} sx={{ width: 1, height: 1 }}>
+              <Grid style={{'justifyContent': 'space-between', "height": "80vh"}} container spacing={0} sx={{ width: 1 }}>
                 <Grid size={6} sx={{ width: 0.25, height: 0.985 }}>
 
                   <PatientProfileComponent selectedPatient={selectedPatient}

@@ -525,7 +525,7 @@ function HCList({ selectedPatient, setNewHCContainer, hcDate, setHcDate }) {
 
         <Divider sx={{ mb: 1 }} />
 
-        <Box sx={{ flexGrow: 1, overflow: 'auto', height: '170px' }}>
+        <Box sx={{ flexGrow: 1, overflow: 'auto' }} className="responsive-overflow">
           <List sx={{ p: 0 }}>
             {daysInWeek.map((day, index) => (
               <React.Fragment key={index}>

@@ -106,12 +106,6 @@ body {
     position: absolute;
 }
 
-.dashboard-content-background {
-    position: absolute !important;
-    top: 20px;
-    left: 180px;
-}
-
 .dashboard-content-container {
     margin: 10px 0 0 0;
     display: grid;
@@ -288,3 +282,29 @@ textarea:not(:placeholder-shown) + label{
 /*  color: #000000 !important;*/
 /*  border: none !important;*/
 /*}*/
+
+
+.responsive-overflow {
+    max-height: 18vh
+}
+
+@media screen and (max-height: 900px) {
+    .responsive-overflow {
+        max-height: 15vh
+    }
+}
+
+.dashboard-content-background {
+    position: absolute !important;
+    top: 20px;
+    left: 9vw;
+}
+
+@media screen and (max-width: 1600px) {
+    .dashboard-content-background {
+        position: absolute !important;
+        top: 20px;
+        left: 10vw;
+    }
+}
+

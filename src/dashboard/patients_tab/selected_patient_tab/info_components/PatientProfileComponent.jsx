@@ -574,7 +574,7 @@ function PatientProfileComponent({ selectedPatient, setNewRoomContainer, setNewC
                 Düzenle
               </Button>
             </Stack>
-            <List sx={{ p: 0, flexGrow: 1 }}>
+            <List sx={{ p: 0, flexGrow: 1 }} style={{"overflowY": "auto", "height": "30vh"}}>
               {vitalTypes.map((key, index) => {
                 const score = patientVitals[key] || [];
                 return (
